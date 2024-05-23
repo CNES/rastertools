@@ -1,0 +1,57 @@
+{
+	"rastertypes": [
+		{
+			"name": "RGB_TIF",
+			"product_pattern": "^RGB_TIF_(?P<date>[0-9_]*)_test\\.(tif|TIF)$",
+			"bands": [
+				{
+					"channel": "red",
+					"description": "red"
+				},
+				{
+					"channel": "green",
+					"description": "green"
+				},
+				{
+					"channel": "blue",
+					"description": "blue"
+				},
+				{
+					"channel": "nir",
+					"description": "nir"
+				}
+			],
+			"date_format": "%Y%m%d_%H%M%S",
+			"nodata": 0
+		},
+		{
+			"name": "RGB_TIF_ARCHIVE",
+			"product_pattern": "^RGB_TIF_(?P<date>[0-9\\_]*).*$",
+			"bands_pattern": "^TIF_(?P<bands>{}).*\\.(tif|TIF)$",
+			"bands": [
+				{
+					"channel": "red",
+					"identifier": "r",
+					"description": "red"
+				},
+				{
+					"channel": "green",
+					"identifier": "g",
+					"description": "green"
+				},
+				{
+					"channel": "blue",
+					"identifier": "b",
+					"description": "blue"
+				},
+				{
+					"channel": "nir",
+					"identifier": "n",
+					"description": "nir"
+				}
+			],
+			"date_format": "%Y%m%d_%H%M%S",
+			"nodata": 0
+		}
+	]
+}

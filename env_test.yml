@@ -1,0 +1,11 @@
+name: rastertools
+
+channels:
+  - conda-forge
+
+dependencies:
+  - pytest 
+  - pytest-cov 
+  - sphinx 
+  - sphinx_rtd_theme
+

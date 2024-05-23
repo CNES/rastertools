@@ -1,0 +1,7 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32630" } },
+"features": [
+{ "type": "Feature", "properties": { "b1.name": "ndvi", "b1.date": "20180928-105515", "b1.median": 0.61723983287811279, "b1.majority": -1.0, "b1.minority": -0.99672669172286987, "b1.unique": 987130, "b1.percentile_10": 0.23887100666761399, "b1.percentile_90": 0.92893081903457642 }, "geometry": { "type": "Polygon", "coordinates": [ [ [ 742910.0, 4848610.0 ], [ 742910.0, 4836910.0 ], [ 754890.0, 4836910.0 ], [ 754890.0, 4848610.0 ], [ 742910.0, 4848610.0 ] ] ] } }
+]
+}
