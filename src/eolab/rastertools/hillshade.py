@@ -123,6 +123,10 @@ class Hillshade(Rastertool, Windowable):
             radius = int(delta / np.tan(np.radians(self.elevation)))
         else:
             radius = self.radius
+      
+        if radius > 512:
+            _logger.info(f"The radius value is {radius} exceeding 512 threshold."
+                         "Radius is reset to 512.")
 
         if radius >= min(self.window_size) / 2:
             raise ValueError(f"The radius (option --radius, value={radius}) must be strictly "
