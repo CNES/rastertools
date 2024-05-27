@@ -70,3 +70,18 @@ def with_bands_arguments(parser):
         dest="all_bands",
         action="store_true",
         help="Compute all bands")
+
+def with_max_radius_arguments(parser):
+    """Add argument to set the max accepted radius value of hillshade computation
+
+    Args:
+        parser: the argument parser to configure
+    """
+    # argument to set the max radius
+    parser.add_argument(
+        '-mr',
+        '--max_radius',
+        dest="max_radius",
+        default=None,
+        type=int,
+        help="Threshold of max radius, default: None")

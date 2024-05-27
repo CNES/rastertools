@@ -71,6 +71,7 @@ def create_argparser(rastertools_parsers):
              "that lists the input files to process (one input file per line in .lst)")
     cli.with_outputdir_arguments(parser)
     cli.with_window_arguments(parser)
+    cli.with_max_radius_arguments(parser)
 
     # set the function to call when this subcommand is called
     parser.set_defaults(func=create_hillshade)
@@ -93,5 +94,6 @@ def create_hillshade(args) -> Hillshade:
     # set up config with args values
     tool.with_output(args.output)
     tool.with_windows(args.window_size, args.pad)
+    tool.with_max_radius(args.max_radius)
 
     return tool

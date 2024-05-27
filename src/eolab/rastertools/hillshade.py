@@ -64,6 +64,7 @@ class Hillshade(Rastertool, Windowable):
         """
         super().__init__()
         self.with_windows()
+        self.with_max_radius()
 
         self._elevation = elevation
         self._azimuth = azimuth
@@ -124,9 +125,10 @@ class Hillshade(Rastertool, Windowable):
         else:
             radius = self.radius
       
-        if radius > 512:
-            _logger.info(f"The radius value is {radius} exceeding 512 threshold."
-                         "Radius is reset to 512.")
+        if self.max_radius and radius > self.max_radius:
+            _logger.info(f"The radius value is {radius} exceeding {self.max_radius} threshold. "
+                         f"Radius is reset to {self.max_radius}.")
+            radius = self.max_radius
 
         if radius >= min(self.window_size) / 2:
             raise ValueError(f"The radius (option --radius, value={radius}) must be strictly "
