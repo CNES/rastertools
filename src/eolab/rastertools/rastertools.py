@@ -54,11 +54,6 @@ class Rastertool(ABC):
         """Dir where to store intermediate VRT images"""
         return self.outputdir or "." if self.keep_vrt else None
 
-    @property
-    def max_radius(self) -> int:
-        """Max value of the radius (in pixel)"""
-        return self._max_radius
-
     def with_output(self, outputdir: str = "."):
         """Set up the output.
 
@@ -90,20 +85,6 @@ class Rastertool(ABC):
             possible to chain the with... calls (fluent API)
         """
         self._keep_vrt = keep_vrt
-        return self
-
-    def with_max_radius(self, max_radius: int=None):
-        """Set up the max accepted radius (in pixels).
-
-        Args:
-            max_radius (int, optional, default=None):
-                Output max accepted radius value. If none, it is set to None.
-
-        Returns:
-            :obj:`eolab.rastertools.Rastertool`: The current instance so that it is
-            possible to chain the with... calls (fluent API)
-        """
-        self._max_radius = max_radius
         return self
 
     def process_files(self, inputfiles: List[str]):
