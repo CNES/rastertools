@@ -50,6 +50,13 @@ def create_argparser(rastertools_parsers):
                     " elevation angle. If not set, it is automatically computed from"
                     " the range of altitudes in the digital model."
         },
+        "max_radius": {
+            "required": False,
+            "type": int,
+            "help": "Max accepted radius value (in pixels)"
+                    " If not set, radius will not be limited"
+                    " and it can increase computation time."
+        },
         "resolution": {
             "default": 0.5,
             "required": True,
@@ -71,7 +78,6 @@ def create_argparser(rastertools_parsers):
              "that lists the input files to process (one input file per line in .lst)")
     cli.with_outputdir_arguments(parser)
     cli.with_window_arguments(parser)
-    cli.with_max_radius_arguments(parser)
 
     # set the function to call when this subcommand is called
     parser.set_defaults(func=create_hillshade)
@@ -89,11 +95,10 @@ def create_hillshade(args) -> Hillshade:
         :obj:`eolab.rastertools.Hillshade`: The configured rastertool to run
     """
     # create the rastertool object
-    tool = Hillshade(args.elevation, args.azimuth, args.resolution, args.radius)
+    tool = Hillshade(args.elevation, args.azimuth, args.resolution, args.radius, args.max_radius)
 
     # set up config with args values
     tool.with_output(args.output)
     tool.with_windows(args.window_size, args.pad)
-    tool.with_max_radius(args.max_radius)
 
     return tool

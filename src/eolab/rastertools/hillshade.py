@@ -48,7 +48,7 @@ class Hillshade(Rastertool, Windowable):
     The output image is a mask where pixels corresponding to hillshades equal to 1.
     """
 
-    def __init__(self, elevation: float, azimuth: float, resolution: float, radius: int = None):
+    def __init__(self, elevation: float, azimuth: float, resolution: float, radius: int = None, max_radius: int = None):
         """ Constructor
 
         Args:
@@ -61,15 +61,18 @@ class Hillshade(Rastertool, Windowable):
             radius (int):
                 Max distance from current point (in pixels) to consider
                 for evaluating the hillshade
+            max_radius (int):
+                Max accepted radius value (in pixels) to consider
+                for evaluating the hillshade
         """
         super().__init__()
         self.with_windows()
-        self.with_max_radius()
 
         self._elevation = elevation
         self._azimuth = azimuth
         self._resolution = resolution
         self._radius = radius
+        self._max_radius = max_radius
 
     @property
     def elevation(self):
@@ -91,6 +94,11 @@ class Hillshade(Rastertool, Windowable):
         """Max distance from current point (in pixels) to consider
         for evaluating the max elevation angle"""
         return self._radius
+
+    @property
+    def max_radius(self):
+        """Max accepted radius (in pixels)"""
+        return self._max_radius
 
     def process_file(self, inputfile: str) -> List[str]:
         """Compute Hillshade for the input file
