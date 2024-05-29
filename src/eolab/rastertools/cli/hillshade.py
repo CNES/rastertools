@@ -43,12 +43,12 @@ def create_argparser(rastertools_parsers):
             "help": "Azimuth of the sun in degrees, [0°, 360°] "
                     "where 0°=north, 90°=east, 180°=south and 270°=west"
         },
-        "max_radius": {
+        "radius": {
             "required": False,
             "type": int,
-            "help": "Max accepted distance (in pixels) around a point to evaluate horizontal"
-                    " elevation angle. Radius is automatically computed from"
-                    " the range of altitudes in the digital model and it should not exceed max_radius"
+            "help": "Max distance (in pixels) around a point to evaluate horizontal"
+                    " elevation angle. If not set, it is automatically computed from"
+                    " the range of altitudes in the digital model"
         },
         "resolution": {
             "default": 0.5,
@@ -88,7 +88,7 @@ def create_hillshade(args) -> Hillshade:
         :obj:`eolab.rastertools.Hillshade`: The configured rastertool to run
     """
     # create the rastertool object
-    tool = Hillshade(args.elevation, args.azimuth, args.resolution, args.max_radius)
+    tool = Hillshade(args.elevation, args.azimuth, args.resolution, args.radius)
 
     # set up config with args values
     tool.with_output(args.output)

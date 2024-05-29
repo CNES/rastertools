@@ -48,7 +48,7 @@ class Hillshade(Rastertool, Windowable):
     The output image is a mask where pixels corresponding to hillshades equal to 1.
     """
 
-    def __init__(self, elevation: float, azimuth: float, resolution: float, max_radius: int = None):
+    def __init__(self, elevation: float, azimuth: float, resolution: float, radius: int = None):
         """ Constructor
 
         Args:
@@ -58,8 +58,8 @@ class Hillshade(Rastertool, Windowable):
                 Azimuth of the sun (in degrees)
             resolution (float):
                 Resolution of a raster pixel (in meter)
-            max_radius (int):
-                Max distance accepted from current point (in pixels) to consider
+            radius (int):
+                Max distance from current point (in pixels) to consider
                 for evaluating the hillshade
         """
         super().__init__()
@@ -68,7 +68,7 @@ class Hillshade(Rastertool, Windowable):
         self._elevation = elevation
         self._azimuth = azimuth
         self._resolution = resolution
-        self._max_radius = max_radius
+        self._radius = radius
 
     @property
     def elevation(self):
@@ -86,10 +86,10 @@ class Hillshade(Rastertool, Windowable):
         return self._resolution
 
     @property
-    def max_radius(self):
+    def radius(self):
         """Max distance from current point (in pixels) to consider
         for evaluating the max elevation angle"""
-        return self._max_radius
+        return self._radius
 
     def process_file(self, inputfile: str) -> List[str]:
         """Compute Hillshade for the input file
@@ -119,14 +119,15 @@ class Hillshade(Rastertool, Windowable):
                 wmin = min(wmin, float(data.min())) if wmin is not None else float(data.min())
 
         delta = int((wmax - wmin) / self.resolution)
-        radius = int(delta / np.tan(np.radians(self.elevation)))
+        optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
 
-        if self.max_radius is not None and radius > self.max_radius:
-            _logger.info(f"The radius value is {radius} exceeding {self.max_radius} threshold. "
-                         f"Radius is set to {self.max_radius}.")
-            radius = self.max_radius
+        if self.radius is not None and optimal_radius > self.radius:
+            _logger.warning(f"The radius value is {optimal_radius} exceeding {self.radius} threshold. "
+                            f"Oversized radius affects computation time and so radius is set to {self.radius}. "
+                            "Result may miss some shadow pixels.")
+            optimal_radius = self.radius
 
-        if radius >= min(self.window_size) / 2:
+        if optimal_radius >= min(self.window_size) / 2:
             raise ValueError(f"The radius (option --radius, value={radius}) must be strictly "
                              "less than half the size of the window (option --window_size, "
                              f"value={min(self.window_size)})")
@@ -145,7 +146,7 @@ class Hillshade(Rastertool, Windowable):
             "elevation": self.elevation,
             "azimuth": self.azimuth,
             "resolution": self.resolution,
-            "radius": radius
+            "radius": optimal_radius
         }
         hillshade.configure(hillshade_conf)
 
@@ -153,7 +154,7 @@ class Hillshade(Rastertool, Windowable):
         compute_sliding(
             inputfile, output_image, hillshade,
             window_size=self.window_size,
-            window_overlap=radius,
+            window_overlap=optimal_radius,
             pad_mode=self.pad_mode)
 
         return [output_image.as_posix()]

@@ -11,7 +11,7 @@ computes the shadows of the ground surface (buildings, trees, etc.).
 
   $ rastertools hillshade --help
   usage: rastertools hillshade [-h] --elevation ELEVATION --azimuth AZIMUTH
-                               [--radius RADIUS] [--max_radius MAX_RADIUS]  --resolution RESOLUTION 
+                               [--radius RADIUS]  --resolution RESOLUTION 
                                [-o OUTPUT] [-ws WINDOW_SIZE]
                                [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
                                inputs [inputs ...]
@@ -32,7 +32,7 @@ computes the shadows of the ground surface (buildings, trees, etc.).
                           90°=zenith and 0°=horizon
     --azimuth AZIMUTH     Azimuth of the sun in degrees, [0°, 360°] where
                           0°=north, 90°=east, 180°=south and 270°=west
-    --max_radius MAX_RADIUS       Max accepted distance (in pixels) around a point to evaluate
+    --radius RADIUS       Max distance (in pixels) around a point to evaluate
                           horizontal elevation angle
     --resolution RESOLUTION
                           Pixel resolution in meter
