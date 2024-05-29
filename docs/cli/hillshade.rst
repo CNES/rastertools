@@ -32,10 +32,8 @@ computes the shadows of the ground surface (buildings, trees, etc.).
                           90°=zenith and 0°=horizon
     --azimuth AZIMUTH     Azimuth of the sun in degrees, [0°, 360°] where
                           0°=north, 90°=east, 180°=south and 270°=west
-    --radius RADIUS       Max distance (in pixels) around a point to evaluate
+    --max_radius MAX_RADIUS       Max accepted distance (in pixels) around a point to evaluate
                           horizontal elevation angle
-    --max_radius MAX_RADIUS
-                          Max accepted radius value in pixels
     --resolution RESOLUTION
                           Pixel resolution in meter
     -o OUTPUT, --output OUTPUT

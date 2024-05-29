@@ -48,7 +48,7 @@ class Hillshade(Rastertool, Windowable):
     The output image is a mask where pixels corresponding to hillshades equal to 1.
     """
 
-    def __init__(self, elevation: float, azimuth: float, resolution: float, radius: int = None, max_radius: int = None):
+    def __init__(self, elevation: float, azimuth: float, resolution: float, max_radius: int = None):
         """ Constructor
 
         Args:
@@ -58,11 +58,8 @@ class Hillshade(Rastertool, Windowable):
                 Azimuth of the sun (in degrees)
             resolution (float):
                 Resolution of a raster pixel (in meter)
-            radius (int):
-                Max distance from current point (in pixels) to consider
-                for evaluating the hillshade
             max_radius (int):
-                Max accepted radius value (in pixels) to consider
+                Max distance accepted from current point (in pixels) to consider
                 for evaluating the hillshade
         """
         super().__init__()
@@ -71,7 +68,6 @@ class Hillshade(Rastertool, Windowable):
         self._elevation = elevation
         self._azimuth = azimuth
         self._resolution = resolution
-        self._radius = radius
         self._max_radius = max_radius
 
     @property
@@ -90,14 +86,9 @@ class Hillshade(Rastertool, Windowable):
         return self._resolution
 
     @property
-    def radius(self):
+    def max_radius(self):
         """Max distance from current point (in pixels) to consider
         for evaluating the max elevation angle"""
-        return self._radius
-
-    @property
-    def max_radius(self):
-        """Max accepted radius (in pixels)"""
         return self._max_radius
 
     def process_file(self, inputfile: str) -> List[str]:
@@ -114,28 +105,25 @@ class Hillshade(Rastertool, Windowable):
         outdir = Path(self.outputdir)
         output_image = outdir.joinpath(f"{utils.get_basename(inputfile)}-hillshade.tif")
 
-        if self.radius is None:
-            # compute the radius from data range
-            # radius represents the max distance of buildings that can create a hillshade
-            # considering the sun elevation.
-            wmax = None
-            wmin = None
-            with rasterio.open(inputfile) as src:
-                if src.count != 1:
-                    raise ValueError("Invalid input file, it must contain a single band.")
-                for ji, window in src.block_windows(1):
-                    data = src.read(1, masked=True, window=window)
-                    wmax = max(wmax, float(data.max())) if wmax is not None else float(data.max())
-                    wmin = min(wmin, float(data.min())) if wmin is not None else float(data.min())
+        # compute the radius from data range
+        # radius represents the max distance of buildings that can create a hillshade
+        # considering the sun elevation.
+        wmax = None
+        wmin = None
+        with rasterio.open(inputfile) as src:
+            if src.count != 1:
+                raise ValueError("Invalid input file, it must contain a single band.")
+            for ji, window in src.block_windows(1):
+                data = src.read(1, masked=True, window=window)
+                wmax = max(wmax, float(data.max())) if wmax is not None else float(data.max())
+                wmin = min(wmin, float(data.min())) if wmin is not None else float(data.min())
 
-            delta = int((wmax - wmin) / self.resolution)
-            radius = int(delta / np.tan(np.radians(self.elevation)))
-        else:
-            radius = self.radius
-      
-        if self.max_radius and radius > self.max_radius:
+        delta = int((wmax - wmin) / self.resolution)
+        radius = int(delta / np.tan(np.radians(self.elevation)))
+
+        if self.max_radius is not None and radius > self.max_radius:
             _logger.info(f"The radius value is {radius} exceeding {self.max_radius} threshold. "
-                         f"Radius is reset to {self.max_radius}.")
+                         f"Radius is set to {self.max_radius}.")
             radius = self.max_radius
 
         if radius >= min(self.window_size) / 2:
