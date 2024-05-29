@@ -115,12 +115,10 @@ class Hillshade(Rastertool, Windowable):
             with rasterio.open(inputfile) as src:
                 if src.count != 1:
                     raise ValueError("Invalid input file, it must contain a single band.")
-                h, w = src.height, src.width
-                win_size = min(self.window_size)
-                for i in range(h // win_size + 1):
-                    for j in range(w // win_size + 1):
+                for i in range(src.height // self.window_size[0]  + 1):
+                    for j in range(src.width // self.window_size[1]  + 1):
                         # Oversized window (out of source bounds) is handled by Window
-                        win = Window(i*win_size, j*win_size, win_size, win_size)
+                        win = Window(i*self.window_size[0] , j*self.window_size[1] , self.window_size[0] , self.window_size[1])
                         data = src.read(1, masked=True, window=win)
                         if np.isnan(data).all():    continue
                         wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
