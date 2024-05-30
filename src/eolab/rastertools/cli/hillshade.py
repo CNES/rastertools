@@ -48,7 +48,7 @@ def create_argparser(rastertools_parsers):
             "type": int,
             "help": "Max distance (in pixels) around a point to evaluate horizontal"
                     " elevation angle. If not set, it is automatically computed from"
-                    " the range of altitudes in the digital model"
+                    " the range of altitudes in the digital model."
         },
         "resolution": {
             "default": 0.5,

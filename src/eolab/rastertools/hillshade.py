@@ -121,14 +121,15 @@ class Hillshade(Rastertool, Windowable):
         delta = int((wmax - wmin) / self.resolution)
         optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
 
-        if self.radius is not None and optimal_radius > self.radius:
-            _logger.warning(f"The radius value is {optimal_radius} exceeding {self.radius} threshold. "
+        if self.radius is None or optimal_radius <= self.radius:
+            self.radius = optimal_radius
+        else:
+            _logger.warning(f"The optimal radius value is {optimal_radius} exceeding {self.radius} threshold. "
                             f"Oversized radius affects computation time and so radius is set to {self.radius}. "
                             "Result may miss some shadow pixels.")
-            optimal_radius = self.radius
 
-        if optimal_radius >= min(self.window_size) / 2:
-            raise ValueError(f"The radius (option --radius, value={radius}) must be strictly "
+        if self.radius >= min(self.window_size) / 2:
+            raise ValueError(f"The radius (option --radius, value={self.radius}) must be strictly "
                              "less than half the size of the window (option --window_size, "
                              f"value={min(self.window_size)})")
 
@@ -146,7 +147,7 @@ class Hillshade(Rastertool, Windowable):
             "elevation": self.elevation,
             "azimuth": self.azimuth,
             "resolution": self.resolution,
-            "radius": optimal_radius
+            "radius": self.radius
         }
         hillshade.configure(hillshade_conf)
 
@@ -154,7 +155,7 @@ class Hillshade(Rastertool, Windowable):
         compute_sliding(
             inputfile, output_image, hillshade,
             window_size=self.window_size,
-            window_overlap=optimal_radius,
+            window_overlap=self.radius,
             pad_mode=self.pad_mode)
 
         return [output_image.as_posix()]
