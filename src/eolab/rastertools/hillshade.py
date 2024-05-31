@@ -106,30 +106,34 @@ class Hillshade(Rastertool, Windowable):
         outdir = Path(self.outputdir)
         output_image = outdir.joinpath(f"{utils.get_basename(inputfile)}-hillshade.tif")
 
-        if self.radius is None:
-            # compute the radius from data range
-            # radius represents the max distance of buildings that can create a hillshade
-            # considering the sun elevation.
-            wmax = None
-            wmin = None
-            with rasterio.open(inputfile) as src:
-                if src.count != 1:
-                    raise ValueError("Invalid input file, it must contain a single band.")
-                for i in range(src.height // self.window_size[0]  + 1):
-                    for j in range(src.width // self.window_size[1]  + 1):
-                        # Oversized window (out of source bounds) is handled by Window
-                        win = Window(i*self.window_size[0] , j*self.window_size[1] , self.window_size[0] , self.window_size[1])
-                        data = src.read(1, masked=True, window=win)
-                        if not np.isnan(data).all():
-                            wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
-                            wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
-            delta = int((wmax - wmin) / self.resolution)
-            radius = int(delta / np.tan(np.radians(self.elevation)))
-        else:
-            radius = self.radius
+        # compute the radius from data range
+        # radius represents the max distance of buildings that can create a hillshade
+        # considering the sun elevation.
+        wmax = None
+        wmin = None
+        with rasterio.open(inputfile) as src:
+            if src.count != 1:
+                raise ValueError("Invalid input file, it must contain a single band.")
+            for i in range(src.height // self.window_size[0]  + 1):
+                for j in range(src.width // self.window_size[1]  + 1):
+                    # Oversized window (out of source bounds) is handled by Window
+                    win = Window(i*self.window_size[0] , j*self.window_size[1] , self.window_size[0] , self.window_size[1])
+                    data = src.read(1, masked=True, window=win)
+                    if not np.isnan(data).all():
+                        wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
+                        wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
+        delta = int((wmax - wmin) / self.resolution)
+        optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
 
-        if radius >= min(self.window_size) / 2:
-            raise ValueError(f"The radius (option --radius, value={radius}) must be strictly "
+        if self.radius is None or optimal_radius <= self.radius:
+            self.radius = optimal_radius
+        else:
+            _logger.warning(f"The optimal radius value is {optimal_radius} exceeding {self.radius} threshold. "
+                            f"Oversized radius affects computation time and so radius is set to {self.radius}. "
+                            "Result may miss some shadow pixels.")
+
+        if self.radius >= min(self.window_size) / 2:
+            raise ValueError(f"The radius (option --radius, value={self.radius}) must be strictly "
                              "less than half the size of the window (option --window_size, "
                              f"value={min(self.window_size)})")
 
@@ -147,7 +151,7 @@ class Hillshade(Rastertool, Windowable):
             "elevation": self.elevation,
             "azimuth": self.azimuth,
             "resolution": self.resolution,
-            "radius": radius
+            "radius": self.radius
         }
         hillshade.configure(hillshade_conf)
 
@@ -155,7 +159,7 @@ class Hillshade(Rastertool, Windowable):
         compute_sliding(
             inputfile, output_image, hillshade,
             window_size=self.window_size,
-            window_overlap=radius,
+            window_overlap=self.radius,
             pad_mode=self.pad_mode)
 
         return [output_image.as_posix()]

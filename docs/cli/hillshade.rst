@@ -11,7 +11,7 @@ computes the shadows of the ground surface (buildings, trees, etc.).
 
   $ rastertools hillshade --help
   usage: rastertools hillshade [-h] --elevation ELEVATION --azimuth AZIMUTH
-                               [--radius RADIUS] --resolution RESOLUTION 
+                               [--radius RADIUS] --resolution RESOLUTION
                                [-o OUTPUT] [-ws WINDOW_SIZE]
                                [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
                                inputs [inputs ...]
