@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 
 import rasterio
+from rasterio.windows import Window
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
@@ -113,11 +114,14 @@ class Hillshade(Rastertool, Windowable):
         with rasterio.open(inputfile) as src:
             if src.count != 1:
                 raise ValueError("Invalid input file, it must contain a single band.")
-            for ji, window in src.block_windows(1):
-                data = src.read(1, masked=True, window=window)
-                wmax = max(wmax, float(data.max())) if wmax is not None else float(data.max())
-                wmin = min(wmin, float(data.min())) if wmin is not None else float(data.min())
-
+            for i in range(src.height // self.window_size[0]  + 1):
+                for j in range(src.width // self.window_size[1]  + 1):
+                    # Oversized window (out of source bounds) is handled by Window
+                    win = Window(i*self.window_size[0] , j*self.window_size[1] , self.window_size[0] , self.window_size[1])
+                    data = src.read(1, masked=True, window=win)
+                    if not np.isnan(data).all():
+                        wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
+                        wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
         delta = int((wmax - wmin) / self.resolution)
         optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
 
