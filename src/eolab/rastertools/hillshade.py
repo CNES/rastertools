@@ -120,10 +120,9 @@ class Hillshade(Rastertool, Windowable):
                         # Oversized window (out of source bounds) is handled by Window
                         win = Window(i*self.window_size[0] , j*self.window_size[1] , self.window_size[0] , self.window_size[1])
                         data = src.read(1, masked=True, window=win)
-                        if np.isnan(data).all():    continue
-                        wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
-                        wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
-
+                        if not np.isnan(data).all():
+                            wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
+                            wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
             delta = int((wmax - wmin) / self.resolution)
             radius = int(delta / np.tan(np.radians(self.elevation)))
         else:
