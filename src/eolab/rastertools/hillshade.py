@@ -92,12 +92,6 @@ class Hillshade(Rastertool, Windowable):
         for evaluating the max elevation angle"""
         return self._radius
 
-    @radius.setter
-    def radius(self, value):
-        """Set distance from current point (in pixels) to consider
-        for evaluating the max elevation angle"""
-        self._radius = value
-
     def process_file(self, inputfile: str) -> List[str]:
         """Compute Hillshade for the input file
 
@@ -132,7 +126,7 @@ class Hillshade(Rastertool, Windowable):
         optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
 
         if self.radius is None or optimal_radius <= self.radius:
-            self.radius = optimal_radius
+            self._radius = optimal_radius
             _logger.info(f"Using optimal radius {self.radius} for hillshade computation")
         else:
             _logger.warning(f"The optimal radius value is {optimal_radius} exceeding {self.radius} threshold. "
