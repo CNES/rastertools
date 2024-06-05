@@ -66,7 +66,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
                 raise ValueError(f"Invalid bands, all values are not in range [1, {src.count}]")
 
             # setup profile for output image
-            profile.update(driver='GTiff',
+            profile.update(driver='GTiff', compress='lzw',
                            blockxsize=blockxsize, blockysize=blockysize, tiled=True,
                            dtype=dtype, nodata=rasterprocessing.nodata or src.nodata,
                            count=len(bands))
