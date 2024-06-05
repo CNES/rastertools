@@ -92,6 +92,12 @@ class Hillshade(Rastertool, Windowable):
         for evaluating the max elevation angle"""
         return self._radius
 
+    @radius.setter
+    def radius(self, value):
+        """Set distance from current point (in pixels) to consider
+        for evaluating the max elevation angle"""
+        self._radius = value
+
     def process_file(self, inputfile: str) -> List[str]:
         """Compute Hillshade for the input file
 
