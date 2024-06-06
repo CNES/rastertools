@@ -126,7 +126,8 @@ class Hillshade(Rastertool, Windowable):
         optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
 
         if self.radius is None or optimal_radius <= self.radius:
-            self.radius = optimal_radius
+            self._radius = optimal_radius
+            _logger.info(f"Using optimal radius {self.radius} for hillshade computation")
         else:
             _logger.warning(f"The optimal radius value is {optimal_radius} exceeding {self.radius} threshold. "
                             f"Oversized radius affects computation time and so radius is set to {self.radius}. "
