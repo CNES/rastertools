@@ -58,7 +58,6 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
 
             # dtype of output data
             dtype = rasterprocessing.dtype or rasterio.float32
-
             # check band index and handle all bands options (when bands is an empty list)
             if bands is None or len(bands) == 0:
                 bands = src.indexes
@@ -68,7 +67,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
             # setup profile for output image
             profile.update(driver='GTiff', compress='lzw',
                            blockxsize=blockxsize, blockysize=blockysize, tiled=True,
-                           dtype=dtype, nodata=rasterprocessing.nodata or src.nodata,
+                           dtype=np.int8, nodata=rasterprocessing.nodata or src.nodata,
                            count=len(bands))
 
             with rasterio.open(output_image, "w", **profile):
