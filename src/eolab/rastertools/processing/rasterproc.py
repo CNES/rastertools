@@ -19,6 +19,8 @@ class RasterProcessing:
                  algo: Callable = None,
                  nodata: float = None,
                  dtype: np.dtype = None,
+                 compress: str = None,
+                 nbits: int = False,
                  per_band_algo: bool = False):
         """Constructor
 
@@ -35,6 +37,11 @@ class RasterProcessing:
             dtype (rasterio or numpy data type, optional, default=None):
                 Type of generated data. When None, the generated data are supposed
                 to be of the same type as input data.
+            compress (str, optional, default=None):
+                Set the compression to use.
+            nbits (int, optional, default=None):
+                Create a file with less than 8 bits per sample by passing a value from
+                1 to 7. The apparent pixel type shoul be Byte.
             per_band_algo (bool, optional, default=False):
                 Whether the algo is applied on a dataset that contains only one band
                 (per_band_algo=True) or on a dataset with all bands (per_band_algo=False)
@@ -44,6 +51,8 @@ class RasterProcessing:
         self._per_band_algo = per_band_algo
         self._nodata = nodata
         self._dtype = dtype
+        self._compress = compress
+        self._nbits = nbits
         self._arguments = dict()
 
     def __repr__(self) -> str:
@@ -74,6 +83,16 @@ class RasterProcessing:
     def dtype(self):
         """Type of the generated data"""
         return self._dtype
+
+    @property
+    def compress(self) -> str:
+        """Set the compression to use"""
+        return self._compress
+
+    @property
+    def nbits(self) -> int:
+        """bits size of the generated data"""
+        return self._nbits
 
     @property
     def description(self):

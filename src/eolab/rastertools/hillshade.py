@@ -139,8 +139,8 @@ class Hillshade(Rastertool, Windowable):
                              f"value={min(self.window_size)})")
 
         # Configure the processing
-        hillshade = RasterProcessing("hillshade", algo=algo.hillshade, dtype=np.float32,
-                                     per_band_algo=True)
+        hillshade = RasterProcessing("hillshade", algo=algo.hillshade, dtype=np.ubyte,
+                                     nbits=1, compress='lzw', per_band_algo=True)
         hillshade.with_arguments({
             "elevation": None,
             "azimuth": None,
