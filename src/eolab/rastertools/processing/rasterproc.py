@@ -41,7 +41,7 @@ class RasterProcessing:
                 Set the compression to use.
             nbits (int, optional, default=None):
                 Create a file with less than 8 bits per sample by passing a value from
-                1 to 7. The apparent pixel type shoul be Byte.
+                1 to 7. The apparent pixel type should be Byte.
             per_band_algo (bool, optional, default=False):
                 Whether the algo is applied on a dataset that contains only one band
                 (per_band_algo=True) or on a dataset with all bands (per_band_algo=False)
