@@ -493,7 +493,7 @@ def hillshade(input_data, **kwargs):
 
     # initialize output
     shape = input_data.shape
-    out = np.zeros(shape, dtype=np.float32)
+    out = np.zeros(shape, dtype=bool)
 
     # prevent nodata problem
     input_band = np.nan_to_num(input_data[0], copy=False, nan=0)
@@ -513,7 +513,6 @@ def hillshade(input_data, **kwargs):
 
     angles = np.arctan(ratios)
     out[0, radius: shape[1] - radius, radius: shape[2] - radius] = angles > elevation
-
     return out
 
 
