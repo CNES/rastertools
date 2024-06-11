@@ -71,7 +71,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
 
             # setup profile for output image
             profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
-                           tiled=True, dtype=dtype, nbits=1, compress = compress,
+                           tiled=True, dtype=dtype, nbits=nbits, compress = compress,
                            nodata=nodata, count=len(bands))
 
             with rasterio.open(output_image, "w", **profile):
