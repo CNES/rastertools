@@ -60,7 +60,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
             dtype = rasterprocessing.dtype or rasterio.float32
             processing_dtype = rasterprocessing.processing_dtype or dtype
             nbits = rasterprocessing.nbits
-            compress = rasterprocessing.compress
+            compress = rasterprocessing.compress or src.compression or 'lzw'
             nodata = rasterprocessing.nodata or src.nodata
 
             # check band index and handle all bands options (when bands is an empty list)
