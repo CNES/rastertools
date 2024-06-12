@@ -513,6 +513,7 @@ def hillshade(input_data, **kwargs):
 
     angles = np.arctan(ratios)
     out[0, radius: shape[1] - radius, radius: shape[2] - radius] = angles > elevation
+
     return out
 
 
