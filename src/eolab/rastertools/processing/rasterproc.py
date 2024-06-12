@@ -40,7 +40,7 @@ class RasterProcessing:
                 to be of the same type as input data.
             processing_dtype (rasterio or numpy data type, optional, default=None):
                 Type of processed data. When None, the processed data are supposed
-                to be of the same type as input data.
+                to be of the same type as dtype parameter.
             compress (str, optional, default=None):
                 Set the compression to use.
             nbits (int, optional, default=None):
