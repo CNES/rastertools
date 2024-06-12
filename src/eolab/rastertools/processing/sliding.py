@@ -57,8 +57,8 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
                 blockysize = utils.highest_power_of_2(src.height)
 
             # dtype and creation options of output data
-            dtype_algo = np.float32 or rasterio.float32
-            dtype = rasterprocessing.dtype
+            dtype = rasterprocessing.dtype or rasterio.float32
+            processing_dtype = rasterprocessing.processing_dtype or dtype
             nbits = rasterprocessing.nbits
             compress = rasterprocessing.compress
             nodata = rasterprocessing.nodata or src.nodata
@@ -71,7 +71,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
 
             # setup profile for output image
             profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
-                           tiled=True, dtype=dtype, nbits=nbits, compress = compress,
+                           tiled=True, dtype=dtype, nbits=nbits, compress=compress,
                            nodata=nodata, count=len(bands))
 
             with rasterio.open(output_image, "w", **profile):
@@ -102,7 +102,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
     process_map(_process_sliding, repeat(rasterprocessing),
                 repeat(input_image), repeat(output_image),
                 sliding_windows_bands, repeat(window_overlap),
-                repeat(pad_mode), repeat(dtype_algo),
+                repeat(pad_mode), repeat(processing_dtype),
                 repeat(write_lock),
                 **kwargs)
 

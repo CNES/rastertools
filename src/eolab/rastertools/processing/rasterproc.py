@@ -19,6 +19,7 @@ class RasterProcessing:
                  algo: Callable = None,
                  nodata: float = None,
                  dtype: np.dtype = None,
+                 processing_dtype: np.dtype = None,
                  compress: str = None,
                  nbits: int = False,
                  per_band_algo: bool = False):
@@ -37,6 +38,9 @@ class RasterProcessing:
             dtype (rasterio or numpy data type, optional, default=None):
                 Type of generated data. When None, the generated data are supposed
                 to be of the same type as input data.
+            processing_dtype (rasterio or numpy data type, optional, default=None):
+                Type of processed data. When None, the processed data are supposed
+                to be of the same type as input data.
             compress (str, optional, default=None):
                 Set the compression to use.
             nbits (int, optional, default=None):
@@ -51,6 +55,7 @@ class RasterProcessing:
         self._per_band_algo = per_band_algo
         self._nodata = nodata
         self._dtype = dtype
+        self._processing_dtype = processing_dtype
         self._compress = compress
         self._nbits = nbits
         self._arguments = dict()
@@ -83,6 +88,11 @@ class RasterProcessing:
     def dtype(self):
         """Type of the generated data"""
         return self._dtype
+
+    @property
+    def processing_dtype(self):
+        """Type of the processed data"""
+        return self._processing_dtype
 
     @property
     def compress(self) -> str:
