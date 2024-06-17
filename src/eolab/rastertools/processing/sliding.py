@@ -58,7 +58,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
 
             # dtype and creation options of output data
             dtype = rasterprocessing.dtype or rasterio.float32
-            processing_dtype = rasterprocessing.processing_dtype or dtype
+            in_dtype = rasterprocessing.in_dtype or dtype
             nbits = rasterprocessing.nbits
             compress = rasterprocessing.compress or src.compression or 'lzw'
             nodata = rasterprocessing.nodata or src.nodata
@@ -102,7 +102,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
     process_map(_process_sliding, repeat(rasterprocessing),
                 repeat(input_image), repeat(output_image),
                 sliding_windows_bands, repeat(window_overlap),
-                repeat(pad_mode), repeat(processing_dtype),
+                repeat(pad_mode), repeat(in_dtype),
                 repeat(write_lock),
                 **kwargs)
 
