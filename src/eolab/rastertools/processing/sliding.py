@@ -56,8 +56,12 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
             if src.height < blockysize:
                 blockysize = utils.highest_power_of_2(src.height)
 
-            # dtype of output data
+            # dtype and creation options of output data
             dtype = rasterprocessing.dtype or rasterio.float32
+            in_dtype = rasterprocessing.in_dtype or dtype
+            nbits = rasterprocessing.nbits
+            compress = rasterprocessing.compress or src.compression or 'lzw'
+            nodata = rasterprocessing.nodata or src.nodata
 
             # check band index and handle all bands options (when bands is an empty list)
             if bands is None or len(bands) == 0:
@@ -66,10 +70,9 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
                 raise ValueError(f"Invalid bands, all values are not in range [1, {src.count}]")
 
             # setup profile for output image
-            profile.update(driver='GTiff',
-                           blockxsize=blockxsize, blockysize=blockysize, tiled=True,
-                           dtype=dtype, nodata=rasterprocessing.nodata or src.nodata,
-                           count=len(bands))
+            profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
+                           tiled=True, dtype=dtype, nbits=nbits, compress=compress,
+                           nodata=nodata, count=len(bands))
 
             with rasterio.open(output_image, "w", **profile):
                 # file is created
@@ -99,7 +102,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
     process_map(_process_sliding, repeat(rasterprocessing),
                 repeat(input_image), repeat(output_image),
                 sliding_windows_bands, repeat(window_overlap),
-                repeat(pad_mode), repeat(dtype),
+                repeat(pad_mode), repeat(in_dtype),
                 repeat(write_lock),
                 **kwargs)
 
