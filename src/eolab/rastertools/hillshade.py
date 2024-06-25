@@ -123,7 +123,7 @@ class Hillshade(Rastertool, Windowable):
                         wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
                         wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
         delta = int((wmax - wmin) / self.resolution)
-        optimal_radius = int(delta / np.tan(np.radians(self.elevation)))
+        optimal_radius = abs(int(delta / np.tan(np.radians(self.elevation))))
 
         if self.radius is None or optimal_radius <= self.radius:
             self._radius = optimal_radius
