@@ -23,6 +23,21 @@ __refdir = utils4test.get_refdir("test_rasterproduct/")
 
 
 def test_rasterproduct_valid_parameters():
+    """
+    Test the initialization and properties of `RasterProduct` with valid parameters.
+
+    This test case verifies the proper creation and expected properties of `RasterProduct`
+    objects from various supported file formats and structures:
+    - Sentinel-2 L1C archive with one file per band.
+    - SPOT6 archive with one file for all bands.
+    - Standard raster file with multiple channels.
+
+    Assertions:
+        - `file` path, raster type, and channels match expected values.
+        - Band and mask files are correctly listed.
+        - Archive status and extracted metadata (e.g., date, tile, orbit, and satellite) match
+          expected values based on the input files.
+    """
     # archive with one file per band
     basename = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041"
     file = Path(
@@ -83,6 +98,18 @@ def test_rasterproduct_valid_parameters():
 
 
 def test_rasterproduct_invalid_parameters():
+    """
+    Test the handling of invalid parameters when creating a `RasterProduct`.
+
+    This test case verifies:
+    - Passing `None` as a file parameter raises a `ValueError`.
+    - Unrecognized raster type in input file raises a `ValueError`.
+    - Unsupported file types raise `ValueError` with appropriate error messages.
+
+    Assertions:
+        - Each invalid parameter triggers a `ValueError` with a specific message indicating
+          the type of parameter issue.
+    """
     with pytest.raises(ValueError) as exc:
         RasterProduct(None)
     assert "'file' cannot be None" in str(exc.value)
@@ -99,6 +126,18 @@ def test_rasterproduct_invalid_parameters():
 
 
 def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
+    """
+    Test the creation and processing of a Sentinel-2 L2A MAJA `RasterProduct`.
+
+    Parameters:
+        compare (bool): If True, compares generated files to reference files.
+        save_gen_as_ref (bool): If True, saves generated files as new reference files.
+
+    Assertions:
+        - Generated file paths match expected paths.
+        - Comparison or saving of reference files completes without errors.
+        - Raster data can be opened without errors.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -146,6 +185,23 @@ def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
 
 
 def test_create_product_S2_L1C(compare, save_gen_as_ref):
+    """
+    Test the creation and processing of a Sentinel-2 L1C `RasterProduct`.
+
+    This test case verifies:
+    - Creation of a single file for the L1C product and generation of clipped output.
+    - Comparison of generated files against reference files or saving as new references.
+    - Loading the generated raster using `rasterio` to confirm proper creation.
+
+    Parameters:
+        compare (bool): If True, compares generated files to reference files.
+        save_gen_as_ref (bool): If True, saves generated files as new reference files.
+
+    Assertions:
+        - Generated file paths and metadata match expected values.
+        - Reference comparison or saving completes as expected.
+        - Raster data can be loaded and accessed without errors.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -177,6 +233,23 @@ def test_create_product_S2_L1C(compare, save_gen_as_ref):
 
 
 def test_create_product_S2_L2A_SEN2CORE(compare, save_gen_as_ref):
+    """
+    Test the creation of a Sentinel-2 L2A SEN2CORE `RasterProduct`.
+
+    This test case verifies:
+    - Creation of the raster and VRT files.
+    - Comparison of generated files with reference files or saving as new references if needed.
+    - Loading the generated VRT to ensure accessibility with `rasterio`.
+
+    Parameters:
+        compare (bool): If True, compares generated files to reference files.
+        save_gen_as_ref (bool): If True, saves generated files as new reference files.
+
+    Assertions:
+        - VRT file path and metadata match expected output.
+        - Reference file operations are successful.
+        - The VRT file can be accessed with `rasterio` without issues.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -206,6 +279,23 @@ def test_create_product_S2_L2A_SEN2CORE(compare, save_gen_as_ref):
 
 
 def test_create_product_SPOT67(compare, save_gen_as_ref):
+    """
+    Test the creation of a SPOT6/7 `RasterProduct`.
+
+    This test case verifies:
+    - Creation of the product using SPOT6 input archive.
+    - Comparison of generated files with reference files or saving as new references if specified.
+    - Loading the raster using `rasterio` to verify successful file generation.
+
+    Parameters:
+        compare (bool): If True, compares generated files to reference files.
+        save_gen_as_ref (bool): If True, saves generated files as new reference files.
+
+    Assertions:
+        - Output paths and contents match expected values.
+        - Reference file comparison and saving are correctly performed.
+        - Raster data opens without errors in `rasterio`.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -235,6 +325,19 @@ def test_create_product_SPOT67(compare, save_gen_as_ref):
 
 
 def test_create_product_special_cases():
+    """
+    Test special cases in `RasterProduct` creation, including in-memory, directory, and VRT handling.
+
+    This test case covers:
+    - Creation of products in memory (with and without masks).
+    - Handling of product creation from VRT and directory inputs.
+    - Loading raster data via `rasterio` to ensure correct accessibility.
+
+    Assertions:
+        - VRT and in-memory files are correctly created.
+        - Directory input processing and band masking work as expected.
+        - Raster files can be opened without errors in `rasterio`.
+    """
     # SUPPORTED CASES
 
     # creation in memory (without masks)

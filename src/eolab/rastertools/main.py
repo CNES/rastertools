@@ -231,7 +231,6 @@ def run_tool(args):
 
             # launch process
             tool.process_files(inputs)
-
             _logger.info("Done!")
         except RastertoolConfigurationException as rce:
             _logger.exception(rce)

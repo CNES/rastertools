@@ -16,16 +16,38 @@ __refdir = utils4test.get_refdir("test_rasterproc/")
 
 
 def algo2D(bands):
+    """
+    Apply a scaling factor to each band independently.
+
+    Parameters:
+    bands (numpy.ndarray): A 2D array containing a single band of raster data.
+
+    Returns:
+    numpy.ndarray: An array with each element scaled by a factor of 2.
+    """
     out = 2. * bands
     return out
 
 
 def algo3D(bands):
+    """
+    Apply a scaling factor to all bands simultaneously.
+
+    Parameters:
+    bands (numpy.ndarray): A 3D array containing multiple bands of raster data.
+
+    Returns:
+    numpy.ndarray: An array with each element in all bands scaled by a factor of 2.
+    """
     out = 2. * bands
     return out
 
 
 def test_compute_sliding():
+    """
+    Test the compute_sliding function with 2D and 3D raster data.
+    It verifies that the computed output matches the expected transformation.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 

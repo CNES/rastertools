@@ -74,10 +74,10 @@ class Radioindice(Rastertool, Windowable):
         \\end{eqnarray}
 
     References:
-        Deering D.W., Rouse J.W., Haas R.H., and Schell J.A., 1975. Measuring forage production
+        `Deering D.W., Rouse J.W., Haas R.H., and Schell J.A., 1975. Measuring forage production
         of grazing units from Landsat MSS data. Pages 1169-1178 In: Cook J.J. (Ed.), Proceedings
         of the Tenth International Symposium on Remote Sensing of Environment (Ann Arbor, 1975),
-        Vol. 2, Ann Arbor, Michigan, USA.
+        Vol. 2, Ann Arbor, Michigan, USA. <https://www.scirp.org/reference/referencespapers?referenceid=1046714>`_
 
     """
 
@@ -91,8 +91,8 @@ class Radioindice(Rastertool, Windowable):
         rvi = \\frac{nir}{red}
 
     References:
-        Jordan C.F., 1969. Derivation of leaf area index from quality of light on the forest
-        floor. Ecology 50:663-666
+        `Jordan C.F., 1969. Derivation of leaf area index from quality of light on the forest
+        floor. Ecology 50:663-666 <https://esajournals.onlinelibrary.wiley.com/doi/10.2307/1936256>`_
     """
 
     # Vegetation indices: pvi
@@ -105,8 +105,8 @@ class Radioindice(Rastertool, Windowable):
         pvi = (nir - 0.90893 * red - 7.46216) * 0.74
 
     References:
-        Richardson A.J., Wiegand C.L., 1977. Distinguishing vegetation from soil background
-        information. Photogramm Eng Rem S 43-1541-1552
+        `Richardson A.J., Wiegand C.L., 1977. Distinguishing vegetation from soil background
+        information. Photogramm Eng Rem S 43-1541-1552 <https://www.asprs.org/wp-content/uploads/pers/1977journal/dec/1977_dec_1541-1552.pdf>`_
     """
 
     # Vegetation indices: savi
@@ -119,7 +119,7 @@ class Radioindice(Rastertool, Windowable):
         savi = \\frac{(nir - red) * (1. + 0.5)}{nir + red + 0.5}
 
     References:
-        Huete A.R., 1988. A soil-adjusted vegetation index (SAVI). Remote Sens Environ 25:295-309
+        `Huete A.R., 1988. A soil-adjusted vegetation index (SAVI). Remote Sens Environ 25:295-309 <https://www.sciencedirect.com/science/article/abs/pii/003442578890106X>`_
     """
 
     # Vegetation indices: tsavi
@@ -132,9 +132,9 @@ class Radioindice(Rastertool, Windowable):
         tsavi = \\frac{0.7 * (nir - 0.7 * red - 0.9)}{0.7 * nir + red + 0.08 * (1 + 0.7^2)}
 
     References:
-        Baret F., Guyot G., Major D., 1989. TSAVI: a vegetation index which minimizes soil
+        `Baret F., Guyot G., Major D., 1989. TSAVI: a vegetation index which minimizes soil
         brightness effects on LAI or APAR estimation. 12th Canadian Symposium on Remote
-        Sensing and IGARSS 1990, Vancouver, Canada, 07/10-14
+        Sensing and IGARSS 1990, Vancouver, Canada, 07/10-14. <https://www.researchgate.net/publication/3679422_TSAVI_A_vegetation_index_which_minimizes_soil_brightness_effects_on_LAI_and_APAR_estimation>`_
     """
 
     # Vegetation indices: msavi
@@ -153,12 +153,12 @@ class Radioindice(Rastertool, Windowable):
         \\end{eqnarray}
 
     References:
-        Qi J., Chehbouni A., Huete A.R., Kerr Y.H., 1994. Modified Soil Adjusted Vegetation
-        Index (MSAVI). Remote Sens Environ 48:119-126
+        `Qi J., Chehbouni A., Huete A.R., Kerr Y.H., 1994. Modified Soil Adjusted Vegetation
+        Index (MSAVI). Remote Sens Environ 48:119-126 <https://www.researchgate.net/publication/223906415_A_Modified_Soil_Adjusted_Vegetation_Index>`_
 
-        Qi J., Kerr Y., Chehbouni A., 1994. External factor consideration in vegetation index
+        `Qi J., Kerr Y., Chehbouni A., 1994. External factor consideration in vegetation index
         development. Proc. of Physical Measurements and Signatures in Remote Sensing,
-        ISPRS, 723-730.
+        ISPRS, 723-730. <https://www.academia.edu/20596726/External_factor_consideration_in_vegetation_index_development>`_
     """
 
     # Vegetation indices: msavi2
@@ -184,8 +184,8 @@ class Radioindice(Rastertool, Windowable):
         ipvi = \\frac{nir}{nir + red}
 
     References:
-        Crippen, R. E. 1990. Calculating the Vegetation Index Faster, Remote Sensing of
-        Environment, vol 34., pp. 71-73.
+        `Crippen, R. E. 1990. Calculating the Vegetation Index Faster, Remote Sensing of
+        Environment, vol 34., pp. 71-73. <https://www.sciencedirect.com/science/article/abs/pii/003442579090085Z>`_
     """
 
     # Vegetation indices: evi
@@ -272,7 +272,7 @@ class Radioindice(Rastertool, Windowable):
     ndbi = RadioindiceProcessing("ndbi").with_channels(
         [BandChannel.nir, BandChannel.mir])
     """Normalized Difference Built Up Index (nir, mir channels)
-
+    
     .. math::
 
         ndbi = \\frac{mir - nir}{mir + nir}
@@ -455,8 +455,12 @@ class Radioindice(Rastertool, Windowable):
 def compute_indices(input_image: str, image_channels: List[BandChannel],
                     indice_image: str, indices: List[RadioindiceProcessing],
                     window_size: tuple = (1024, 1024)):
-    """Compute the indices on the input image and produce a multiple bands
+    """
+    Compute the indices on the input image and produce a multiple bands
     image (one band per indice)
+
+    The possible indices are the following :
+    ndvi, tndvi, rvi, pvi, savi, tsavi, msavi, msavi2, ipvi, evi, ndwi, ndwi2, mndwi, ndpi, ndti, ndbi, ri, bi, bi2
 
     Args:
         input_image (str):
