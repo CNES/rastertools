@@ -5,6 +5,7 @@ Definition of a radiometric indice and functions to compute it.
 """
 from typing import List, Callable, Union
 
+import numpy
 import numpy as np
 
 from eolab.rastertools.processing import algo
@@ -12,7 +13,11 @@ from eolab.rastertools.product import BandChannel
 
 
 class RasterProcessing:
-    """This class defines a processing on a raster image.
+    """
+    Defines a processing algorithm for raster image data.
+
+    This class allows users to define custom processing operations on raster data
+    by specifying an algorithm, data types, compression, and other parameters.
     """
 
     def __init__(self, name: str,
@@ -70,7 +75,7 @@ class RasterProcessing:
 
     @property
     def algo(self) -> Callable:
-        """Processing algo that is called on a multidimensional array of data"""
+        """Process an algo that is called on a multidimensional array of data"""
         return self._algo
 
     @property
@@ -101,7 +106,7 @@ class RasterProcessing:
 
     @property
     def nbits(self) -> int:
-        """bits size of the generated data"""
+        """Bits size of the generated data"""
         return self._nbits
 
     @property
@@ -151,9 +156,8 @@ class RasterProcessing:
         Args:
             arguments (Dict[str, Dict]):
                 Dictionary where the keys are the arguments' names and the values are dictionaries
-                of arguments' properties as defined in ArgumentParser.add_argument - see
-                https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.
-                The properties dictionaries are used to configure the command line 'rastertools'.
+                of arguments' properties as defined in `ArgumentParser.add_argument  <https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser>`_ .
+                The properties dictionaries are used to configure the command line 'rastertools'.*
                 The possible keys are: action, nargs, const, default, type, choices, required, help,
                 metavar and dest
 
@@ -173,7 +177,7 @@ class RasterProcessing:
         [setattr(self, argument, argsdict[argument])
          for argument in self.arguments if argument in argsdict]
 
-    def compute(self, input_data: Union[List[np.ndarray], np.ndarray]):
+    def compute(self, input_data: Union[List[np.ndarray], np.ndarray]) -> numpy.ndarray:
         """Compute the output from the different bands of the input data. Output
         data are supposed to be the same size as input_data.
 
@@ -183,7 +187,7 @@ class RasterProcessing:
                 with all bands
 
         Returns:
-            Output data
+            Numpy array or list of numpy arrays of the size of input data
         """
         if self.algo is not None:
             argparameters = {arg: getattr(self, arg, None) for arg in self.arguments}
@@ -212,7 +216,7 @@ class RadioindiceProcessing(RasterProcessing):
         """List of channels necessary to compute the radiometric indice"""
         return self._channels
 
-    def with_channels(self, channels: List[BandChannel]):
+    def with_channels(self, channels: List[BandChannel]) :
         """Set the BandChannels necessary to compute the radiometric indice
 
         Args:

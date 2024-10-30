@@ -26,24 +26,34 @@ _logger = logging.getLogger(__name__)
 def compute_sliding(input_image: str, output_image: str, rasterprocessing: RasterProcessing,
                     window_size: tuple = (1024, 1024), window_overlap: int = 0,
                     pad_mode: str = "edge", bands: List[int] = None):
-    """Run a given raster processing on an input image and produce the output image
+    """
+    Apply a sliding window raster processing operation on an input image and save the result.
+
+    This function processes a raster image in small sliding windows, allowing efficient
+    memory management for large datasets by processing chunks. The specified `rasterprocessing`
+    operation is applied to each window, with options for padding and overlapping windows.
 
     Args:
-        input_image (str):
-            Path of the raster to compute
-        output_image (str):
-            Path of the output raster image
-        rasterprocessing ([:obj:`eolab.rastertools.processing.RasterProcessing`]):
-            Processing to apply on input image
-        window_size (tuple(int, int), optional, default=(1024, 1024)):
-            Size of windows for splitting the processed image in small parts
-        window_overlap (int, optional, default=0):
-            Number of pixels in the window that shall overlap previous (or next) window
-        pad_mode (str, optional, default="edge"):
-            Mode for padding data around the windows that are on the edge of the image
-            (See https://numpy.org/doc/stable/reference/generated/numpy.pad.html)
-        bands ([int], optional, default=None):
-            List of bands to process. None if all bands shall be processed
+        input_image (str): Path to the input raster image file to be processed.
+        output_image (str): Path to save the output raster image after processing.
+        rasterprocessing (RasterProcessing): A processing object defining the algorithm and
+            parameters to apply on each window of the input image.
+        window_size (tuple(int, int), optional): Size of each window for processing,
+            default is (1024, 1024).
+        window_overlap (int, optional): Number of pixels to overlap between consecutive windows,
+            default is 0.
+        pad_mode (str, optional, default="edge"): Padding mode for the edges of the windows, default is "edge".
+            Refer to `numpy.pad <https://numpy.org/doc/stable/reference/generated/numpy.pad.html`_ documentation for valid modes.
+        bands (List[int], optional): List of specific bands to process. If None, all bands in
+            the input image will be processed.
+
+    Raises:
+        ValueError: If specified band indices are out of range for the input image.
+
+    Note:
+        This function supports concurrent processing and makes use of a thread pool for efficient
+        handling of multiple windows. Window padding at the image boundaries is applied as
+        specified, and sliding window indices are computed internally.
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
         with rasterio.open(input_image) as src:

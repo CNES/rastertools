@@ -16,7 +16,10 @@ __license__ = "Apache v2.0"
 __refdir = utils4test.get_refdir("test_radioindice/")
 
 
-def test_speed_process_files(compare, save_gen_as_ref):
+def test_speed_process_files(compare : bool, save_gen_as_ref : bool):
+    """
+
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 

@@ -1,4 +1,4 @@
-.. radioindice:
+.. _radioindice:
 
 radioindice
 -----------
@@ -42,7 +42,7 @@ radioindice
                           bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,
                           ndti, ndvi, ndwi, ndwi2, pvi, ri, rvi, savi, tndvi,
                           tsavi
-    --ndvi                Compute ndvi indice
+    --ndvi                Compute ndvi indice INSERT LINK TO CORRESPONDING DOC
     --tndvi               Compute tndvi indice
     --rvi                 Compute rvi indice
     --pvi                 Compute pvi indice

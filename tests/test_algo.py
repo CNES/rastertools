@@ -12,6 +12,13 @@ __license__ = "Apache v2.0"
 
 
 def test_local_sum():
+    """
+    Test the local sum filter with varying kernel sizes.
+
+    This function verifies that the local sum filter correctly applies to a
+    5x5 matrix with kernel sizes ranging from 1 to 5, comparing each output
+    to expected results.
+    """
     results = [
         np.array(
             [[0, 1, 2, 3, 4],
@@ -48,6 +55,8 @@ def test_local_sum():
 
         # we need to extend the input data
         radius = (kernel_width + 1) // 2
+        print("radius", radius)
+        print("kernel", kernel_width)
 
         band = np.arange(25).reshape(5, 5)
         # reshape and pad band, input shape is increased by kernel_width or
@@ -57,15 +66,25 @@ def test_local_sum():
 
         # output shape is array shape - kernel_width
         output = algo.local_sum(array, kernel_size=kernel_width)
+        # print(output)
+        # print(output.shape)
 
         # if kernel_width is odd, output is too large
         output = output[:, radius:-radius, radius:-radius]
 
+        #print(output)
+        #print(output.shape)
+        print(array[0, radius:-radius, radius:-radius])
+        print(results[i - 1])
+        #pause = input("???")
         assert (output[0] == results[i - 1]).all()
 
-
 def test_local_mean():
+    """
+    Test the local mean filter with a kernel size of 2.
 
+    This test verifies the local mean filter by comparing its output on a 5x5 matrix to an expected result matrix.
+    """
     result = np.array(
         [[1, 1.5, 2.5, 3.5, 4],
          [3, 3.5, 4.5, 5.5, 6],
@@ -94,7 +113,11 @@ def test_local_mean():
     )
     mask = np.pad(mask, (radius, radius), mode="edge")
 
-    array = ma.array(band, mask=mask)
+    array = ma.array(band, mask=mask) # masks the band array
+    # ie. removes the first line and first column of band
+
+    print("padded band", band)
+    print("masked array", array[radius:-radius, radius:-radius])
 
     # output shape is array shape - kernel_width
     output = algo.local_mean(array, kernel_size=kernel_width)
@@ -102,11 +125,20 @@ def test_local_mean():
     # if kernel_width is odd, output is too large
     output = output[radius:-radius, radius:-radius]
 
+
+    print("result", result)
+
     assert (output == result).all()
 
 
 def test_bresenham_line():
+    """
+    Test the Bresenham's line algorithm for angles from 0° to 360° in 15° increments.
 
+    This function verifies that the Bresenham line algorithm generates accurate
+    line coordinates for a given radius across multiple theta values. Each angle
+    is tested against an expected list of coordinates.
+    """
     results = [
         # 0°
         [(1, 0), (2, 0), (3, 0), (4, 0), (5, 0)],

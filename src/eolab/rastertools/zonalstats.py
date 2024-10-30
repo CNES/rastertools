@@ -38,7 +38,8 @@ _logger = logging.getLogger(__name__)
 
 
 class Zonalstats(Rastertool):
-    """Raster tool that computes zonal statistics of a raster product.
+    """
+    Raster tool that computes zonal statistics of a raster product.
     """
 
     supported_output_formats = {
@@ -163,7 +164,7 @@ class Zonalstats(Rastertool):
 
     @property
     def area(self) -> bool:
-        """Whether to compute stats multiplied by the pixel area"""
+        """Whether to compute the statistics multiplied by the pixel area"""
         return self._area
 
     @property
@@ -493,7 +494,7 @@ class Zonalstats(Rastertool):
                       geometries: gpd.GeoDataFrame,
                       descr: List[str], date: str,
                       area_square_meter: int) -> List[List[Dict[str, float]]]:
-        """Compute the stats
+        """Compute the statistics of the input data. [Minimum, Maximum, Mean, Standard deviation]
 
         Args:
             raster (str):
@@ -511,8 +512,8 @@ class Zonalstats(Rastertool):
                 Area represented by a pixel
 
         Returns:
-            [[{str: float}]]: a list of list of dictionnaries. Dict associates
-            the stat names and the stat values.
+        list[list[dict]]
+        The dictionnary associates the name of the statistics to its value.
         """
         _logger.info("Compute statistics")
         # Compute zonal statistics
@@ -574,7 +575,7 @@ class Zonalstats(Rastertool):
         Returns:
             GeoDataFrame: The updated geometries with statistics saved in metadata of
             the following form: b{band_number}.{metadata_name} where metadata_name is
-            sucessively the band name, the date and the stats names (min, mean, max, median, std)
+            successively the band name, the date and the statistics names (min, mean, max, median, std)
         """
         prefix = self.prefix or [""] * len(bands)
         for i, band in enumerate(bands):

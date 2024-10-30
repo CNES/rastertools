@@ -19,6 +19,20 @@ __refdir = utils4test.get_refdir("test_radioindice/")
 
 
 def test_radioindice_process_file_merge():
+    '''
+    This function tests the Radioindice class's ability to generate a merged output file containing multiple indices. The indices generated
+    include:
+
+        NDVI, TNDVI, RVI, PVI, SAVI, TSAVI, MSAVI, MSAVI2, IPVI, EVI, NDWI, NDWI2,
+        MNDVI, NDPI, NDTI, NDBI, RI, BI, BI2.
+
+    The function compares the generated output to an expected output file.
+
+    Asserts:
+    - The generated output file is named correctly and matches the expected filename.
+
+    Clears the output directory at the end of the test.
+    '''
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -36,7 +50,22 @@ def test_radioindice_process_file_merge():
     utils4test.clear_outdir()
 
 
-def test_radioindice_process_file_separate(compare, save_gen_as_ref):
+def test_radioindice_process_file_separate(compare : bool, save_gen_as_ref : bool):
+    """
+    Test the Radioindice class by generating individual files for each indice.
+
+    This function verifies the generation of separate output files for NDVI and NDWI.
+    The results can be compared with reference files or saved as new references if desired.
+
+    Parameters:
+    - compare (bool): If True, compares the generated files to reference files.
+    - save_gen_as_ref (bool): If True, saves the generated files as new reference files.
+
+    Asserts:
+    - The output files match the reference files.
+
+    Clears the output directory at the end of the test.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -66,6 +95,17 @@ def test_radioindice_process_file_separate(compare, save_gen_as_ref):
 
 
 def test_radioindice_process_files():
+    '''
+    Test the Radioindice class by processing multiple files and merging results.
+
+    This function applies the NDVI and NDWI to a list of Sentinel-2 datasets.
+    The function generates a merged output file for each input file. Results are verified by comparing to tif files containing the expected results.
+
+    Asserts:
+    - The generated output files match the expected names for merged indices.
+
+    Clears the output directory at the end of the test.
+    '''
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
@@ -86,6 +126,21 @@ def test_radioindice_process_files():
 
 
 def test_radioindice_incompatible_indice_rastertype(caplog):
+    """
+    Test handling of incompatible indices and raster types in the Radioindice class.
+
+    This function verifies that the Radioindice class correctly handles cases where the
+    raster file lacks the required bands for a specified index.
+
+    Parameters:
+    - caplog: pytest fixture for capturing log output within the test.
+
+    Asserts:
+    - No output files are generated (output list is empty).
+    - An error log entry is recorded with details about the missing bands.
+
+    Clears the output directory at the end of the test.
+    """
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
