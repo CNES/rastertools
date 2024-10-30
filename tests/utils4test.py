@@ -47,24 +47,24 @@ def copy_to_ref(files, refdir):
 
 
 def basename(infile):
-    """function to get basename of file"""
+    """
+    Function to get basename of file
+    """
     file = Path(infile) if isinstance(infile, str) else infile
     suffix = len("".join(file.suffixes))
     return file.name if suffix == 0 else file.name[:-suffix]
 
 
-def cmpfiles(a, b, common, tolerance=1e-9):
-    """Compare common files in two directories.
+def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9) -> tuple:
+    """
+    Compare common files in two directories.
 
-    a, b -- directory names
-    common -- list of file names found in both directories
-    shallow -- if true, do comparison based solely on stat() information
+    Args:
+    a, b (str) : Directory names
+    common (list) : List of file names found in both directories
 
-    Returns a tuple of three lists:
-      files that compare equal
-      files that are different
-      filenames that aren't regular files.
-
+    Returns:
+      Tuple of three lists ( [files that are the same], [files that differs], [filenames that aren't regular files] )
     """
     res = ([], [], [])
     for x in common:
@@ -75,6 +75,9 @@ def cmpfiles(a, b, common, tolerance=1e-9):
 
 
 def _cmp(gld, new, tolerance):
+    """
+
+    """
     ftype = os.path.splitext(gld)[-1].lower()
     cmp = cmptools.CMP_FUN[ftype]
     try:

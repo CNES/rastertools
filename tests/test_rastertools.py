@@ -769,7 +769,7 @@ def test_hillshade_command_line_default():
     # elevation / azimuth are retrieved from https://www.sunearthtools.com/dp/tools/pos_sun.php
     argslist = [
         # default case: hillshade at Toulouse the September, 21 solar noon
-        "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/tests_out"
+        "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o tests/tests_out"
         " tests/tests_data/toulouse-mnh.tif",
         # default case: hillshade at Toulouse the June, 21, solar 6PM
         "-v hs --elevation 25.82 --azimuth 278.58 --resolution 0.5 -o tests/tests_out"
@@ -802,7 +802,7 @@ def test_hillshade_command_line_errors(caplog):
         "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/truc"
         " tests/tests_data/toulouse-mnh.tif",
         # missing required argument
-        "-v hs --elevation 46.81 --resolution 0.5 -o tests/tests_out"
+        "-v hs --elevation 46.81 --resolution 0.5 "
         " tests/tests_data/toulouse-mnh.tif",
         # input file has more than 1 band
         "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/tests_out"

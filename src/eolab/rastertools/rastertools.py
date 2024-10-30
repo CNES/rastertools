@@ -41,7 +41,7 @@ class Rastertool(ABC):
 
     @property
     def outputdir(self) -> str:
-        """Output dir where to store results"""
+        """Path of the output directory where are stored the results"""
         return self._outputdir
 
     @property
@@ -99,7 +99,7 @@ class Rastertool(ABC):
             inputfiles ([str]): Input images to process
 
         Returns:
-            [str]: List of generated files
+            ([str]) The list of the generated files
         """
         all_outputs = []
         for filename in inputfiles:
@@ -109,6 +109,7 @@ class Rastertool(ABC):
 
         # add a postprocessing call
         outputs = self.postprocess_files(inputfiles, all_outputs)
+
         if outputs:
             all_outputs.extend(outputs)
         return all_outputs
@@ -167,8 +168,10 @@ class Windowable:
 
     @property
     def pad_mode(self) -> str:
-        """Mode for padding the image when windows are on the edge of the image
-        (See https://numpy.org/doc/stable/reference/generated/numpy.pad.html)"""
+        """
+        Mode used to `pad <https://numpy.org/doc/stable/reference/generated/numpy.pad.html>`_ the image when the window is on the edge of the image
+        The mode can be self defined or among [constant (default), edge, linear_ramp, maximum, mean, median, minimum, reflect, symmetric, wrap, empty].
+        """
         return self._pad_mode
 
     def with_windows(self, window_size: int = 1024, pad_mode: str = "edge"):

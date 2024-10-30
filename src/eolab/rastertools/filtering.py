@@ -24,10 +24,10 @@ class Filtering(Rastertool, Windowable):
 
     Predefined filters are available:
 
-    - median filter
-    - local sum
-    - local mean
-    - adaptive gaussian filter.
+    - Median filter
+    - Local sum
+    - Local mean
+    - Adaptive gaussian filter.
 
     A filter is applied on a kernel of a configurable size. To set the kernel size, you need
     to call:
@@ -79,7 +79,14 @@ class Filtering(Rastertool, Windowable):
         help="Apply median filter",
         description="Apply a median filter (see scipy median_filter for more information)"
     )
-    """RasterFilter that computes the median of the kernel"""
+    """
+    Applies a Median Filter to the input data using 
+    `scipy.ndimage.median_filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html>`_.
+    The filter computes the median contained in the sliding window determined by kernel_size.
+
+    Returns:
+        Numpy array containing the input data filtered by the median filter
+    """
 
     local_sum = RasterFilter(
         "sum", algo=algo.local_sum
@@ -87,7 +94,12 @@ class Filtering(Rastertool, Windowable):
         help="Apply local sum filter",
         description="Apply a local sum filter using integral image method"
     )
-    """RasterFilter that computes the local sum of the kernel"""
+    """Computes the local sums of the input data.
+    Each element is the sum of the pixels contained in the sliding window determined by kernel_size.
+
+    Returns:
+        Numpy array of the size of input_data containing the computed local sums
+    """
 
     local_mean = RasterFilter(
         "mean", algo=algo.local_mean
@@ -95,7 +107,12 @@ class Filtering(Rastertool, Windowable):
         help="Apply local mean filter",
         description="Apply a local mean filter using integral image method",
     )
-    """RasterFilter that computes the local mean of the kernel"""
+    """Computes the local means of the input data.
+    Each element is the mean of the pixels contained in the sliding window determined by kernel_size.
+
+    Returns:
+        Numpy array of the size of input_data containing the computed local means
+    """
 
     adaptive_gaussian = RasterFilter(
         "adaptive_gaussian", algo=algo.adaptive_gaussian, per_band_algo=True
@@ -110,16 +127,20 @@ class Filtering(Rastertool, Windowable):
             "help": "Standard deviation of the Gaussian distribution (sigma)"
         },
     })
-    """RasterFilter that applies an adaptive gaussian filter to the kernel. It has a special
-    parameter named sigma that defines the standard deviation of the Gaussian distribution."""
+    """RasterFilter that applies an adaptive gaussian filter to the kernel. The parameter sigma defines the standard deviation 
+    of the Gaussian distribution.
+
+    Returns:
+        Numpy array containing the input data filtered by the Gaussian filter.
+    """
 
     @staticmethod
     def get_default_filters():
         """Get the list of predefined raster filters
 
         Returns:
-            [:obj:`eolab.rastertools.processing.RasterFilter`]: list of predefined
-            raster filters.
+            [:obj:`eolab.rastertools.processing.RasterFilter`] List of the predefined
+            raster filters ([Median, Local sum, Local mean, Adaptive gaussian])
         """
         return [
             Filtering.median_filter, Filtering.local_sum,
@@ -154,7 +175,7 @@ class Filtering(Rastertool, Windowable):
 
     @property
     def raster_filter(self) -> RasterFilter:
-        """Raster filter to apply"""
+        """Name of the filter to apply to the raster"""
         return self._raster_filter
 
     def with_filter_configuration(self, argsdict: Dict):
@@ -180,7 +201,7 @@ class Filtering(Rastertool, Windowable):
                 Input image to process
 
         Returns:
-            [str]: A list containing a single element: the generated filtered image.
+            ([str]) A list of one element containing the path of the generated filtered image.
         """
         _logger.info(f"Processing file {inputfile}")
 

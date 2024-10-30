@@ -50,18 +50,19 @@ class Hillshade(Rastertool, Windowable):
     """
 
     def __init__(self, elevation: float, azimuth: float, resolution: float, radius: int = None):
-        """ Constructor
+        """ Constructor for the Hillshade class.
 
         Args:
             elevation (float):
-                Elevation of the sun (in degrees), 0 is vertical top
+                Elevation of the sun (in degrees), 0 is vertical top (zenith).
             azimuth (float):
-                Azimuth of the sun (in degrees)
+                Azimuth of the sun (in degrees), measured clockwise from north.
             resolution (float):
-                Resolution of a raster pixel (in meter)
-            radius (int):
-                Max distance from current point (in pixels) to consider
-                for evaluating the hillshade
+                Resolution of a raster pixel (in meters).
+            radius (int, optional):
+                Maximum distance from the current point (in pixels) to consider
+                for evaluating the hillshade. If None, the radius is calculated
+                based on the data range.
         """
         super().__init__()
         self.with_windows()
@@ -73,34 +74,38 @@ class Hillshade(Rastertool, Windowable):
 
     @property
     def elevation(self):
-        """Elevation of the sun (in degrees)"""
+        """Return the elevation of the sun (in degrees)"""
         return self._elevation
 
     @property
     def azimuth(self):
-        """Azimuth of the sun (in degrees)"""
+        """Return the azimuth of the sun (in degrees)"""
         return self._azimuth
 
     @property
     def resolution(self):
-        """Resolution of a raster pixel (in meter)"""
+        """Return the resolution of a raster pixel (in meter)"""
         return self._resolution
 
     @property
     def radius(self):
-        """Max distance from current point (in pixels) to consider
-        for evaluating the max elevation angle"""
+        """Return the maximum distance from current point (in pixels)
+        for evaluating the maximum elevation angle"""
         return self._radius
 
     def process_file(self, inputfile: str) -> List[str]:
-        """Compute Hillshade for the input file
+        """
+        Compute hillshade for the input file.
 
         Args:
             inputfile (str):
-                Input image to process
+                Input image file path to process.
 
         Returns:
-            [str]: A list containing a single element: the generated hillshade image.
+            List[str]: A list containing the file path of the generated hillshade image.
+
+        Raises:
+            ValueError: If the input file contains more than one band or if the radius exceeds constraints.
         """
         _logger.info(f"Processing file {inputfile}")
         outdir = Path(self.outputdir)
