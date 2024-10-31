@@ -3,6 +3,7 @@
 
 import numpy as np
 import numpy.ma as ma
+import rasterio
 
 from eolab.rastertools.processing import algo
 
@@ -55,8 +56,6 @@ def test_local_sum():
 
         # we need to extend the input data
         radius = (kernel_width + 1) // 2
-        print("radius", radius)
-        print("kernel", kernel_width)
 
         band = np.arange(25).reshape(5, 5)
         # reshape and pad band, input shape is increased by kernel_width or
@@ -66,17 +65,10 @@ def test_local_sum():
 
         # output shape is array shape - kernel_width
         output = algo.local_sum(array, kernel_size=kernel_width)
-        # print(output)
-        # print(output.shape)
 
         # if kernel_width is odd, output is too large
         output = output[:, radius:-radius, radius:-radius]
 
-        #print(output)
-        #print(output.shape)
-        print(array[0, radius:-radius, radius:-radius])
-        print(results[i - 1])
-        #pause = input("???")
         assert (output[0] == results[i - 1]).all()
 
 def test_local_mean():
@@ -116,17 +108,11 @@ def test_local_mean():
     array = ma.array(band, mask=mask) # masks the band array
     # ie. removes the first line and first column of band
 
-    print("padded band", band)
-    print("masked array", array[radius:-radius, radius:-radius])
-
     # output shape is array shape - kernel_width
     output = algo.local_mean(array, kernel_size=kernel_width)
 
     # if kernel_width is odd, output is too large
     output = output[radius:-radius, radius:-radius]
-
-
-    print("result", result)
 
     assert (output == result).all()
 

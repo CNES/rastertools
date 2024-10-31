@@ -125,7 +125,7 @@ class TestCase:
             caplog.clear()
 
         # clear output dir
-        #utils4test.clear_outdir()
+        utils4test.clear_outdir()
 
 
 def test_rastertools_command_line_info():
@@ -670,8 +670,8 @@ def test_filtering_command_line_errors(caplog):
     # list of commands to test
     argslist = [
         # output dir does not exist
-        #"-v fi median --kernel_size 8 -o tests/truc"
-        #" tests/tests_data/tif_file.tif",
+        "-v fi median --kernel_size 8 -o tests/truc"
+        " tests/tests_data/tif_file.tif",
         # missing required argument
         "-v fi adaptive_gaussian --kernel_size 32 -o tests/tests_out"
         " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
@@ -689,7 +689,7 @@ def test_filtering_command_line_errors(caplog):
           "The kernel size (option --kernel_size, value=15) must be strictly less than the "
           "window size minus 1 (option --window_size, value=16)")]
     ]
-    sysexitlist = [2,1]#[2, 2, 1]
+    sysexitlist = [2, 2, 1]
 
     # generate test cases
     tests = [TestCase(args).with_logs(logs).with_sys_exit(sysexit)
@@ -715,10 +715,10 @@ def test_svf_command_line_default():
     ]
     output_filenames = ["toulouse-mnh-svf.tif"]
 
-    print(argslist)
     # generate test cases
     tests = [TestCase(args).output(output_filenames)
              for args in argslist]
+
     # execute test cases
     for test in tests:
         test.run_test(check_outputs=False)
@@ -829,7 +829,7 @@ def test_hillshade_command_line_errors(caplog):
     # generate test cases
     tests = [TestCase(args).with_logs(logs).with_sys_exit(sysexit)
              for (args, logs, sysexit) in zip(argslist, logslist, sysexitlist)]
-    print(tests)
+
     # execute test cases
     for test in tests:
         test.run_test(caplog, check_outputs=False)

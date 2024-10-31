@@ -104,14 +104,12 @@ class Rastertool(ABC):
         all_outputs = []
         for filename in inputfiles:
             outputs = self.process_file(filename)
-            print(filename)
-            #raise Exception("feiv")
             if outputs:
                 all_outputs.extend(outputs)
 
         # add a postprocessing call
         outputs = self.postprocess_files(inputfiles, all_outputs)
-        raise Exception("feiv")
+
         if outputs:
             all_outputs.extend(outputs)
         return all_outputs

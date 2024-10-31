@@ -132,6 +132,25 @@ To see the definitions of these arguments, type the option --help.
 
     .. autofunction:: eolab.rastertools.processing.algo.local_sum
 
+    Here is an example of the local mean applied to the NDVI of a SENTINEL2 L2A THEIA image cropped to a region of interest.
+    This raster was previously computed using :ref:`radioindice` on the original SENTINEL2 L2A THEIA image.
+
+    .. code-block:: console
+
+     $ rastertools filter sum --kernel_size 16 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+
+    .. list-table::
+       :widths: 20 20
+       :header-rows: 0
+
+       * - .. centered:: Original
+         - .. centered:: Filtered by Local sum
+
+       * - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.jpg
+            :align: center
+         - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-sum.jpg
+            :align: center
+
 - **Local mean**
 
     .. code-block:: console
@@ -183,14 +202,14 @@ To see the definitions of these arguments, type the option --help.
 
     .. code-block:: console
 
-     $ rastertools filter mean --kernel_size 16 --sigma 1 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+     $ rastertools filter mean --kernel_size 16 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
 
     .. list-table::
        :widths: 20 20
        :header-rows: 0
 
        * - .. centered:: Original
-         - .. centered::Filtered by Local mean
+         - .. centered:: Filtered by Local mean
 
        * - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.jpg
             :align: center
@@ -260,6 +279,6 @@ To see the definitions of these arguments, type the option --help.
 
        * - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.jpg
             :align: center
-         - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive-gaussian.jpg
+         - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive_gaussian.jpg
             :align: center
 

@@ -576,7 +576,6 @@ def local_mean(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray 
     #kernel_size = kwargs.get('kernel_size', 8)
     # compute local sum of band pixels
     output = _local_sum(input_data, kernel_size)
-    print("after local sum", output)
     # compute local sum of band mask: number of valid pixels
     # in the kernel
     if ma.is_masked(input_data):
@@ -631,7 +630,7 @@ def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : in
     return out
 
 
-def svf(input_data : np.ndarray, radius : int = 8, direction : int = 12, resolution : float = 0.5, altitude = None) -> np.ndarray:
+def svf(input_data : np.ndarray, radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> np.ndarray:
     """
     Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Height Model (DHM).
 
@@ -661,6 +660,8 @@ def svf(input_data : np.ndarray, radius : int = 8, direction : int = 12, resolut
         raise ValueError("svf only accepts 3 dims numpy arrays")
     if input_data.shape[0] != 1:
         raise ValueError("svf only accepts numpy arrays with first dim of size 1")
+
+    nb_directions = directions
     '''
     radius = kwargs.get('radius', 8)
     nb_directions = kwargs.get('directions', 12)
@@ -670,8 +671,7 @@ def svf(input_data : np.ndarray, radius : int = 8, direction : int = 12, resolut
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=np.float32)
-    print(shape)
-    print(input_data)
+
     # prevent nodata problem
     # change the NaN in the input array to 0
     input_band = np.nan_to_num(input_data[0], copy=False, nan=0)
@@ -812,10 +812,5 @@ def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float 
 
     angles = np.arctan(ratios)
     out[0, radius: shape[1] - radius, radius: shape[2] - radius] = angles > elevation
-
-    print("sum of the elements of in : ", np.sum(input_data))
-    print(np.sum(angles > elevation))
-    print(angles)
-    print("sum of the elements of out : ", np.sum(out))
 
     return out
