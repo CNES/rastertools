@@ -3,7 +3,6 @@
 
 import numpy as np
 import numpy.ma as ma
-import rasterio
 
 from eolab.rastertools.processing import algo
 
