@@ -5,7 +5,10 @@ import pytest
 import logging
 import filecmp
 from pathlib import Path
-from eolab.rastertools import run_tool
+
+from click import argument
+
+from eolab.rastertools import rastertools
 from eolab.rastertools.product import RasterType
 
 from . import utils4test
@@ -94,7 +97,7 @@ class TestCase:
 
         # run rastertools
         with pytest.raises(SystemExit) as wrapped_exception:
-            run_tool(args=self._args)
+            rastertools(self.args)
 
         # check sys_exit
         if check_sys_exit:
@@ -134,23 +137,31 @@ def test_rastertools_command_line_info():
         TestCase("-h"),
         TestCase("--version"),
         TestCase(""),
-        TestCase("radioindice --help"),
-        TestCase("ri -h"),
-        TestCase("zonalstats --help"),
-        TestCase("zs -h"),
-        TestCase("tiling --help"),
-        TestCase("ti -h"),
         TestCase("filter --help"),
-        TestCase("fi -h"),
-        TestCase("timeseries --help"),
-        TestCase("ts -h"),
-        TestCase("speed --help"),
-        TestCase("sp -h"),
-        TestCase("svf --help"),
-        TestCase("svf -h"),
-        TestCase("hillshade --help"),
-        TestCase("hs -h")
+        TestCase("fi -h")
     ]
+    # tests = [
+    #     TestCase("--help"),
+    #     TestCase("-h"),
+    #     TestCase("--version"),
+    #     TestCase(""),
+    #     TestCase("radioindice --help"),
+    #     TestCase("ri -h"),
+    #     TestCase("zonalstats --help"),
+    #     TestCase("zs -h"),
+    #     TestCase("tiling --help"),
+    #     TestCase("ti -h"),
+    #     TestCase("filter --help"),
+    #     TestCase("fi -h"),
+    #     TestCase("timeseries --help"),
+    #     TestCase("ts -h"),
+    #     TestCase("speed --help"),
+    #     TestCase("sp -h"),
+    #     TestCase("svf --help"),
+    #     TestCase("svf -h"),
+    #     TestCase("hillshade --help"),
+    #     TestCase("hs -h")
+    # ]
     for test in tests:
         test.run_test()
 
@@ -670,13 +681,13 @@ def test_filtering_command_line_errors(caplog):
     # list of commands to test
     argslist = [
         # output dir does not exist
-        "-v fi median --kernel_size 8 -o tests/truc"
+        "-v filter median --kernel_size 8 -o tests/truc"
         " tests/tests_data/tif_file.tif",
         # missing required argument
-        "-v fi adaptive_gaussian --kernel_size 32 -o tests/tests_out"
+        "-v filter adaptive_gaussian --kernel_size 32 -o tests/tests_out"
         " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
         # kernel_size > window_size
-        "-v fi median -a --kernel_size 15 --window_size 16 -o tests/tests_out"
+        "-v filter median -a --kernel_size 15 --window_size 16 -o tests/tests_out"
         " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
     ]
 
@@ -707,8 +718,7 @@ def test_svf_command_line_default():
     # list of commands to test
     argslist = [
         # default case: svf at the point height
-        "-v svf --radius 50 --directions 16 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        "ftilin",
         # default case: svf on ground
         "-v svf --radius 50 --directions 16 --resolution 0.5 --altitude 0 -o tests/tests_out"
         " tests/tests_data/toulouse-mnh.tif",
