@@ -3,49 +3,29 @@
 """
 CLI definition for the speed tool
 """
-import eolab.rastertools.cli as cli
 from eolab.rastertools import Speed
+from eolab.rastertools.cli.utils_cli import apply_process
+import click
+import os
+
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-def create_argparser(rastertools_parsers):
-    """Adds the speed subcommand to the given rastertools subparser
+#Speed command
+@click.command("speed",context_settings=CONTEXT_SETTINGS)
+@click.argument('inputs', type=str, nargs = -1, required = 1)
 
-    Args:
-        rastertools_parsers:
-            The rastertools subparsers to which this subcommand shall be added.
+@click.option('-b','--bands', type=int, multiple = True, help="List of bands to process")
 
-            This argument provides from a code like this::
+@click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
 
-                import argparse
-                main_parser = argparse.ArgumentParser()
-                rastertools_parsers = main_parser.add_subparsers()
-                speed.create_argparser(rastertools_parsers)
+@click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 
-    Returns:
-        The rastertools subparsers updated with this subcommand
+@click.pass_context
+def speed(ctx, inputs : list, bands : list, all_bands : bool, output : str) :
     """
-    parser = rastertools_parsers.add_parser(
-        "speed", aliases=["sp"],
-        help="Compute speed of rasters",
-        description="Compute the speed of radiometric values of several raster images",
-        epilog="By default only first band is computed.")
-    parser.add_argument(
-        "inputs",
-        nargs='+',
-        help="Input files to process (e.g. Sentinel2 L2A MAJA from THEIA). "
-             "You can provide a single file with extension \".lst\" (e.g. \"speed.lst\") "
-             "that lists the input files to process (one input file per line in .lst)")
-    cli.with_bands_arguments(parser)
-    cli.with_outputdir_arguments(parser)
-
-    # set the function to call when this subcommand is called
-    parser.set_defaults(func=create_speed)
-
-    return rastertools_parsers
-
-
-def create_speed(args) -> Speed:
-    """Create and configure a new rastertool "Speed" according to argparse args
+    CHANGE DOCSTRING
+    Create and configure a new rastertool "Speed" according to argparse args
 
     Args:
         args: args extracted from command line
@@ -55,15 +35,15 @@ def create_speed(args) -> Speed:
     """
 
     # get the bands to process
-    if args.all_bands:
+    if all_bands:
         bands = None
     else:
-        bands = list(map(int, args.bands)) if args.bands else [1]
+        bands = list(map(int, bands)) if bands else [1]
 
     # create the rastertool object
     tool = Speed(bands)
 
     # set up config with args values
-    tool.with_output(args.output)
+    tool.with_output(output)
 
-    return tool
+    apply_process(ctx, tool, inputs)

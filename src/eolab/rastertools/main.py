@@ -16,16 +16,15 @@ import os
 import sys
 import json
 import click
-from eolab.rastertools.cli.filtering import filter
+from eolab.rastertools.cli.filtering_dyn import filter
+from eolab.rastertools.cli.hillshade import hillshade
+from eolab.rastertools.cli.speed import speed
+from eolab.rastertools.cli.svf import svf
+from eolab.rastertools.cli.tiling import tiling
+from eolab.rastertools.cli.timeseries import timeseries #radioindice, zonalstats
 from eolab.rastertools import __version__
-from eolab.rastertools.cli import radioindice, zonalstats, tiling, speed
-from eolab.rastertools.cli import filtering, svf, hillshade, timeseries
 from eolab.rastertools.product import RasterType
 
-
-_logger = logging.getLogger(__name__)
-def get_logger():
-    return _logger
 
 def add_custom_rastertypes(rastertypes):
     """Add definition of new raster types. The json string shall have the following format:
@@ -126,15 +125,16 @@ def add_custom_rastertypes(rastertypes):
     """
     RasterType.add(rastertypes)
 
-@click.group()
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.option(
     '-t', '--rastertype',
     'rastertype',
+    default = None,
     # Click automatically uses the last argument as the variable name, so "dest" is this last parameter
     type=click.Path(exists=True),
     help="JSON file defining additional raster types of input files")
-
 @click.option(
     '--max_workers',
     "max_workers",
@@ -142,49 +142,43 @@ def add_custom_rastertypes(rastertypes):
     help="Maximum number of workers for parallel processing. If not given, it will default to "
             "the number of processors on the machine. When all processors are not allocated to "
             "run rastertools, it is thus recommended to set this option.")
-
 @click.option(
     '--debug',
     "keep_vrt",
     is_flag=True,
     help="Store to disk the intermediate VRT images that are generated when handling "
             "the input files which can be complex raster product composed of several band files.")
-
 @click.option(
     '-v',
     '--verbose',
     is_flag=True,
     help="set loglevel to INFO")
-
 @click.option(
     '-vv',
     '--very-verbose',
     is_flag=True,
     help="set loglevel to DEBUG")
-
 @click.version_option(version='rastertools {}'.format(__version__))  # Ensure __version__ is defined
-
 @click.pass_context
 def rastertools(ctx, rastertype : str, max_workers : int, keep_vrt : bool, verbose : bool, very_verbose : bool):
     """
-        Collection of tools on raster data.
-        CHANGE DOCSTRING
-        Main entry point allowing external calls.
+    Main entry point for the `rastertools` Command Line Interface.
 
-        Args:
-            rastertype: JSON file defining additional raster types.
-            max_workers: Maximum number of workers for parallel processing.
-            keep_vrt: Store intermediate VRT images.
-            verbose: Set loglevel to INFO.
-            very_verbose: Set loglevel to DEBUG.
-            command: The command to execute (e.g., filtering).
-            inputs: Input files for processing.
+    The `rastertools` CLI provides tools for raster processing
+    and analysis and allows configurable data handling, parallel processing,
+    and debugging support.
 
-        sys.exit returns:
+    Logging:
 
-        - 0: everything runs fine
-        - 1: processing errors occured
-        - 2: wrong execution configuration
+        - INFO level (`-v`) gives detailed step information.
+
+        - DEBUG level (`-vv`) offers full debug-level tracing.
+
+    Environment Variables:
+
+        - `RASTERTOOLS_NOTQDM`: If the log level is above INFO, sets this to disable progress bars.
+
+        - `RASTERTOOLS_MAXWORKERS`: If `max_workers` is set, it defines the max workers for rastertools.
     """
     ctx.ensure_object(dict)
     ctx.obj['keep_vrt'] = keep_vrt
@@ -194,6 +188,9 @@ def rastertools(ctx, rastertype : str, max_workers : int, keep_vrt : bool, verbo
         loglevel = logging.DEBUG
     elif verbose:
         loglevel = logging.INFO
+    else:
+        loglevel = logging.WARNING
+
     logformat = "[%(asctime)s] %(levelname)s - %(name)s - %(message)s"
     logging.basicConfig(level=loglevel, stream=sys.stdout, format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
@@ -210,14 +207,21 @@ def rastertools(ctx, rastertype : str, max_workers : int, keep_vrt : bool, verbo
 
 
 # Register subcommands from other modules
-rastertools.add_command(filter)
-#rastertools.add_command(hillshade)
-#rastertools.add_command(radioindice)
-#rastertools.add_command(speed)
-#rastertools.add_command(svf)
-#rastertools.add_command(tiling)
-#rastertools.add_command(timeseries)
-#rastertools.add_command(zonalstats)
+rastertools.add_command(filter, name = "fi")
+rastertools.add_command(filter, name = "filter")
+rastertools.add_command(hillshade, name = "hs")
+rastertools.add_command(hillshade, name = "hillshade")
+#rastertools.add_command(radioindice, name = "ri")
+#rastertools.add_command(radioindice, name = "radioindice")
+rastertools.add_command(speed, name = "sp")
+rastertools.add_command(speed, name = "speed")
+rastertools.add_command(svf, name = "svf")
+rastertools.add_command(tiling, name = "ti")
+rastertools.add_command(tiling, name = "tiling")
+rastertools.add_command(timeseries, name = "ts")
+rastertools.add_command(timeseries, name = "timeseries")
+#rastertools.add_command(zonalstats, name = "zs")
+#rastertools.add_command(zonalstats, name = "zonalstats")
 
 @rastertools.result_callback()
 @click.pass_context
@@ -226,10 +230,10 @@ def handle_result(ctx):
         click.echo(ctx.get_help())
         ctx.exit()
 
-def run():
+def run(*args, **kwargs):
     """Entry point for console_scripts
     """
-    rastertools()
+    rastertools(*args, **kwargs)
 
 
 if __name__ == "__main__":
