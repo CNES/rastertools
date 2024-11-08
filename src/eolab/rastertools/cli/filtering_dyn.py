@@ -3,6 +3,8 @@
 """
 CLI definition for the filtering tool
 """
+from typing import Callable
+
 from eolab.rastertools import Filtering
 #from eolab.rastertools.main import get_logger
 from eolab.rastertools.cli.utils_cli import apply_process
@@ -51,6 +53,14 @@ def create_filtering(output : str, window_size : int, pad : str, argsdict : dict
     return tool
 
 
+def filter_options(options : list):
+    def wrapper(function):
+        for option in options:
+            function = option(function)
+        return function
+    return wrapper
+
+
 inpt_arg = click.argument('inputs', type=str, nargs = -1, required = 1)
 
 ker_opt = click.option('--kernel_size', type=int, help="Kernel size of the filter function, e.g. 3 means a square" 
@@ -66,9 +76,11 @@ pad_opt = click.option('-p','--pad',default="edge", type=click.Choice(['none','e
                   "(see https://numpy.org/doc/stable/reference/generated/numpy.pad.html"
                   "for more information)")
 
-band_opt = click.option('-b','--bands', type=int, multiple = True, help="List of bands to process")
+band_opt = click.option('-b','--bands', multiple = True, type=int, help="List of bands to process")
 
 all_opt = click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
+
+sigma = click.option('--sigma', type=int, default=1, help="Standard deviation of the Gaussian distribution")
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.pass_context
@@ -81,16 +93,14 @@ def filter(ctx):
 
 def create_filter(filter_name : str):
 
+    list_opt = [inpt_arg, ker_opt, out_opt, win_opt, pad_opt, band_opt, all_opt]
+    if filter_name == 'adaptive_gaussian':
+        list_opt.append(sigma)
+
     @filter.command(filter_name, context_settings=CONTEXT_SETTINGS)
-    @inpt_arg
-    @ker_opt
-    @out_opt
-    @win_opt
-    @pad_opt
-    @band_opt
-    @all_opt
+    @filter_options(list_opt)
     @click.pass_context
-    def filter_filtername(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool):
+    def filter_filtername(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool, **kwargs):
         """
         Execute the requested filter on the input files with the specified parameters.
         The `inputs` argument can either be a single file or a `.lst` file containing a list of input files.
@@ -103,14 +113,17 @@ def create_filter(filter_name : str):
         You can provide a single file with extension \".lst\" (e.g. \"filtering.lst\") that lists
         the input files to process (one input file per line in .lst).
         """
+        argsdict = {"inputs": inputs}
 
-        print(bands)
+        if filter_name == 'adaptive_gaussian':
+            argsdict = {"sigma" : kwargs["sigma"]}
+
         # Configure the filter tool instance
         tool = create_filtering(
             output=output,
             window_size=window_size,
             pad=pad,
-            argsdict={"inputs": inputs},
+            argsdict=argsdict,
             filter=filter_name,
             bands=bands,
             kernel_size=kernel_size,
