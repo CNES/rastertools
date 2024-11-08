@@ -177,7 +177,7 @@ def test_radioindice_command_line_default():
         # two indices with their own options, merge
         "-v ri --pvi --savi -o tests/tests_out -m tests/tests_data/listing.lst",
         # indices option, roi
-        "--verbose ri --indices pvi savi -nd nir red --roi tests/tests_data/COMMUNE_32001.shp"
+        "--verbose ri --indices pvi --indices savi -nd nir red --roi tests/tests_data/COMMUNE_32001.shp"
         " --output tests/tests_out"
         " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
         " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
@@ -542,7 +542,7 @@ def test_tiling_command_line_default():
         "--verbose ti -o tests/tests_out -g tests/tests_data/grid.geojson"
         " tests/tests_data/tif_file.tif",
         # specify specific ids
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 77 93 --id_col id"
+        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 77 --id 93 --id_col id"
         " tests/tests_data/tif_file.tif"
     ]
     input_filenames = ["tests/tests_data/tif_file.tif"]
@@ -578,10 +578,10 @@ def test_tiling_command_line_special_case(caplog):
     # list of commands to test
     argslist = [
         # some invalid ids
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 1 2 93 --id_col id"
+        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 1 --id 2 --id 93 --id_col id"
         " tests/tests_data/tif_file.tif",
         # a geometry does not overlap raster
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 78 93 --id_col id"
+        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 78 --id 93 --id_col id"
         " tests/tests_data/tif_file.tif"
     ]
 
@@ -653,7 +653,7 @@ def test_filtering_command_line_default():
         "-v --max_workers 1 fi median -a --kernel_size 8 -o tests/tests_out"
         " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
         # default case: local sum
-        "-v fi sum -b 1 2 --kernel_size 8 -o tests/tests_out"
+        "-v fi sum -b 1 -b 2 --kernel_size 8 -o tests/tests_out"
         " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
         # default case: local mean
         "-v fi mean -b 1 --kernel_size 8 -o tests/tests_out"
@@ -718,7 +718,8 @@ def test_svf_command_line_default():
     # list of commands to test
     argslist = [
         # default case: svf at the point height
-        "ftilin",
+        "-v svf --radius 50 --directions 16 --resolution 0.5 -o tests/tests_out"
+        " tests/tests_data/toulouse-mnh.tif",
         # default case: svf on ground
         "-v svf --radius 50 --directions 16 --resolution 0.5 --altitude 0 -o tests/tests_out"
         " tests/tests_data/toulouse-mnh.tif",

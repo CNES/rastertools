@@ -12,15 +12,14 @@ import os
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-def parse_normalized_difference(ctx, param, value):
-    """Parse the pairs of bands as (band1, band2) tuples."""
-    if value:
-        # Split the input pairs and store them as tuples
-        parsed_pairs = []
-        for i in range(0, len(value), 2):
-            parsed_pairs.append((value[i], value[i + 1]))
-        return parsed_pairs
-    return None
+
+def indices_opt(function):
+    list_indices = ['--ndvi', '--tndvi', '--rvi', '--pvi', '--savi', '--tsavi', '--msavi', '--msavi2', '--ipvi',
+                    '--evi', '--ndwi', '--ndwi2', '--mndwi', '--ndpi', '--ndti', '--ndbi', '--ri', '--bi', '--bi2']
+
+    for idc in list_indices:
+        function = click.option(idc, is_flag=True, help=f"Compute {id} indice")(function)
+    return function
 
 
 #Radioindice command
@@ -35,14 +34,16 @@ def parse_normalized_difference(ctx, param, value):
 
 @click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
 
-list_indices = ['--ndvi', '--tndvi', '--rvi', '--pvi', '--savi', '--tsavi', '--msavi', '--msavi2', '--ipvi',
-'--evi', '--ndwi', '--ndwi2', '--mndwi', '--ndpi', '--ndti', '--ndbi', '--ri', '--bi', '--bi2']
+@click.option('-i', '--indices', type=click.Choice(['ndvi', 'tndvi', 'rvi', 'pvi', 'savi', 'tsavi', 'msavi', 'msavi2', 'ipvi',
+                    'evi', 'ndwi', 'ndwi2', 'mndwi', 'ndpi', 'ndti', 'ndbi', 'ri', 'bi', 'bi2']), multiple = True,
+                    help=" List of indices to computePossible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,"
+                        " ndti, ndvi, ndwi, ndwi2, pvi, ri, rvi, savi, tndvi, tsavi")
 
-for id in list_indices:
-    @click.option(id, is_flag = True, help=f"Compute {id} indice")
+
+@indices_opt
 
 @click.option('-nd', '--normalized_difference','nd',type=str,
-    multiple=True, nargs=2, callback= parse_normalized_difference, metavar="band1 band2",
+    multiple=True, nargs=2, metavar="band1 band2",
               help="Compute the normalized difference of two bands defined"
                         "as parameter of this option, e.g. \"-nd red nir\" will compute (red-nir)/(red+nir). "
                         "See eolab.rastertools.product.rastertype.BandChannel for the list of bands names. "
@@ -50,7 +51,7 @@ for id in list_indices:
 
 
 @click.pass_context
-def radioindice(ctx, inputs : list, output : str, merge : bool, roi : str, window_size : int, nd : bool, *args) :
+def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, roi : str, window_size : int, nd : bool, **kwargs) :
     """Create and configure a new rastertool "Radioindice" according to argparse args
 
         Args:
@@ -58,12 +59,14 @@ def radioindice(ctx, inputs : list, output : str, merge : bool, roi : str, windo
 
         Returns:
             :obj:`eolab.rastertools.Radioindice`: The configured rastertool to run
-        """
+    """
+    indices_opt = [key for key, value in kwargs.items() if value]
     indices_to_compute = []
 
     # append indices defined with --<name_of_indice>
     indices_to_compute.extend([indice for indice in Radioindice.get_default_indices()
-                               if indices])
+                               if indice.name in indices_opt])
+
     # append indices defined with --indices
     if indices:
         indices_dict = {indice.name: indice for indice in Radioindice.get_default_indices()}
@@ -99,5 +102,6 @@ def radioindice(ctx, inputs : list, output : str, merge : bool, roi : str, windo
     tool.with_roi(roi)
     tool.with_windows(window_size)
 
-    return tool
+    apply_process(ctx, tool, inputs)
+
 

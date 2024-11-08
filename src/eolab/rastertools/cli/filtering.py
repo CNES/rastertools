@@ -210,8 +210,9 @@ def mean(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_
 @pad_opt
 @band_opt
 @all_opt
+@click.option('--sigma', type = int, default = 1, help = "Standard deviation of the Gaussian distribution")
 @click.pass_context
-def adaptive_gaussian(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool) :
+def adaptive_gaussian(ctx, inputs : list, output : str, window_size : int, pad : str, sigma : int, kernel_size : int, bands : list, all_bands : bool) :
     """
     Execute the adaptive gaussian filter on the input files with the specified parameters.
 
@@ -233,7 +234,7 @@ def adaptive_gaussian(ctx, inputs : list, output : str, window_size : int, pad :
             output=output,
             window_size=window_size,
             pad=pad,
-            argsdict={"inputs": inputs},
+            argsdict={"inputs": inputs, "sigma" : sigma},
             filter='adaptive_gaussian',
             bands=bands,
             kernel_size=kernel_size,
