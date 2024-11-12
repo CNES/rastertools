@@ -4,7 +4,7 @@ import sys
 import click
 
 #TO DO
-_logger = logging.getLogger("main")
+_logger = logging.getLogger(__name__)
 
 def _extract_files_from_list(cmd_inputs):
     """
@@ -64,11 +64,14 @@ def apply_process(ctx, tool, inputs : list):
         Exception: Any other errors that occur during processing.
     """
     try:
+        print('@' * 50)
         # handle the input file of type "lst"
         inputs_extracted = _extract_files_from_list(inputs)
 
+        print('@' * 50)
         # setup debug mode in which intermediate VRT files are stored to disk or not
         tool.with_vrt_stored(ctx.obj.get('keep_vrt'))
+        print('@' * 50)
 
         # launch process
         tool.process_files(inputs_extracted)
@@ -76,11 +79,13 @@ def apply_process(ctx, tool, inputs : list):
         _logger.info("Done!")
 
     except RastertoolConfigurationException as rce:
+        print('@'*50)
         _logger.exception(rce)
         sys.exit(2)
 
     except Exception as err:
+        print('!' * 50)
         _logger.exception(err)
         sys.exit(1)
-
+    print('?' * 50)
     sys.exit(0)

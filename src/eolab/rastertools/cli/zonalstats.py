@@ -12,7 +12,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 #Zonalstats command
-@click.command("radioindice",context_settings=CONTEXT_SETTINGS)
+@click.command("zonalstats",context_settings=CONTEXT_SETTINGS)
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
 @click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
@@ -58,7 +58,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option('--category_names',type = str, default="", help="JSON files containing a dict with classes index as keys and names to display classes as values.")
 
 @click.pass_context
-def zonalstats(ctx, inputs : list, output : str, output_format : str, geometries : str, within : str, stats : int, categorical : bool, valid_threshold : float ,area : bool, prefix, bands : list, all_bands : bool, sigma, chartfile, display : bool, geom_index : str, category_file : str, category_index : str, category_names : str) :
+def zonalstats(ctx, inputs : list, output : str, output_format : str, geometries : str, within : str, stats : list, categorical : bool, valid_threshold : float ,area : bool, prefix, bands : list, all_bands : bool, sigma, chartfile, display : bool, geom_index : str, category_file : str, category_index : str, category_names : str) :
     """
     Compute zonal statistics
     Compute zonal statistics of a raster image.\n Available statistics are: 
@@ -74,9 +74,11 @@ def zonalstats(ctx, inputs : list, output : str, output_format : str, geometries
     Returns:
         :obj:`eolab.rastertools.Zonalstats`: The configured rastertool to run
     """
+    print(output)
+    print(output_format)
     # get and check the list of stats to compute
     if stats:
-        stats_to_compute = stats
+        stats_to_compute = list(stats)
     elif categorical:
         stats_to_compute = []
     else:

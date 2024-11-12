@@ -81,12 +81,14 @@ src/eolab/rastertools/__pycache__/utils.cpython-38.pyc
 src/eolab/rastertools/__pycache__/zonalstats.cpython-38.pyc
 src/eolab/rastertools/cli/__init__.py
 src/eolab/rastertools/cli/filtering.py
+src/eolab/rastertools/cli/filtering_dyn.py
 src/eolab/rastertools/cli/hillshade.py
 src/eolab/rastertools/cli/radioindice.py
 src/eolab/rastertools/cli/speed.py
 src/eolab/rastertools/cli/svf.py
 src/eolab/rastertools/cli/tiling.py
 src/eolab/rastertools/cli/timeseries.py
+src/eolab/rastertools/cli/utils_cli.py
 src/eolab/rastertools/cli/zonalstats.py
 src/eolab/rastertools/cli/__pycache__/__init__.cpython-38.pyc
 src/eolab/rastertools/cli/__pycache__/filtering.cpython-38.pyc

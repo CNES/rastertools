@@ -80,7 +80,7 @@ band_opt = click.option('-b','--bands', multiple = True, type=int, help="List of
 
 all_opt = click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
 
-sigma = click.option('--sigma', type=int, default=1, help="Standard deviation of the Gaussian distribution")
+sigma = click.option('--sigma', type=int, required = True, help="Standard deviation of the Gaussian distribution")
 
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.pass_context

@@ -210,7 +210,7 @@ def mean(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_
 @pad_opt
 @band_opt
 @all_opt
-@click.option('--sigma', type = int, default = 1, help = "Standard deviation of the Gaussian distribution")
+@click.option('--sigma', type = int, required = True, help = "Standard deviation of the Gaussian distribution")
 @click.pass_context
 def adaptive_gaussian(ctx, inputs : list, output : str, window_size : int, pad : str, sigma : int, kernel_size : int, bands : list, all_bands : bool) :
     """

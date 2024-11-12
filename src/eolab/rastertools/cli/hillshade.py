@@ -15,17 +15,17 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command("hillshade",context_settings=CONTEXT_SETTINGS)
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
-@click.option('--elevation', type=float, help="Elevation of the sun in degrees, [0°, 90°] where"
+@click.option('--elevation', type=float, required = True, help="Elevation of the sun in degrees, [0°, 90°] where"
                         "90°=zenith and 0°=horizon")
 
-@click.option('--azimuth', type=float, help="Azimuth of the sun in degrees, [0°, 360°] where"
+@click.option('--azimuth', type=float, required = True, help="Azimuth of the sun in degrees, [0°, 360°] where"
                         "0°=north, 90°=east, 180°=south and 270°=west")
 
 @click.option('--radius', type=int, help="Maximum distance (in pixels) around a point to evaluate"
                         "horizontal elevation angle. If not set, it is automatically computed from"
                         " the range of altitudes in the digital model.")
 
-@click.option('--resolution',default=0.5, type=float, help="Pixel resolution in meter")
+@click.option('--resolution', required = True, type=float, help="Pixel resolution in meter")
 
 @click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 

@@ -225,6 +225,19 @@ rastertools.add_command(timeseries, name = "timeseries")
 rastertools.add_command(zonalstats, name = "zs")
 rastertools.add_command(zonalstats, name = "zonalstats")
 
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
+#Speed command
+@click.command("ema",context_settings=CONTEXT_SETTINGS)
+@click.option('--inputs', type=int)
+@click.pass_context
+def ema(ctx, inputs) :
+    raise Exception(f"coucou {inputs}")
+
+rastertools.add_command(ema, name = "ema")
+
+
 @rastertools.result_callback()
 @click.pass_context
 def handle_result(ctx):
