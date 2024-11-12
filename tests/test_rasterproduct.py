@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import pytest
+import os
 import filecmp
 import zipfile
 from pathlib import Path
@@ -41,13 +42,13 @@ def test_rasterproduct_valid_parameters():
     # archive with one file per band
     basename = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041"
     file = Path(
-        utils4test.indir + basename + ".zip")
+        utils4test.indir.split(os.getcwd() + "/")[-1] + basename + ".zip")
     prod = RasterProduct(file)
 
     assert prod.file == file
     assert prod.rastertype == RasterType.get("S2_L1C")
     assert prod.channels == RasterType.get("S2_L1C").channels
-    band_format = f"/vsizip/tests/tests_data/{basename}.zip/"
+    band_format = f"/vsizip/" + utils4test.indir.split(os.getcwd() + "/")[-1] + f"{basename}.zip/"
     band_format += f"{basename}.SAFE/GRANULE/L1C_T30TYP_A013519_20191008T105335/IMG_DATA/"
     band_format += "T30TYP_20191008T105029_{}.jp2"
     assert prod.bands_files == {b: band_format.format(b) for b in prod.rastertype.get_band_ids()}
@@ -61,13 +62,13 @@ def test_rasterproduct_valid_parameters():
 
     # archive with one file for all bands
     basename = "SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82"
-    file = utils4test.indir + basename + ".tar.gz"
+    file = utils4test.indir.split(os.getcwd() + "/")[-1] + basename + ".tar.gz"
     prod = RasterProduct(file)
 
     assert prod.file == Path(file)
     assert prod.rastertype == RasterType.get("SPOT67_GEOSUD")
     assert prod.channels == [BandChannel.red, BandChannel.green, BandChannel.blue, BandChannel.nir]
-    band = f"/vsitar/tests/tests_data/{basename}.tar.gz/SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82/"
+    band = f"/vsitar/" + utils4test.indir.split(os.getcwd() + "/")[-1] + f"{basename}.tar.gz/SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82/"
     band += "PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
     band += "IMG_SPOT6_MS_201805111031189_ORT_SPOT6_20180517_1333011n1b80qobn5ex_1_R1C1.TIF"
     assert prod.bands_files == {"all": band}

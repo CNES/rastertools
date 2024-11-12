@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: rastertools
-Version: 0.6.1.post1.dev0+gbedb844.d20241022
+Version: 0.6.1.post1.dev19+gebce3d0.d20241113
 Summary: Compute radiometric indices and zonal statistics on rasters
 Home-page: https://github.com/cnes/rastertools
 Author: Olivier Queyrut

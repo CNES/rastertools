@@ -3,12 +3,17 @@
 """
 CLI definition for the radioindice tool
 """
+import logging
+
 from eolab.rastertools import RastertoolConfigurationException, Radioindice
 from eolab.rastertools.cli.utils_cli import apply_process
 from eolab.rastertools.product import BandChannel
 from eolab.rastertools.processing import RadioindiceProcessing
+import sys
 import click
 import os
+
+_logger = logging.getLogger(__name__)
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
@@ -34,8 +39,7 @@ def indices_opt(function):
 
 @click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
 
-@click.option('-i', '--indices', type=click.Choice(['ndvi', 'tndvi', 'rvi', 'pvi', 'savi', 'tsavi', 'msavi', 'msavi2', 'ipvi',
-                    'evi', 'ndwi', 'ndwi2', 'mndwi', 'ndpi', 'ndti', 'ndbi', 'ri', 'bi', 'bi2']), multiple = True,
+@click.option('-i', '--indices', type=str, multiple = True,
                     help=" List of indices to computePossible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,"
                         " ndti, ndvi, ndwi, ndwi2, pvi, ri, rvi, savi, tndvi, tsavi")
 
@@ -74,7 +78,8 @@ def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, 
             if ind in indices_dict:
                 indices_to_compute.append(indices_dict[ind])
             else:
-                raise RastertoolConfigurationException(f"Invalid indice name: {ind}")
+                _logger.exception(RastertoolConfigurationException(f"Invalid indice name: {ind}"))
+                sys.exit(2)
 
     if nd:
         for nd in nd:
@@ -85,8 +90,8 @@ def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, 
                     [channel2, channel1])
                 indices_to_compute.append(new_indice)
             else:
-                raise RastertoolConfigurationException(
-                    f"Invalid band(s) in normalized difference: {nd[0]} and/or {nd[1]}")
+                _logger.exception(RastertoolConfigurationException(f"Invalid band(s) in normalized difference: {nd[0]} and/or {nd[1]}"))
+                sys.exit(2)
 
     # handle special case: no indice setup
     if len(indices_to_compute) == 0:

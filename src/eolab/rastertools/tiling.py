@@ -11,6 +11,7 @@ from pathlib import Path
 import rasterio
 import rasterio.mask
 import geopandas as gpd
+import sys
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, RastertoolConfigurationException
@@ -119,21 +120,24 @@ class Tiling(Rastertool):
         # Test if id_column is defined when ids are set
         if id_column is not None:
             if id_column not in self._grid.columns:
-                raise RastertoolConfigurationException(
-                    f"Invalid id column named \"{id_column}\": it does not exist in the grid")
+                _logger.exception(RastertoolConfigurationException(
+                    f"Invalid id column named \"{id_column}\": it does not exist in the grid"))
+                sys.exit(2)
             self._grid = self._grid.set_index(id_column)
 
         if ids is not None:
             if id_column is None:
-                raise RastertoolConfigurationException(
-                    "Ids cannot be specified when id_col is not defined")
+                _logger.exception(RastertoolConfigurationException(
+                    "Ids cannot be specified when id_col is not defined"))
+                sys.exit(2)
 
             self._grid = self._grid[self._grid.index.isin(ids)]
             if self._grid.empty:
                 # if no id common between grid and given ids
-                raise RastertoolConfigurationException(
+                _logger.exception(RastertoolConfigurationException(
                     f"No value in the grid column \"{id_column}\" are matching "
-                    f"the given list of ids {str(ids)}")
+                    f"the given list of ids {str(ids)}"))
+                sys.exit(2)
             else:
                 invalid_ids = [i for i in ids if i not in self._grid.index]
                 if len(invalid_ids) > 0:

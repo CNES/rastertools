@@ -56,6 +56,8 @@ def tiling(ctx, inputs : list, grid_file : str, id_column : str, id : list, outp
     """
     if id == () :
         id = None
+    else:
+        id = list(id)
 
     # create the rastertool object
     tool = Tiling(grid_file)

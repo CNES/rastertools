@@ -11,15 +11,15 @@ import os
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-#Speed command
+#SVF command
 @click.command("svf",context_settings=CONTEXT_SETTINGS)
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
-@click.option('--radius',required = True, type=int, default = 16, help="Maximum distance (in pixels) around a point to evaluate horizontal elevation angle")
+@click.option('--radius', required = True, type=int, help="Maximum distance (in pixels) around a point to evaluate horizontal elevation angle")
 
-@click.option('--directions',required = True, type=int, default = 12, help="Number of directions on which to compute the horizon elevation angle")
+@click.option('--directions',required = True, type=int, help="Number of directions on which to compute the horizon elevation angle")
 
-@click.option('--resolution',default=0.5, type=float, help="Pixel resolution in meter")
+@click.option('--resolution', required = True, type=float, help="Pixel resolution in meter")
 
 @click.option('--altitude', type=int, help="Reference altitude to use for computing the SVF. If this option is not"
                     " specified, SVF is computed for every point at the altitude of the point")

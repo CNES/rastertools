@@ -9,12 +9,14 @@ from eolab.rastertools import Timeseries
 from eolab.rastertools.cli.utils_cli import apply_process
 from eolab.rastertools import RastertoolConfigurationException
 import click
+import sys
 import os
+import logging
 
+_logger = logging.getLogger(__name__)
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-
-#Speed command
+#Timeseries command
 @click.command("timeseries",context_settings=CONTEXT_SETTINGS)
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
@@ -69,15 +71,17 @@ def timeseries(ctx, inputs : list, bands : list, all_bands : bool, output : str,
     try:
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
     except Exception:
-        raise RastertoolConfigurationException(
-            f"Invalid format for start date: {start_date} (must be %Y-%m-%d)")
+        _logger.exception(RastertoolConfigurationException(
+            f"Invalid format for start date: {start_date} (must be %Y-%m-%d)"))
+        sys.exit(2)
 
     # convert start/end dates to datetime
     try:
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
     except Exception:
-        raise RastertoolConfigurationException(
-            f"Invalid format for end date: {end_date} (must be %Y-%m-%d)")
+        _logger.exception(RastertoolConfigurationException(
+            f"Invalid format for end date: {end_date} (must be %Y-%m-%d)"))
+        sys.exit(2)
 
     # create the rastertool object
     tool = Timeseries(start_date, end_date, time_period, bands)
