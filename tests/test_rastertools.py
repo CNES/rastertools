@@ -7,7 +7,7 @@ import filecmp
 from click.testing import CliRunner
 from pathlib import Path
 
-from eolab.rastertools import rastertools, RastertoolConfigurationException
+from eolab.rastertools import rastertools
 from eolab.rastertools.product import RasterType
 
 from . import utils4test
@@ -98,24 +98,21 @@ class TestCase:
         else:
             check_logs = False
 
-        print(self.args)
-
         try:
             rastertools(self.args)
 
         except SystemExit as wrapped_exception:
-            print(wrapped_exception)
             if check_sys_exit:
                 # Check if the exit code matches the expected value
                 assert wrapped_exception.code == self._sys_exit, (f"Expected exit code {self._sys_exit}, but got {wrapped_exception.code}")
 
         # check list of outputs
         if check_outputs:
-            outdir = Path(utils4test.outdir)
+            outdir = Path(RastertoolsTestsData.tests_output_data_dir + "/")
             assert sorted([x.name for x in outdir.iterdir()]) == sorted(self._outputs)
 
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, self._refdir, self._outputs)
+            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", self._refdir, self._outputs)
             assert len(match) == 3
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -125,8 +122,6 @@ class TestCase:
 
         # check logs
         if check_logs:
-            print('...'*20)
-            print(caplog.record_tuples)
             for i, log in enumerate(self._logs):
                 assert caplog.record_tuples[i] == log
 

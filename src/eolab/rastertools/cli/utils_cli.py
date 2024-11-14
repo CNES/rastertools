@@ -6,6 +6,17 @@ import click
 #TO DO
 _logger = logging.getLogger(__name__)
 
+all_opt = click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
+
+band_opt = click.option('-b','--bands', type=int, multiple = True, help="List of bands to process")
+
+win_opt = click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
+
+pad_opt = click.option('-p', '--pad',default="edge", type=click.Choice(['none','edge','maximum','mean','median','minimum','reflect','symmetric','wrap']),
+              help="Pad to use around the image, default : edge" 
+                  "(see https://numpy.org/doc/stable/reference/generated/numpy.pad.html"
+                  " for more information)")
+
 def _extract_files_from_list(cmd_inputs):
     """
     Extracts a list of file paths from a command line input.

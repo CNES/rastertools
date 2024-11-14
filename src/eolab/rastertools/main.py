@@ -16,6 +16,8 @@ import os
 import sys
 import json
 import click
+from pkg_resources import iter_entry_points
+from click_plugins import with_plugins
 from eolab.rastertools.cli.filtering import filter
 from eolab.rastertools.cli.hillshade import hillshade
 from eolab.rastertools.cli.speed import speed
@@ -131,6 +133,8 @@ def add_custom_rastertypes(rastertypes):
 #Rastertools CLI group
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
+
+@with_plugins(iter_entry_points('core_package.cli_plugins'))
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.option(
     '-t', '--rastertype',

@@ -6,7 +6,7 @@ CLI definition for the radioindice tool
 import logging
 
 from eolab.rastertools import RastertoolConfigurationException, Radioindice
-from eolab.rastertools.cli.utils_cli import apply_process
+from eolab.rastertools.cli.utils_cli import apply_process, win_opt
 from eolab.rastertools.product import BandChannel
 from eolab.rastertools.processing import RadioindiceProcessing
 import sys
@@ -42,7 +42,7 @@ def indices_opt(function):
 
 @click.option('-r', '--roi', type= str, help="Region of interest in the input image (vector)")
 
-@click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
+@win_opt
 
 @click.option('-i', '--indices', type=str, multiple = True,
                     help=" List of indices to compute. Possible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,"

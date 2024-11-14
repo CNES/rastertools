@@ -611,10 +611,6 @@ def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : in
     if input_data.shape[0] != 1:
         raise ValueError("adaptive_gaussian only accepts numpy arrays with first dim of size 1")
 
-    '''
-    kernel_size = kwargs.get('kernel_size', 8)
-    sigma = kwargs.get('sigma', 1)
-    '''
     dtype = input_data.dtype
 
     w_1 = (input_data[0, :, :-2] - input_data[0, :, 2:]) ** 2
@@ -662,12 +658,7 @@ def svf(input_data : np.ndarray, radius : int = 8, directions : int = 12, resolu
         raise ValueError("svf only accepts numpy arrays with first dim of size 1")
 
     nb_directions = directions
-    '''
-    radius = kwargs.get('radius', 8)
-    nb_directions = kwargs.get('directions', 12)
-    resolution = kwargs.get('resolution', 0.5)
-    altitude = kwargs.get('altitude', None)
-    '''
+
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=np.float32)
@@ -784,12 +775,7 @@ def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float 
         raise ValueError("hillshade only accepts 3 dims numpy arrays")
     if input_data.shape[0] != 1:
         raise ValueError("hillshade only accepts numpy arrays with first dim of size 1")
-    '''
-    elevation = np.radians(kwargs.get('elevation', 0.0))
-    azimuth = kwargs.get('azimuth', 0.0)
-    radius = kwargs.get('radius', 8)
-    resolution = kwargs.get('resolution', 0.5)
-    '''
+
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=bool)

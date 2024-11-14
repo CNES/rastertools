@@ -4,7 +4,7 @@
 CLI definition for the zonalstats tool
 """
 from eolab.rastertools import Zonalstats
-from eolab.rastertools.cli.utils_cli import apply_process
+from eolab.rastertools.cli.utils_cli import apply_process, all_opt, band_opt
 import click
 import os
 
@@ -38,10 +38,6 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.option('--prefix', default = None, help="Add a prefix to the keys (default: None). One prefix per band (e.g. 'band1 band2')")
 
-@click.option('-b','--bands', multiple = True, type=int, help="List of bands to process")
-
-@click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
-
 @click.option('--sigma',help="Distance to the mean value (in sigma) in order to produce a raster that highlights outliers.")
 
 @click.option('-c','--chart',"chartfile", help="Generate a chart per stat and per geometry (x=timestamp of the input products / y=stat value) and "
@@ -57,6 +53,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.option('--category_names',type = str, default="", help="JSON files containing a dict with classes index as keys and names to display classes as values.")
 
+@band_opt
+@all_opt
 @click.pass_context
 def zonalstats(ctx, inputs : list, output : str, output_format : str, geometries : str, within : str, stats : list, categorical : bool, valid_threshold : float ,area : bool, prefix, bands : list, all_bands : bool, sigma, chartfile, display : bool, geom_index : str, category_file : str, category_index : str, category_names : str) :
     """

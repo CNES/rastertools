@@ -8,6 +8,7 @@ __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
 __license__ = "Apache v2.0"
 
+from .utils4test import RastertoolsTestsData
 
 __refdir = utils4test.get_refdir("test_stats/")
 
@@ -16,8 +17,8 @@ EXTRA_STATS = "sum median mad percentile_5 range majority minority unique nodata
 
 
 def test_compute_zonal_default_stats():
-    raster = utils4test.indir + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-    geojson = utils4test.indir + "COMMUNE_32xxx.geojson"
+    raster = RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+    geojson = RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_32xxx.geojson"
     stats_to_compute = DEFAULT_STATS
     categorical = False
     bands = [1]
@@ -63,8 +64,8 @@ def test_compute_zonal_default_stats():
 
 
 def test_compute_zonal_extra_stats():
-    raster = utils4test.indir + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-    geojson = utils4test.indir + "COMMUNE_32xxx.geojson"
+    raster = RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+    geojson = RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_32xxx.geojson"
     stats_to_compute = EXTRA_STATS + ["valid"]
     categorical = False
     bands = [1]
@@ -167,8 +168,8 @@ def test_compute_zonal_extra_stats():
 
 
 def test_compute_zonal_categorical():
-    raster = utils4test.indir + "OCS_2017_CESBIO_extract.tif"
-    geojson = utils4test.indir + "COMMUNE_59xxx.geojson"
+    raster = RastertoolsTestsData.tests_input_data_dir + "/" + "OCS_2017_CESBIO_extract.tif"
+    geojson = RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_59xxx.geojson"
     stats_to_compute = ['count']
     categorical = True
     bands = [1]
@@ -205,10 +206,10 @@ def test_compute_zonal_categorical():
 
 
 def test_compute_zonal_stats_per_category():
-    raster = utils4test.indir + "DSM_PHR_Dunkerque.tif"
-    geojson = utils4test.indir + "COMMUNE_59xxx.geojson"
-    catgeojson = utils4test.indir + "OSO_2017_classification_dep59.shp"
-    catlabels = utils4test.indir + "OSO_nomenclature_2017.json"
+    raster = RastertoolsTestsData.tests_input_data_dir + "/" + "DSM_PHR_Dunkerque.tif"
+    geojson = RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_59xxx.geojson"
+    catgeojson = RastertoolsTestsData.tests_input_data_dir + "/" + "OSO_2017_classification_dep59.shp"
+    catlabels = RastertoolsTestsData.tests_input_data_dir + "/" + "OSO_nomenclature_2017.json"
     stats_to_compute = DEFAULT_STATS
     bands = [1]
     geometries = vector.reproject(vector.filter(geojson, raster), raster)

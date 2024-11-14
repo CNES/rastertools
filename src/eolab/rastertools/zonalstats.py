@@ -315,7 +315,6 @@ class Zonalstats(Rastertool):
             :obj:`eolab.rastertools.Zonalstats`: the current instance so that it is
             possible to chain the with... calls (fluent API)
         """
-        print(self._stats)
         # Manage sigma computation option that requires mean + std dev computation
         if "mean" not in self._stats:
             self._stats.append("mean")

@@ -21,19 +21,14 @@ class RastertoolsTestsData:
     tests_output_data_dir:str = str(project_dir / "tests" / "tests_out")
     tests_ref_data_dir:str = str(project_dir / "tests" / "tests_refs")
 
-projectdir = RastertoolsTestsData.tests_project_dir + "/"
-indir = RastertoolsTestsData.tests_input_data_dir + "/"
-outdir = RastertoolsTestsData.tests_output_data_dir + "/"
-__root_refdir = RastertoolsTestsData.tests_ref_data_dir + "/"
-
 def get_refdir(testname: str):
-    return __root_refdir + testname
+    return RastertoolsTestsData.tests_ref_data_dir + '/' + testname
 
 
 def clear_outdir(subdirs=True):
     """function to clear content of a dir"""
-    for file in os.listdir(outdir):
-        file_path = os.path.join(outdir, file)
+    for file in os.listdir(RastertoolsTestsData.tests_output_data_dir + '/'):
+        file_path = os.path.join(RastertoolsTestsData.tests_output_data_dir + '/', file)
         if os.path.isfile(file_path):
             os.unlink(file_path)
         elif subdirs:
@@ -42,8 +37,8 @@ def clear_outdir(subdirs=True):
 
 
 def create_outdir():
-    if not os.path.isdir(outdir):
-        os.makedirs(outdir)
+    if not os.path.isdir(RastertoolsTestsData.tests_output_data_dir + '/'):
+        os.makedirs(RastertoolsTestsData.tests_output_data_dir + '/')
     clear_outdir()
 
 
@@ -53,7 +48,7 @@ def delete_dir(dir):
 
 def copy_to_ref(files, refdir):
     for f in files:
-        os.replace(outdir + f, refdir + f)
+        os.replace(RastertoolsTestsData.tests_output_data_dir + '/' + f, refdir + f)
 
 
 def basename(infile):
