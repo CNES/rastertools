@@ -4,7 +4,7 @@
 CLI definition for the speed tool
 """
 from eolab.rastertools import Speed
-from eolab.rastertools.cli.utils_cli import apply_process
+from eolab.rastertools.cli.utils_cli import apply_process, band_opt, all_opt
 import click
 import os
 
@@ -15,9 +15,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command("speed",context_settings=CONTEXT_SETTINGS)
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
-@click.option('-b','--bands', type=int, multiple = True, help="List of bands to process")
-
-@click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
+@band_opt
+@all_opt
 
 @click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 

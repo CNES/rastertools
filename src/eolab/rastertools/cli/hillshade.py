@@ -4,7 +4,7 @@
 CLI definition for the hillshade tool
 """
 from eolab.rastertools import Hillshade
-from eolab.rastertools.cli.utils_cli import apply_process
+from eolab.rastertools.cli.utils_cli import apply_process, pad_opt, win_opt
 import click
 import os
 
@@ -29,12 +29,8 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 
-@click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
-
-@click.option('-p', '--pad',default="edge", type=click.Choice(['none','edge','maximum','mean','median','minimum','reflect','symmetric','wrap']),
-              help="Pad to use around the image, default : edge" 
-                  " (see https://numpy.org/doc/stable/reference/generated/numpy.pad.html"
-                  " for more information)")
+@win_opt
+@pad_opt
 
 @click.pass_context
 def hillshade(ctx, inputs : list, elevation : float, azimuth : float, radius : int, resolution : float, output : str, window_size : int, pad : str) :

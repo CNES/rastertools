@@ -13,6 +13,8 @@ __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
 __license__ = "Apache v2.0"
 
+from .utils4test import RastertoolsTestsData
+
 
 def test_rastertype_valid_parameters():
     # S2 L1C
@@ -352,7 +354,7 @@ def test_rastertype_SPOT67():
 
 
 def test_rastertype_additional():
-    file = utils4test.indir + "additional_rastertypes.json"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "additional_rastertypes.json"
 
     with open(file) as json_content:
         RasterType.add(json.load(json_content))

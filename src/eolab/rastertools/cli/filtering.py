@@ -4,7 +4,7 @@
 CLI definition for the filtering tool
 """
 from eolab.rastertools import Filtering
-from eolab.rastertools.cli.utils_cli import apply_process
+from eolab.rastertools.cli.utils_cli import apply_process, pad_opt, win_opt, all_opt, band_opt
 import click
 import os
 
@@ -71,17 +71,6 @@ ker_opt = click.option('--kernel_size', type=int, help="Kernel size of the filte
                    " (default: 8)")
 
 out_opt = click.option('-o', '--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
-
-win_opt = click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
-
-pad_opt = click.option('-p','--pad',default="edge", type=click.Choice(['none','edge','maximum','mean','median','minimum','reflect','symmetric','wrap']),
-              help="Pad to use around the image, default : edge" 
-                  "(see https://numpy.org/doc/stable/reference/generated/numpy.pad.html"
-                  "for more information)")
-
-band_opt = click.option('-b','--bands', multiple = True, type=int, help="List of bands to process")
-
-all_opt = click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
 
 sigma = click.option('--sigma', type=int, required = True, help="Standard deviation of the Gaussian distribution")
 

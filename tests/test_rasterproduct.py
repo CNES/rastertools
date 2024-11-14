@@ -19,6 +19,7 @@ __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
 __license__ = "Apache v2.0"
 
+from .utils4test import RastertoolsTestsData
 
 __refdir = utils4test.get_refdir("test_rasterproduct/")
 
@@ -41,14 +42,15 @@ def test_rasterproduct_valid_parameters():
     """
     # archive with one file per band
     basename = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041"
+    origin_path = RastertoolsTestsData.tests_input_data_dir + "/".split(os.getcwd() + "/")[-1]
     file = Path(
-        utils4test.indir.split(os.getcwd() + "/")[-1] + basename + ".zip")
+        origin_path + basename + ".zip")
     prod = RasterProduct(file)
 
     assert prod.file == file
     assert prod.rastertype == RasterType.get("S2_L1C")
     assert prod.channels == RasterType.get("S2_L1C").channels
-    band_format = f"/vsizip/" + utils4test.indir.split(os.getcwd() + "/")[-1] + f"{basename}.zip/"
+    band_format = f"/vsizip/" + origin_path + f"{basename}.zip/"
     band_format += f"{basename}.SAFE/GRANULE/L1C_T30TYP_A013519_20191008T105335/IMG_DATA/"
     band_format += "T30TYP_20191008T105029_{}.jp2"
     assert prod.bands_files == {b: band_format.format(b) for b in prod.rastertype.get_band_ids()}
@@ -62,13 +64,13 @@ def test_rasterproduct_valid_parameters():
 
     # archive with one file for all bands
     basename = "SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82"
-    file = utils4test.indir.split(os.getcwd() + "/")[-1] + basename + ".tar.gz"
+    file = origin_path + basename + ".tar.gz"
     prod = RasterProduct(file)
 
     assert prod.file == Path(file)
     assert prod.rastertype == RasterType.get("SPOT67_GEOSUD")
     assert prod.channels == [BandChannel.red, BandChannel.green, BandChannel.blue, BandChannel.nir]
-    band = f"/vsitar/" + utils4test.indir.split(os.getcwd() + "/")[-1] + f"{basename}.tar.gz/SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82/"
+    band = f"/vsitar/" + origin_path + f"{basename}.tar.gz/SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82/"
     band += "PROD_SPOT6_001/VOL_SPOT6_001_A/IMG_SPOT6_MS_001_A/"
     band += "IMG_SPOT6_MS_201805111031189_ORT_SPOT6_20180517_1333011n1b80qobn5ex_1_R1C1.TIF"
     assert prod.bands_files == {"all": band}
@@ -82,7 +84,7 @@ def test_rasterproduct_valid_parameters():
 
     # regular raster file
     basename = "RGB_TIF_20170105_013442_test.tif"
-    file = utils4test.indir + basename
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + basename
     prod = RasterProduct(file)
 
     assert prod.file == Path(file)
@@ -115,12 +117,12 @@ def test_rasterproduct_invalid_parameters():
         RasterProduct(None)
     assert "'file' cannot be None" in str(exc.value)
 
-    file = utils4test.indir + "InvalidName.zip"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "InvalidName.zip"
     with pytest.raises(ValueError) as exc:
         RasterProduct(file)
     assert f"Unrecognized raster type for input file {file}" in str(exc.value)
 
-    file = utils4test.indir + "grid.geojson"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "grid.geojson"
     with pytest.raises(ValueError) as exc:
         RasterProduct(file)
     assert f"Unsupported input file {file}" in str(exc.value)
@@ -143,31 +145,31 @@ def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
     utils4test.create_outdir()
 
     # unzip SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip
-    file = utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
     with zipfile.ZipFile(file) as myzip:
-        myzip.extractall(utils4test.outdir)
+        myzip.extractall(RastertoolsTestsData.tests_output_data_dir + "/")
 
     # creation of S2 L2A MAJA products
-    files = [Path(utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"),
-             Path(utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_tar.tar"),
-             Path(utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_targz.TAR.GZ"),
-             Path(utils4test.outdir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")]
+    files = [Path(RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"),
+             Path(RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_tar.tar"),
+             Path(RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_targz.TAR.GZ"),
+             Path(RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")]
 
     for file in files:
-        with RasterProduct(file, vrt_outputdir=Path(utils4test.outdir)) as prod:
-            raster = prod.get_raster(roi=Path(utils4test.indir + "COMMUNE_32001.shp"),
+        with RasterProduct(file, vrt_outputdir=Path(RastertoolsTestsData.tests_output_data_dir + "/")) as prod:
+            raster = prod.get_raster(roi=Path(RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_32001.shp"),
                                      masks="all")
 
             assert Path(raster).exists()
-            assert raster == utils4test.outdir + utils4test.basename(file) + "-mask.vrt"
+            assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(file) + "-mask.vrt"
 
             ref = [utils4test.basename(file) + ".vrt",
                    utils4test.basename(file) + "-clipped.vrt",
                    utils4test.basename(file) + "-mask.vrt"]
 
             if compare:
-                print(f"compare {utils4test.outdir} ,{__refdir}, {ref}")
-                match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, ref)
+                print(f"compare {RastertoolsTestsData.tests_output_data_dir} ,{__refdir}, {ref}")
+                match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, ref)
                 assert len(match) == len(ref)
                 assert len(mismatch) == 0
                 assert len(err) == 0
@@ -182,7 +184,7 @@ def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
         utils4test.clear_outdir(subdirs=False)
 
     # delete the dir resulting from unzip
-    utils4test.delete_dir(utils4test.outdir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
+    utils4test.delete_dir(RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
 
 
 def test_create_product_S2_L1C(compare, save_gen_as_ref):
@@ -207,18 +209,18 @@ def test_create_product_S2_L1C(compare, save_gen_as_ref):
     utils4test.create_outdir()
 
     # creation of S2 L1C product
-    infile = utils4test.indir + "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
+    infile = RastertoolsTestsData.tests_input_data_dir + "/" + "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
 
-    with RasterProduct(infile, vrt_outputdir=utils4test.outdir) as prod:
-        raster = prod.get_raster(roi=utils4test.indir + "/COMMUNE_32001.shp",
+    with RasterProduct(infile, vrt_outputdir=RastertoolsTestsData.tests_output_data_dir + "/") as prod:
+        raster = prod.get_raster(roi=RastertoolsTestsData.tests_input_data_dir + "/" + "/COMMUNE_32001.shp",
                                  masks="all")
         assert Path(raster).exists()
-        assert raster == utils4test.outdir + utils4test.basename(infile) + "-clipped.vrt"
+        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(infile) + "-clipped.vrt"
 
         gen_files = [utils4test.basename(infile) + ".vrt",
                      utils4test.basename(infile) + "-clipped.vrt"]
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
             assert len(match) == 2
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -255,16 +257,16 @@ def test_create_product_S2_L2A_SEN2CORE(compare, save_gen_as_ref):
     utils4test.create_outdir()
 
     # creation of S2 L2A SEN2CORE product
-    infile = utils4test.indir + "S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip"
-    with RasterProduct(infile, vrt_outputdir=utils4test.outdir) as prod:
+    infile = RastertoolsTestsData.tests_input_data_dir + "/" + "S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip"
+    with RasterProduct(infile, vrt_outputdir=RastertoolsTestsData.tests_output_data_dir + "/") as prod:
         raster = prod.get_raster()
 
         assert Path(raster).exists()
-        assert raster == utils4test.outdir + utils4test.basename(infile) + ".vrt"
+        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(infile) + ".vrt"
 
         gen_files = [utils4test.basename(infile) + ".vrt"]
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
             assert len(match) == 1
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -302,15 +304,15 @@ def test_create_product_SPOT67(compare, save_gen_as_ref):
 
     # creation of SPOT67 product
     infile = "SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz"
-    with RasterProduct(utils4test.indir + infile, vrt_outputdir=utils4test.outdir) as prod:
+    with RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + infile, vrt_outputdir=RastertoolsTestsData.tests_output_data_dir + "/") as prod:
         raster = prod.get_raster()
 
         assert Path(raster).exists()
-        assert raster == utils4test.outdir + utils4test.basename(infile) + ".vrt"
+        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(infile) + ".vrt"
 
         gen_files = [utils4test.basename(infile) + ".vrt"]
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
             assert len(match) == 1
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -343,7 +345,7 @@ def test_create_product_special_cases():
 
     # creation in memory (without masks)
     file = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
-    with RasterProduct(utils4test.indir + file) as prod:
+    with RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + file) as prod:
         assert prod.get_raster(masks=None).endswith(utils4test.basename(file) + ".vrt")
         # check if product can be opened by rasterio
         dataset = prod.open()
@@ -351,8 +353,8 @@ def test_create_product_special_cases():
 
     # creation in memory (with masks)
     file = "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_tar.tar"
-    with RasterProduct(utils4test.indir + file) as prod:
-        raster = prod.get_raster(roi=Path(utils4test.indir + "COMMUNE_32001.shp"),
+    with RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + file) as prod:
+        raster = prod.get_raster(roi=Path(RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_32001.shp"),
                                  bands=prod.rastertype.get_band_ids(),
                                  masks=prod.rastertype.get_mask_ids())
 
@@ -367,9 +369,9 @@ def test_create_product_special_cases():
 
     # creation from a vrt
     file = "S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.vrt"
-    with RasterProduct(utils4test.indir + file) as prod:
+    with RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + file) as prod:
         raster = prod.get_raster()
-        assert raster == utils4test.indir + utils4test.basename(file) + ".vrt"
+        assert raster == RastertoolsTestsData.tests_input_data_dir + "/" + utils4test.basename(file) + ".vrt"
         assert prod.rastertype == RasterType.get("S2_L2A_SEN2CORE")
         # check if product can be opened by rasterio
         dataset = rasterio.open(raster)
@@ -377,14 +379,14 @@ def test_create_product_special_cases():
 
     # creation from a directory
     # unzip S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip
-    file = utils4test.indir + "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
     with zipfile.ZipFile(file) as myzip:
-        myzip.extractall(utils4test.outdir)
+        myzip.extractall(RastertoolsTestsData.tests_output_data_dir + "/")
     dirname = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.SAFE"
 
-    with RasterProduct(file, vrt_outputdir=Path(utils4test.outdir)) as prod:
+    with RasterProduct(file, vrt_outputdir=Path(RastertoolsTestsData.tests_output_data_dir + "/")) as prod:
         raster = prod.get_raster()
-        assert raster == utils4test.outdir + utils4test.basename(file) + ".vrt"
+        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(file) + ".vrt"
         # check if product can be opened by rasterio
         dataset = rasterio.open(raster)
         dataset.close()
@@ -395,7 +397,7 @@ def test_create_product_special_cases():
     # file = "SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz"
     # channels = [BandChannel.red, BandChannel.green, BandChannel.blue, BandChannel.swir]
     # with pytest.raises(ValueError) as exc:
-    #     prod = RasterProduct(utils4test.indir + file,
+    #     prod = RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + file,
     #                                         RasterType.get("SPOT67_GEOSUD"),
     #                                         channels)
     # msg = f"RasterType does not contain all the channels in {channels}"
@@ -403,7 +405,7 @@ def test_create_product_special_cases():
 
     # creation of a product with bands that do not exist in the product (but that
     # do exist in rastertype)
-    file = utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
     with zipfile.ZipFile(file) as myzip:
         names = myzip.namelist()
         selection = []
@@ -413,9 +415,9 @@ def test_create_product_special_cases():
                n.endswith("FRE_B4.tif") or \
                n.endswith("CLM_R1.tif"):
                 selection.append(n)
-        myzip.extractall(utils4test.outdir, selection)
+        myzip.extractall(RastertoolsTestsData.tests_output_data_dir + "/", selection)
 
-    file = Path(utils4test.outdir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
+    file = Path(RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
 
     with pytest.raises(ValueError) as exc:
         prod = RasterProduct(file)

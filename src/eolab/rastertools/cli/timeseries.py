@@ -6,7 +6,7 @@ CLI definition for the timeseries tool
 from datetime import datetime
 
 from eolab.rastertools import Timeseries
-from eolab.rastertools.cli.utils_cli import apply_process
+from eolab.rastertools.cli.utils_cli import apply_process, win_opt, all_opt, band_opt
 from eolab.rastertools import RastertoolConfigurationException
 import click
 import sys
@@ -20,10 +20,6 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.command("timeseries",context_settings=CONTEXT_SETTINGS)
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
-@click.option('-b','--bands', type=list, help="List of bands to process")
-
-@click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
-
 @click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 
 @click.option("-s","--start_date", help="Start date of the timeseries to generate in the following format: yyyy-MM-dd")
@@ -33,8 +29,9 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.option("-p", "--time_period",type=int, help="Time period (number of days) between two consecutive images in the timeseries "
              "to generate e.g. 10 = generate one image every 10 days")
 
-@click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
-
+@band_opt
+@all_opt
+@win_opt
 @click.pass_context
 
 def timeseries(ctx, inputs : list, bands : list, all_bands : bool, output : str, start_date : str, end_date : str, time_period : int, window_size : int) :
