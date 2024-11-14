@@ -16,7 +16,7 @@ import os
 import sys
 import json
 import click
-from eolab.rastertools.cli.filtering_dyn import filter
+from eolab.rastertools.cli.filtering import filter
 from eolab.rastertools.cli.hillshade import hillshade
 from eolab.rastertools.cli.speed import speed
 from eolab.rastertools.cli.svf import svf
@@ -127,6 +127,8 @@ def add_custom_rastertypes(rastertypes):
     """
     RasterType.add(rastertypes)
 
+
+#Rastertools CLI group
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.group(context_settings=CONTEXT_SETTINGS)
@@ -162,12 +164,12 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
     help="set loglevel to DEBUG")
 @click.version_option(version='rastertools {}'.format(__version__))  # Ensure __version__ is defined
 @click.pass_context
+
 def rastertools(ctx, rastertype : str, max_workers : int, keep_vrt : bool, verbose : bool, very_verbose : bool):
     """
     Main entry point for the `rastertools` Command Line Interface.
 
-    The `rastertools` CLI provides tools for raster processing
-    and analysis and allows configurable data handling, parallel processing,
+    The `rastertools` CLI provides tools for raster processing and analysis and allows configurable data handling, parallel processing,
     and debugging support.
 
     Logging:
@@ -182,6 +184,7 @@ def rastertools(ctx, rastertype : str, max_workers : int, keep_vrt : bool, verbo
 
         - `RASTERTOOLS_MAXWORKERS`: If `max_workers` is set, it defines the max workers for rastertools.
     """
+    #Saving keep_vrt to use it in the subcommands
     ctx.ensure_object(dict)
     ctx.obj['keep_vrt'] = keep_vrt
 
@@ -225,18 +228,6 @@ rastertools.add_command(timeseries, name = "timeseries")
 rastertools.add_command(zonalstats, name = "zs")
 rastertools.add_command(zonalstats, name = "zonalstats")
 
-CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
-
-
-#Speed command
-@click.command("ema",context_settings=CONTEXT_SETTINGS)
-@click.option('--inputs', type=int)
-@click.pass_context
-def ema(ctx, inputs) :
-    raise Exception(f"coucou {inputs}")
-
-rastertools.add_command(ema, name = "ema")
-
 
 @rastertools.result_callback()
 @click.pass_context
@@ -246,7 +237,8 @@ def handle_result(ctx):
         ctx.exit()
 
 def run(*args, **kwargs):
-    """Entry point for console_scripts
+    """
+    Entry point for console_scripts
     """
     rastertools(*args, **kwargs)
 

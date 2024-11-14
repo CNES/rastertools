@@ -8,28 +8,30 @@ speed
 .. code-block:: console
 
   $ rastertools speed --help
-
   usage: rastertools speed [-h] [-b BANDS [BANDS ...]] [-a] [-o OUTPUT]
                            inputs [inputs ...]
-  
-  Compute the speed of radiometric values of several raster images
-  
-  positional arguments:
-    inputs                Input file to process (e.g. Sentinel2 L2A MAJA from
-                          THEIA). You can provide a single file with extension
-                          ".lst" (e.g. "speed.lst") that lists the input files
-                          to process (one input file per line in .lst)
-  
-  optional arguments:
-    -h, --help            show this help message and exit
-    -b BANDS [BANDS ...], --bands BANDS [BANDS ...]
-                          List of bands to compute
-    -a, --all             Compute all bands
-    -o OUTPUT, --output OUTPUT
-                          Output dir where to store results (by default current
-                          dir)
-  
-  By default only first band is computed.
+
+  Compute the speed of radiometric values for multiple raster images.
+
+  This command calculates the speed of radiometric values for raster data,
+  optionally processing specific bands or all bands from the input images. The
+  results are saved to a specified output directory.
+
+  Arguments:
+
+      inputs TEXT
+
+      Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). You can
+      provide a single file with extension ".lst" (e.g. "speed.lst") that
+      lists the input files to process (one input file per line in .lst).
+
+  Options:
+      -b, --bands INTEGER  List of bands to process
+      -a, --all            Process all bands
+      -o, --output TEXT    Output directory to store results (by default current
+                           directory)
+      -h, --help           Show this message and exit.
+
 
 .. warning::
   At least two input rasters must be given. The rasters must match one of the configured raster types,

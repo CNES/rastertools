@@ -4,9 +4,7 @@
 CLI definition for the filtering tool
 """
 from eolab.rastertools import Filtering
-#import eolab.rastertools.main as main
 from eolab.rastertools.cli.utils_cli import apply_process
-#from eolab.rastertools.main import rastertools #Import the click group named rastertools
 import click
 import os
 
@@ -22,19 +20,24 @@ def create_filtering(output : str, window_size : int, pad : str, argsdict : dict
 
     Args:
         output (str): The path for the filtered output file.
+
         window_size (int): Size of the processing window used by the filter.
-        pad (str): Padding method used for windowing (e.g., 'reflect', 'constant', etc.).
+
+        pad (str): Padding method used for windowing (default : 'edge').
+
         argsdict (dict): Dictionary of additional filter configuration arguments.
+
         filter (str): The filter type to apply (must be a valid name in `Filtering` filters).
+
         bands (list): List of bands to process. If empty and `all_bands` is False, defaults to [1].
+
         kernel_size (int): Size of the kernel used by the filter.
+
         all_bands (bool): Whether to apply the filter to all bands (True) or specific bands (False).
 
     Returns:
         :obj:`eolab.rastertools.Filtering`: A configured `Filtering` instance ready for execution.
     """
-
-
     # get the bands to process
     if all_bands:
         bands = None
@@ -53,11 +56,19 @@ def create_filtering(output : str, window_size : int, pad : str, argsdict : dict
     return tool
 
 
+def filter_options(options : list):
+    def wrapper(function):
+        for option in options:
+            function = option(function)
+        return function
+    return wrapper
+
+
 inpt_arg = click.argument('inputs', type=str, nargs = -1, required = 1)
 
 ker_opt = click.option('--kernel_size', type=int, help="Kernel size of the filter function, e.g. 3 means a square" 
-                   "of 3x3 pixels on which the filter function is computed"
-                   "(default: 8)")
+                   " of 3x3 pixels on which the filter function is computed"
+                   " (default: 8)")
 
 out_opt = click.option('-o', '--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 
@@ -72,183 +83,62 @@ band_opt = click.option('-b','--bands', multiple = True, type=int, help="List of
 
 all_opt = click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
 
-@click.group(name = "filter", context_settings=CONTEXT_SETTINGS)
+sigma = click.option('--sigma', type=int, required = True, help="Standard deviation of the Gaussian distribution")
+
+@click.group(context_settings=CONTEXT_SETTINGS)
 @click.pass_context
 def filter(ctx):
-    '''
+    """
     Apply a filter to a set of images.
-    '''
+    """
     ctx.ensure_object(dict)
 
 
-#Median filter
-@filter.command("median",context_settings=CONTEXT_SETTINGS)
-@inpt_arg
-@ker_opt
-@out_opt
-@win_opt
-@pad_opt
-@band_opt
-@all_opt
-@click.pass_context
-def median(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool) :
-    """
-    Execute the median filter on the input files with the specified parameters.
+def create_filter(filter_name : str):
 
-    The filter works by sliding a window across the input raster and replacing each
-    pixel value with the median value of the pixels within that window.
+    list_opt = [inpt_arg, ker_opt, out_opt, win_opt, pad_opt, band_opt, all_opt]
+    if filter_name == 'adaptive_gaussian':
+        list_opt.append(sigma)
 
-    The `inputs` argument can either be a single file or a `.lst` file containing a list of input files.
+    @filter.command(filter_name, context_settings=CONTEXT_SETTINGS)
+    @filter_options(list_opt)
+    @click.pass_context
+    def filter_filtername(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool, **kwargs):
+        """
+        Execute the requested filter on the input files with the specified parameters.
+        The `inputs` argument can either be a single file or a `.lst` file containing a list of input files.
 
-    Arguments:
+        Arguments:
 
-    inputs TEXT
+            inputs TEXT
 
-    Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
-    You can provide a single file with extension \".lst\" (e.g. \"filtering.lst\") that lists
-    the input files to process (one input file per line in .lst).
-    """
-    # Configure the filter tool instance
-    tool = create_filtering(
+            Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
+        You can provide a single file with extension \".lst\" (e.g. \"filtering.lst\") that lists
+        the input files to process (one input file per line in .lst).
+        """
+        argsdict = {"inputs": inputs}
+
+        if filter_name == 'adaptive_gaussian':
+            argsdict = {"sigma" : kwargs["sigma"]}
+
+        # Configure the filter tool instance
+        tool = create_filtering(
             output=output,
             window_size=window_size,
             pad=pad,
-            argsdict={"inputs": inputs},
-            filter='median',
+            argsdict=argsdict,
+            filter=filter_name,
             bands=bands,
             kernel_size=kernel_size,
             all_bands=all_bands)
 
-    apply_process(ctx, tool, inputs)
-
-#Sum filter
-@filter.command("sum",context_settings=CONTEXT_SETTINGS)
-@inpt_arg
-@ker_opt
-@out_opt
-@win_opt
-@pad_opt
-@band_opt
-@all_opt
-@click.pass_context
-def sum(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool) :
-    """
-    Execute the sum filter on the input files with the specified parameters.
-
-    The filter works by sliding a window across the input raster and replacing each
-    pixel value with the median value of the pixels within that window.
-
-    The `inputs` argument can either be a single file or a `.lst` file containing a list of input files.
-
-    Arguments:
-
-    inputs TEXT
-
-    Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
-    You can provide a single file with extension \".lst\" (e.g. \"filtering.lst\") that lists
-    the input files to process (one input file per line in .lst).
-    """
-    # Configure the filter tool instance
-    tool = create_filtering(
-            output=output,
-            window_size=window_size,
-            pad=pad,
-            argsdict={"inputs": inputs},
-            filter='sum',
-            bands=bands,
-            kernel_size=kernel_size,
-            all_bands=all_bands)
-
-    apply_process(ctx, tool, inputs)
-
-#Mean filter
-@filter.command("mean",context_settings=CONTEXT_SETTINGS)
-@inpt_arg
-@ker_opt
-@out_opt
-@win_opt
-@pad_opt
-@band_opt
-@all_opt
-@click.pass_context
-def mean(ctx, inputs : list, output : str, window_size : int, pad : str, kernel_size : int, bands : list, all_bands : bool) :
-    """
-    Execute the mean filter on the input files with the specified parameters.
-
-    The filter works by sliding a window across the input raster and replacing each
-    pixel value with the median value of the pixels within that window.
-
-    The `inputs` argument can either be a single file or a `.lst` file containing a list of input files.
-
-    Arguments:
-
-    inputs TEXT
-
-    Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
-    You can provide a single file with extension \".lst\" (e.g. \"filtering.lst\") that lists
-    the input files to process (one input file per line in .lst).
-    """
-    # Configure the filter tool instance
-    tool = create_filtering(
-            output=output,
-            window_size=window_size,
-            pad=pad,
-            argsdict={"inputs": inputs},
-            filter='mean',
-            bands=bands,
-            kernel_size=kernel_size,
-            all_bands=all_bands)
-
-    apply_process(ctx, tool, inputs)
-
-#Adaptive gaussian filter
-@filter.command("adaptive_gaussian",context_settings=CONTEXT_SETTINGS)
-@inpt_arg
-@ker_opt
-@out_opt
-@win_opt
-@pad_opt
-@band_opt
-@all_opt
-@click.option('--sigma', type = int, required = True, help = "Standard deviation of the Gaussian distribution")
-@click.pass_context
-def adaptive_gaussian(ctx, inputs : list, output : str, window_size : int, pad : str, sigma : int, kernel_size : int, bands : list, all_bands : bool) :
-    """
-    Execute the adaptive gaussian filter on the input files with the specified parameters.
-
-    The filter works by sliding a window across the input raster and replacing each
-    pixel value with the median value of the pixels within that window.
-
-    The `inputs` argument can either be a single file or a `.lst` file containing a list of input files.
-
-    Arguments:
-
-    inputs TEXT
-
-    Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
-    You can provide a single file with extension \".lst\" (e.g. \"filtering.lst\") that lists
-    the input files to process (one input file per line in .lst).
-    """
-    # Configure the filter tool instance
-    tool = create_filtering(
-            output=output,
-            window_size=window_size,
-            pad=pad,
-            argsdict={"inputs": inputs, "sigma" : sigma},
-            filter='adaptive_gaussian',
-            bands=bands,
-            kernel_size=kernel_size,
-            all_bands=all_bands)
-
-    apply_process(ctx, tool, inputs)
+        apply_process(ctx, tool, inputs)
 
 
-@filter.result_callback()
-@click.pass_context
-def handle_result(ctx):
-    if ctx.invoked_subcommand is None:
-        click.echo(ctx.get_help())
-        ctx.exit()
+median = create_filter("median")
+mean = create_filter("mean")
+sum = create_filter("sum")
+adaptive_gaussian = create_filter("adaptive_gaussian")
 
 
 

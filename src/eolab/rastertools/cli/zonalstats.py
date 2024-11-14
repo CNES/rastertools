@@ -60,22 +60,20 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def zonalstats(ctx, inputs : list, output : str, output_format : str, geometries : str, within : str, stats : list, categorical : bool, valid_threshold : float ,area : bool, prefix, bands : list, all_bands : bool, sigma, chartfile, display : bool, geom_index : str, category_file : str, category_index : str, category_names : str) :
     """
-    Compute zonal statistics
-    Compute zonal statistics of a raster image.\n Available statistics are: 
-    min max range mean std percentile_x (x in [0, 100]) median mad 
-    count valid nodata sum majority minority unique
-    By default only first band is computed.
+    Compute zonal statistics of a raster image.
 
-    Create and configure a new rastertool "Zonalstats" according to argparse args
+    Available statistics are:
+    min, max, range, mean, std, percentile_x (x in [0, 100]), median, mad, count, valid, nodata, sum, majority, minority, unique.
 
-    Args:
-        args: args extracted from command line
+    By default, only the first band is computed unless specified otherwise.
 
-    Returns:
-        :obj:`eolab.rastertools.Zonalstats`: The configured rastertool to run
+    Arguments:
+
+        inputs TEXT
+
+        Raster files to process. You can provide a single filewith extension ".lst" (e.g. "zonalstats.lst") that
+    lists the input files to process (one input file per line in .lst)
     """
-    print(output)
-    print(output_format)
     # get and check the list of stats to compute
     if stats:
         stats_to_compute = list(stats)

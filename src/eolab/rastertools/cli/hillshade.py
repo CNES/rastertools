@@ -16,13 +16,13 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.argument('inputs', type=str, nargs = -1, required = 1)
 
 @click.option('--elevation', type=float, required = True, help="Elevation of the sun in degrees, [0°, 90°] where"
-                        "90°=zenith and 0°=horizon")
+                        " 90°=zenith and 0°=horizon")
 
 @click.option('--azimuth', type=float, required = True, help="Azimuth of the sun in degrees, [0°, 360°] where"
-                        "0°=north, 90°=east, 180°=south and 270°=west")
+                        " 0°=north, 90°=east, 180°=south and 270°=west")
 
 @click.option('--radius', type=int, help="Maximum distance (in pixels) around a point to evaluate"
-                        "horizontal elevation angle. If not set, it is automatically computed from"
+                        " horizontal elevation angle. If not set, it is automatically computed from"
                         " the range of altitudes in the digital model.")
 
 @click.option('--resolution', required = True, type=float, help="Pixel resolution in meter")
@@ -33,39 +33,24 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 @click.option('-p', '--pad',default="edge", type=click.Choice(['none','edge','maximum','mean','median','minimum','reflect','symmetric','wrap']),
               help="Pad to use around the image, default : edge" 
-                  "(see https://numpy.org/doc/stable/reference/generated/numpy.pad.html"
-                  "for more information)")
+                  " (see https://numpy.org/doc/stable/reference/generated/numpy.pad.html"
+                  " for more information)")
 
 @click.pass_context
 def hillshade(ctx, inputs : list, elevation : float, azimuth : float, radius : int, resolution : float, output : str, window_size : int, pad : str) :
     """
-    CHANGE DOCSTRING
-    Adds the hillshade subcommand to the given rastertools subparser
+    Execute the hillshade subcommand on a Digital Height Model (DHM) using the given solar
+    parameters (elevation, azimuth), resolution, and optional parameters for processing the raster.
 
     Arguments:
 
-    inputs TEXT
+        inputs TEXT
 
-    Input file to process (i.e. geotiff corresponding to a
+        Input file to process (i.e. geotiff corresponding to a
     Digital Height Model). You can provide a single file
-    with extension ".lst" (e.g. "filtering.lst") that
+    with extension ".lst" (e.g. "hillshade.lst") that
     lists the input files to process (one input file per line in .lst)
-
-    Args:
-        rastertools_parsers:
-            The rastertools subparsers to which this subcommand shall be added.
-
-            This argument provides from a code like this::
-
-                import argparse
-                main_parser = argparse.ArgumentParser()
-                rastertools_parsers = main_parser.add_subparsers()
-                hillshade.create_argparser(rastertools_parsers)
-
-    Returns:
-        The rastertools subparsers updated with this subcommand
     """
-
     # create the rastertool object
     tool = Hillshade(elevation, azimuth, resolution, radius)
 

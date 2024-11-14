@@ -39,27 +39,20 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 def timeseries(ctx, inputs : list, bands : list, all_bands : bool, output : str, start_date : str, end_date : str, time_period : int, window_size : int) :
     """
-    Create and configure a new rastertool "Timeseries" according to argparse args
-    CHANGE DOCSTRING
-    Adds the timeseries subcommand to the given rastertools subparser
+    Generate a timeseries of images (without gaps) from a set of input images.
+    Data not present in the input images (e.g., missing images for specific dates or masked data) are interpolated
+    (with linear interpolation) so that all gaps in the timeseries are filled.
 
-    Temporal gap filling of an image time series
-    Generate a timeseries of images (without gaps) from a set of input images. "
-                    "Data not present in the input images (no image for the date or masked data) "
-                    "are interpolated (with linear interpolation) so that all gaps are filled.",
-        epilog="By default only first band is computed.
+    This command is useful for generating continuous timeseries data, even when some input images are missing
+    or contain masked values.
 
+    Arguments:
 
-    ADD INPUTS
+    inputs TEXT
 
-    INPUTS
-
-    Input files to process (e.g. Sentinel2 L2A MAJA from THEIA).
-    You can provide a single file with extension .lst (e.g. speed.lst)
-    that lists the input files to process (one input file per line in .lst))
-
-    Args:
-        args: args extracted from command line
+        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
+    You can provide a single file with extension \".lst\" (e.g. \"speed.lst\") that lists
+    the input files to process (one input file per line in .lst).
     """
     # get the bands to process
     if all_bands:
