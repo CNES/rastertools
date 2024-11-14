@@ -24,14 +24,19 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def speed(ctx, inputs : list, bands : list, all_bands : bool, output : str) :
     """
-    CHANGE DOCSTRING
-    Create and configure a new rastertool "Speed" according to argparse args
+    Compute the speed of radiometric values for multiple raster images.
 
-    Args:
-        args: args extracted from command line
+    This command calculates the speed of radiometric values for raster data,
+    optionally processing specific bands or all bands from the input images.
+    The results are saved to a specified output directory.
 
-    Returns:
-        :obj:`eolab.rastertools.Speed`: The configured rastertool to run
+    Arguments:
+
+        inputs TEXT
+
+        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
+    You can provide a single file with extension \".lst\" (e.g. \"speed.lst\") that lists
+    the input files to process (one input file per line in .lst).
     """
 
     # get the bands to process

@@ -47,31 +47,36 @@ def apply_process(ctx, tool, inputs : list):
     """
     Apply the chosen process to a set of input files.
 
-    This function extracts input files, configures the tool, and processes the files
-    through the specified tool. It also handles debug settings and intermediate file storage
-    (VRT files). In case of any errors, the function logs the exception and terminates the process
-    with an appropriate exit code.
+    This function extracts input files from a provided list or direct paths, configures the specified tool,
+    and processes the files through the given tool. Additionally, it handles debug settings (such as storing
+    intermediate VRT files) and manages any exceptions during the process. If an error occurs, the function
+    logs the exception and terminates the process with an appropriate exit code.
 
     Args:
-        ctx (click.Context): The context object containing configuration options like whether
-                             to store intermediate VRT files.
-        tool (Filtering or Hillshade or ...): The tool instance that has been configured with the provided parameters.
-        inputs (str): A path to a list of input files, either as a single `.lst` file or a direct
-                      list of file paths.
+        ctx (click.Context):
+            The context object that contains configuration options.
+
+        tool (Filtering or Hillshade or any raster processing tool):
+            The configured tool instance that will apply the process to the input files. The tool should have
+            been properly set up with parameters.
+
+        inputs (list or str):
+            A list of input file paths or a path to a `.lst` file containing a list of input file paths.
+            This argument specifies the files that the tool will process.
 
     Raises:
-        RastertoolConfigurationException: If there is a configuration error with the tool.
-        Exception: Any other errors that occur during processing.
+        RastertoolConfigurationException:
+            If there is a configuration error with the tool or its parameters.
+
+        Exception:
+            Any other exceptions that occur during the processing of the input files.
     """
     try:
-        print('@' * 50)
         # handle the input file of type "lst"
         inputs_extracted = _extract_files_from_list(inputs)
 
-        print('@' * 50)
         # setup debug mode in which intermediate VRT files are stored to disk or not
         tool.with_vrt_stored(ctx.obj.get('keep_vrt'))
-        print('@' * 50)
 
         # launch process
         tool.process_files(inputs_extracted)
@@ -79,13 +84,10 @@ def apply_process(ctx, tool, inputs : list):
         _logger.info("Done!")
 
     except RastertoolConfigurationException as rce:
-        print('@'*50)
         _logger.exception(rce)
         sys.exit(2)
 
     except Exception as err:
-        print('!' * 50)
         _logger.exception(err)
         sys.exit(1)
-    print('?' * 50)
     sys.exit(0)

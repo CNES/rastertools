@@ -19,11 +19,16 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
 def indices_opt(function):
-    list_indices = ['--ndvi', '--tndvi', '--rvi', '--pvi', '--savi', '--tsavi', '--msavi', '--msavi2', '--ipvi',
-                    '--evi', '--ndwi', '--ndwi2', '--mndwi', '--ndpi', '--ndti', '--ndbi', '--ri', '--bi', '--bi2']
+    """
+    Create options for all the possible indices
+    """
+    dict_indices = {'--ndvi' : "ndvi", '--tndvi' : "tndvi", '--rvi' : "rvi", '--pvi' : "pvi", '--savi' : "savi", '--tsavi' : "tsavi",
+                    '--msavi' : "msavi", '--msavi2' : "msavi2", '--ipvi' : "ipvi",
+                    '--evi' : "evi", '--ndwi' : "ndwi", '--ndwi2' : "ndwi2", '--mndwi' : "mndwi",
+                    '--ndpi' : "ndpi", '--ndti' : "ndti", '--ndbi' : "ndbi", '--ri' : "ri", '--bi' : "bi", '--bi2' : "bi2"}
 
-    for idc in list_indices:
-        function = click.option(idc, is_flag=True, help=f"Compute {id} indice")(function)
+    for idc in dict_indices.keys():
+        function = click.option(idc, is_flag=True, help=f"Compute " + dict_indices[idc] + " indice")(function)
     return function
 
 
@@ -40,7 +45,7 @@ def indices_opt(function):
 @click.option('-ws', '--window_size', type=int, default = 1024, help="Size of tiles to distribute processing, default: 1024")
 
 @click.option('-i', '--indices', type=str, multiple = True,
-                    help=" List of indices to computePossible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,"
+                    help=" List of indices to compute. Possible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,"
                         " ndti, ndvi, ndwi, ndwi2, pvi, ri, rvi, savi, tndvi, tsavi")
 
 
@@ -49,20 +54,28 @@ def indices_opt(function):
 @click.option('-nd', '--normalized_difference','nd',type=str,
     multiple=True, nargs=2, metavar="band1 band2",
               help="Compute the normalized difference of two bands defined"
-                        "as parameter of this option, e.g. \"-nd red nir\" will compute (red-nir)/(red+nir). "
+                        " as parameter of this option, e.g. \"-nd red nir\" will compute (red-nir)/(red+nir). "
                         "See eolab.rastertools.product.rastertype.BandChannel for the list of bands names. "
                         "Several nd options can be set to compute several normalized differences.")
 
 
 @click.pass_context
-def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, roi : str, window_size : int, nd : bool, **kwargs) :
-    """Create and configure a new rastertool "Radioindice" according to argparse args
+def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, roi : str, window_size : int, nd : str, **kwargs) :
+    """
+    Compute the requested radio indices on raster data.
 
-        Args:
-            args: args extracted from command line
+    This command computes various vegetation and environmental indices on satellite or raster data based on the
+    provided input images and options. The tool can compute specific indices, merge the results into one image,
+    compute normalized differences between bands, and apply processing using a region of interest (ROI) and specified
+    tile/window size.
 
-        Returns:
-            :obj:`eolab.rastertools.Radioindice`: The configured rastertool to run
+    Arguments:
+
+        inputs TEXT
+
+        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
+    You can provide a single file with extension \".lst\" (e.g. \"radioindice.lst\") that lists
+    the input files to process (one input file per line in .lst).
     """
     indices_opt = [key for key, value in kwargs.items() if value]
     indices_to_compute = []
@@ -82,15 +95,15 @@ def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, 
                 sys.exit(2)
 
     if nd:
-        for nd in nd:
-            if nd[0] in BandChannel.__members__ and nd[1] in BandChannel.__members__:
-                channel1 = BandChannel[nd[0]]
-                channel2 = BandChannel[nd[1]]
-                new_indice = RadioindiceProcessing(f"nd[{nd[0]}-{nd[1]}]").with_channels(
+        for nd_bands in nd:
+            if nd_bands[0] in BandChannel.__members__ and nd_bands[1] in BandChannel.__members__:
+                channel1 = BandChannel[nd_bands[0]]
+                channel2 = BandChannel[nd_bands[1]]
+                new_indice = RadioindiceProcessing(f"nd[{nd_bands[0]}-{nd_bands[1]}]").with_channels(
                     [channel2, channel1])
                 indices_to_compute.append(new_indice)
             else:
-                _logger.exception(RastertoolConfigurationException(f"Invalid band(s) in normalized difference: {nd[0]} and/or {nd[1]}"))
+                _logger.exception(RastertoolConfigurationException(f"Invalid band(s) in normalized difference: {nd_bands[0]} and/or {nd_bands[1]}"))
                 sys.exit(2)
 
     # handle special case: no indice setup
