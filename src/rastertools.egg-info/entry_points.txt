@@ -1,2 +1,2 @@
-[console_scripts]
-rastertools = eolab.rastertools.main:run
+[rasterio.plugins]
+rastertools = src.eolab.rastertools.main:rastertools

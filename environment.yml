@@ -1,4 +1,4 @@
-name: rastertools
+name: temp_test
 
 channels:
   - conda-forge

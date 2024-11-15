@@ -10,9 +10,13 @@ import os
 from pathlib import Path
 from typing import List
 import threading
+import geopandas as gpd
+import numpy as np
 
 import rasterio
 import numpy.ma as ma
+from osgeo import gdal
+from rasterio import CRS
 from tqdm import tqdm
 
 from eolab.rastertools import utils
@@ -427,7 +431,11 @@ class Radioindice(Rastertool, Windowable):
                         indices.append(indice)
 
             # get the raster
+            print(self.roi)
+            # self.roi = "tests/tests_data/COMMUNE_32001.shp"
+            # print(self.roi)
             raster = product.get_raster(roi=self.roi)
+            print(type(raster))
 
             # STEP 2: Compute the indices
             outputs = []
@@ -450,6 +458,51 @@ class Radioindice(Rastertool, Windowable):
 
         # return the list of generated files
         return outputs
+
+def get_raster_profile(raster):
+    # Open the dataset
+
+    # Get the raster driver
+    driver = raster.GetDriver().ShortName
+
+    # Get raster dimensions
+    width = raster.RasterXSize
+    height = raster.RasterYSize
+    count = raster.RasterCount
+
+    # Get geotransform and projection
+    geotransform = raster.GetGeoTransform()
+    crs = raster.GetProjection()
+
+    # Get data type and block size from the first band
+    band = raster.GetRasterBand(1)
+    dtype = gdal.GetDataTypeName(band.DataType)
+    dtype_rasterio = rasterio.dtypes.get_minimum_dtype(band.DataType)
+    nodata = band.GetNoDataValue()
+
+    # Get block size and tiled status
+    blockxsize, blockysize = band.GetBlockSize()
+    tiled = raster.GetMetadata('IMAGE_STRUCTURE').get('TILED', 'NO') == 'YES'
+
+    # Convert geotransform to Rasterio-compatible affine transform
+    transform = rasterio.Affine.from_gdal(*geotransform)
+
+    # Build a profile dictionary similar to rasterio
+    profile = {
+        "driver": driver,  # e.g., "GTiff"
+        "width": width,
+        "height": height,
+        "count": count,
+        "crs": crs,
+        "transform": transform,  # Affine geotransform
+        "dtype": dtype_rasterio,
+        "nodata": nodata,  # Nodata value
+        "blockxsize": blockxsize,  # Block width
+        "blockysize": blockysize,  # Block height
+        "tiled": tiled  # Whether the raster is tiled
+    }
+
+    return profile
 
 
 def compute_indices(input_image: str, image_channels: List[BandChannel],
@@ -474,56 +527,142 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
         window_size (tuple(int, int), optional, default=(1024, 1024)):
             Size of windows for splitting the processed image in small parts
     """
-    with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        with rasterio.open(input_image) as src:
-            profile = src.profile
+    print('...'*50)
+    print(input_image)
+    # with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
+    #     with rasterio.open(input_image) as src:
+    #         profile = src.profile
+    #
+    #         print(profile)
+    #
+    #         # set block size to the configured window_size of first indice
+    #         blockxsize, blockysize = window_size
+    #         print(src.width)
+    #         print(blockxsize)
+    #         if src.width < blockxsize:
+    #             blockxsize = utils.highest_power_of_2(src.width)
+    #         if src.height < blockysize:
+    #             blockysize = utils.highest_power_of_2(src.height)
+    #
+    #         # dtype of output data
+    #         dtype = indices[0].dtype or rasterio.float32
+    #
+    #         # setup profile for output image
+    #         profile.update(driver='GTiff',
+    #                        blockxsize=blockysize, blockysize=blockxsize, tiled=True,
+    #                        dtype=dtype, nodata=indices[0].nodata,
+    #                        count=len(indices))
+    #         print(type(profile))
+    #         with rasterio.open(indice_image, "w", **profile) as dst:
+    #             # Materialize a list of destination block windows
+    #             windows = [window for ij, window in dst.block_windows()]
+    #
+    #             # disable status of tqdm progress bar
+    #             disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+    #
+    #             # compute every indices
+    #             for i, indice in enumerate(indices, 1):
+    #                 # Get the bands necessary to compute the indice
+    #                 bands = [image_channels.index(channel) + 1 for channel in indice.channels]
+    #
+    #                 read_lock = threading.Lock()
+    #                 write_lock = threading.Lock()
+    #
+    #                 def process(window):
+    #                     """Read input raster, compute indice and write output raster"""
+    #                     with read_lock:
+    #                         src_array = src.read(bands, window=window, masked=True)
+    #                         src_array[src_array == src.nodata] = ma.masked
+    #                         src_array = src_array.astype(dtype)
+    #
+    #                     # The computation can be performed concurrently
+    #                     result = indice.algo(src_array).astype(dtype).filled(indice.nodata)
+    #
+    #                     with write_lock:
+    #                         dst.write_band(i, result, window=window)
+    #
+    #                 # compute using concurrent.futures.ThreadPoolExecutor and tqdm
+    #                 for window in tqdm(windows, disable=disable, desc=f"{indice.name}"):
+    #                     process(window)
+    #
+    #                 dst.set_band_description(i, indice.name)
+    # with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
+    #     with rasterio.open(input_image) as src:
+    #         profile = src.profile
 
-            # set block size to the configured window_size of first indice
-            blockxsize, blockysize = window_size
-            if src.width < blockxsize:
-                blockxsize = utils.highest_power_of_2(src.width)
-            if src.height < blockysize:
-                blockysize = utils.highest_power_of_2(src.height)
+    src = gdal.Open(input_image)
+    profile = get_raster_profile(src) #############################
+    print(profile)
+    geotransform = list(src.GetGeoTransform())
+    width = src.RasterXSize
+    height = src.RasterYSize
 
-            # dtype of output data
-            dtype = indices[0].dtype or rasterio.float32
+    # set block size to the configured window_size of first indice
+    blockxsize, blockysize = window_size
+    print(width)
+    print(blockxsize)
 
-            # setup profile for output image
-            profile.update(driver='GTiff',
+    if width < blockxsize:
+        blockxsize = utils.highest_power_of_2(width)
+    if height < blockysize:
+        blockysize = utils.highest_power_of_2(height)
+
+    # dtype of output data
+    dtype = indices[0].dtype or rasterio.float32
+
+    # setup profile for output image
+    profile.update(driver='GTiff',
                            blockxsize=blockysize, blockysize=blockxsize, tiled=True,
                            dtype=dtype, nodata=indices[0].nodata,
                            count=len(indices))
 
-            with rasterio.open(indice_image, "w", **profile) as dst:
-                # Materialize a list of destination block windows
-                windows = [window for ij, window in dst.block_windows()]
+    print(profile)
+    print(type(profile))
+    nodata = src.GetRasterBand(1).GetNoDataValue()
 
-                # disable status of tqdm progress bar
-                disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+    with rasterio.open(indice_image, "w", **profile) as dst:
+        # Materialize a list of destination block windows
+        windows = [window for ij, window in dst.block_windows()]
+        print(windows)
 
-                # compute every indices
-                for i, indice in enumerate(indices, 1):
-                    # Get the bands necessary to compute the indice
-                    bands = [image_channels.index(channel) + 1 for channel in indice.channels]
+        # disable status of tqdm progress bar
+        disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
 
-                    read_lock = threading.Lock()
-                    write_lock = threading.Lock()
+        # compute every indices
+        for i, indice in enumerate(indices, 1):
+            # Get the bands necessary to compute the indice
+            bands = [image_channels.index(channel) + 1 for channel in indice.channels]
 
-                    def process(window):
-                        """Read input raster, compute indice and write output raster"""
-                        with read_lock:
-                            src_array = src.read(bands, window=window, masked=True)
-                            src_array[src_array == src.nodata] = ma.masked
-                            src_array = src_array.astype(dtype)
+            read_lock = threading.Lock()
+            write_lock = threading.Lock()
 
-                        # The computation can be performed concurrently
-                        result = indice.algo(src_array).astype(dtype).filled(indice.nodata)
+            def process(window):
+                """Read input raster, compute indice and write output raster"""
+                with read_lock:
+                    x_offset = int(window.col_off)
+                    y_offset = int(window.row_off)
+                    x_size = int(window.width)
+                    y_size = int(window.height)
 
-                        with write_lock:
-                            dst.write_band(i, result, window=window)
+                    src_array = np.array([
+                        src.GetRasterBand(band).ReadAsArray(x_offset, y_offset, x_size, y_size)
+                        for band in bands], dtype=dtype)
 
-                    # compute using concurrent.futures.ThreadPoolExecutor and tqdm
-                    for window in tqdm(windows, disable=disable, desc=f"{indice.name}"):
-                        process(window)
+                    # Mask nodata values
+                    src_array = np.ma.masked_equal(src_array, nodata)
 
-                    dst.set_band_description(i, indice.name)
+                    # src_array = src.read(bands, window=window, masked=True)
+                    # src_array[src_array == src.nodata] = ma.masked
+                    # src_array = src_array.astype(dtype)
+
+                # The computation can be performed concurrently
+                result = indice.algo(src_array).astype(dtype).filled(indice.nodata)
+
+                with write_lock:
+                    dst.write_band(i, result, window=window)
+
+                # compute using concurrent.futures.ThreadPoolExecutor and tqdm
+            for window in tqdm(windows, disable=disable, desc=f"{indice.name}"):
+                process(window)
+
+            dst.set_band_description(i, indice.name)

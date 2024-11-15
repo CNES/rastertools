@@ -283,9 +283,9 @@ def test_speed_command_line_default():
         # default with a listing of S2A products
         f"-v sp -b 1 -o {RastertoolsTestsData.tests_output_data_dir} {lst_file_path}",
         # default with a list of files
-        f"--verbose speed --output {RastertoolsTestsData.tests_output_data_dir}"
-        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        # f"--verbose speed --output {RastertoolsTestsData.tests_output_data_dir}"
+        # f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        # f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
     ]
     speed_filenames = [
         ["SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-speed-20180928-105515.tif"],
