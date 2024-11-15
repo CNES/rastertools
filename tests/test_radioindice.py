@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 
 import pytest
 import filecmp
@@ -37,12 +38,18 @@ def test_radioindice_process_file_merge():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    origin_path = RastertoolsTestsData.tests_input_data_dir + "/".split(os.getcwd() + "/")[-1]
+
     inputfile = RastertoolsTestsData.tests_input_data_dir + "/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+    print(inputfile)
+    inputfile = origin_path+ "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+    print(inputfile)
     indices = [indice for indice in Radioindice.get_default_indices()]
 
     tool = Radioindice(indices)
+    shapefile = RastertoolsTestsData.tests_input_data_dir + "/COMMUNE_32001.shp"
     tool.with_output(RastertoolsTestsData.tests_output_data_dir , merge=True)
-    tool.with_roi(RastertoolsTestsData.tests_input_data_dir + "/COMMUNE_32001.shp")
+    tool.with_roi(shapefile)
     outputs = tool.process_file(inputfile)
 
     assert outputs == [

@@ -134,7 +134,7 @@ def add_custom_rastertypes(rastertypes):
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-@with_plugins(iter_entry_points('core_package.cli_plugins'))
+# @with_plugins(iter_entry_points('rasterio.plugins'))
 @click.group(context_settings=CONTEXT_SETTINGS)
 @click.option(
     '-t', '--rastertype',
@@ -233,12 +233,12 @@ rastertools.add_command(zonalstats, name = "zs")
 rastertools.add_command(zonalstats, name = "zonalstats")
 
 
-@rastertools.result_callback()
-@click.pass_context
-def handle_result(ctx):
-    if ctx.invoked_subcommand is None:
-        click.echo(ctx.get_help())
-        ctx.exit()
+# @rastertools.result_callback()
+# @click.pass_context
+# def handle_result(ctx):
+#     if ctx.invoked_subcommand is None:
+#         click.echo(ctx.get_help())
+#         ctx.exit()
 
 def run(*args, **kwargs):
     """

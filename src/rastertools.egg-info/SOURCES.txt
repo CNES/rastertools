@@ -81,7 +81,6 @@ src/eolab/rastertools/__pycache__/utils.cpython-38.pyc
 src/eolab/rastertools/__pycache__/zonalstats.cpython-38.pyc
 src/eolab/rastertools/cli/__init__.py
 src/eolab/rastertools/cli/filtering.py
-src/eolab/rastertools/cli/filtering_dyn.py
 src/eolab/rastertools/cli/hillshade.py
 src/eolab/rastertools/cli/radioindice.py
 src/eolab/rastertools/cli/speed.py
@@ -192,9 +191,6 @@ tests/tests_data/SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GE
 tests/tests_data/SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz.properties
 tests/tests_data/additional_rastertypes.json
 tests/tests_data/grid.geojson
-tests/tests_data/listing.lst
-tests/tests_data/listing2.lst
-tests/tests_data/listing3.lst
 tests/tests_data/tif_file.tif
 tests/tests_data/toulouse-mnh.tif
 tests/tests_refs/test_radioindice/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi-speed-20180928-105515.tif

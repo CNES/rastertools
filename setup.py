@@ -1,29 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-    Setup file for rastertools.
-    Use setup.cfg to configure your project.
-
-    This file was generated with PyScaffold 4.0.2.
-    PyScaffold helps you to put up the scaffold of your new Python project.
-    Learn more under: https://pyscaffold.org/
-"""
-import os
 from setuptools import setup, find_packages
-from sphinx.builders.html import setup_resource_paths
-
-with open('src/eolab/rastertools/__init__.py') as f:
-    for line in f:
-        if line.find("__version__") >= 0:
-            version = line.split("=")[1].strip()
-            version = version.strip('"')
-            version = version.strip("'")
-            break
-
 
 if __name__ == "__main__":
     try:
         setup(name='rastertools',
-              version=version,
+              version="0.1.0",
               description=u"Collection of tools for raster data",
               long_description="",
               classifiers=[],
@@ -36,15 +17,33 @@ if __name__ == "__main__":
               zip_safe=False,
               setup_requires = ["setuptools_scm"],
               install_requires=[
-                  'click>=4.0',
-                  'rasterio>=1.2.0',
+                  'click',
+                  'rasterio==1.3.0',
+                  'pytest>=3.6',
+                  'pytest-cov',
+                  'geopandas==0.13',
+                  'python-dateutil==2.9.0',
+                  'kiwisolver==1.4.5',
+                  'fonttools==4.53.1',
+                  'matplotlib==3.7.3',
+                  'packaging==24.1',
+                  'Shapely==1.8.5.post1',
+                  'tomli==2.0.2',
+                  'Rtree==1.3.0',
+                  'Pillow==9.2.0',
+                  'pip==24.2',
+                  'pyproj==3.4.0',
+                  'matplotlib',
+                  'scipy==1.8',
+                  'pyscaffold',
+                  'gdal==3.5.0',
+                  'tqdm==4.66'
               ],
-              extras_require={
-                  'test': ['pytest>=3.6'],
-              },
               entry_points="""
-              """,
-              python_requires='>=3.9',
+                [rasterio.rio_plugins]
+                rastertools=eolab.rastertools.main:rastertools
+                """,
+              python_requires='==3.8.13',
               use_scm_version={"version_scheme": "no-guess-dev"})
     except:  # noqa
         print(
