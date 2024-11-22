@@ -129,50 +129,58 @@ def compute_speed(date0: datetime, date1: datetime,
 
         # open input images
         with product0.open() as src0, product1.open() as src1:
-            if src1.count != src0.count:
-                raise ValueError(f"Number of bands in images {product0} and {product1}"
+            if src1.shape[0] != src0.shape[0]:
+                raise ValueError(f"Number of bands in images {src1.shape[0]} and {src0.count()}"
                                  " are not the same")
-            if src1.width != src0.width or src1.height != src0.height:
-                raise ValueError(f"Images {product0} and {product1} have different sizes")
-            if src1.transform != src0.transform:
-                raise ValueError(f"Images {product0} and {product1} are not fully"
-                                 " geographically overlapping")
+            # if src1.width != src0.width or src1.height != src0.height:
+            #     raise ValueError(f"Images {product0} and {product1} have different sizes")
+            # if src1.transform != src0.transform:
+            #     raise ValueError(f"Images {product0} and {product1} are not fully"
+            #                      " geographically overlapping")
 
-            profile = src0.profile
+            # profile = src0.profile
             dtype = rasterio.float32
 
             # set block size
-            blockysize = 1024 if src0.width > 1024 else utils.highest_power_of_2(src0.width)
-            blockxsize = 1024 if src0.height > 1024 else utils.highest_power_of_2(src0.height)
+            # blockysize = 1024 if src0.width > 1024 else utils.highest_power_of_2(src0.width)
+            # blockxsize = 1024 if src0.height > 1024 else utils.highest_power_of_2(src0.height)
 
             # check band index and handle all bands options (when bands is an empty list)
-            if bands is None or len(bands) == 0:
-                bands = src1.indexes
-            elif min(bands) < 1 or max(bands) > src1.count:
-                raise ValueError(f"Invalid bands, all values are not in range [1, {src1.count}]")
+            # if bands is None or len(bands) == 0:
+            #     bands = src1.indexes
+            # elif min(bands) < 1 or max(bands) > src1.count:
+            #     raise ValueError(f"Invalid bands, all values are not in range [1, {src1.count}]")
 
-            profile.update(driver="GTiff",
-                           blockxsize=blockysize, blockysize=blockxsize, tiled=True,
-                           dtype=dtype, count=len(bands))
+            # profile.update(driver="GTiff",
+            #                blockxsize=blockysize, blockysize=blockxsize, tiled=True,
+            #                dtype=dtype, count=len(bands))
+            print(type(src0))
+            result = algo.speed(src0, src1, interval).astype(dtype)#.filled(src0.nodata)
+            # result = result.compute()
 
-            with rasterio.open(speed_image, "w", **profile) as dst:
-                # Materialize a list of destination block windows
-                windows = [window for ij, window in dst.block_windows()]
+            ##Create the file and compute
+            result.rio.to_raster("/home/ecadaux/zob.tif")
+            print(result)
+            print("!"*50)
+            # with rasterio.open(speed_image, "w", **profile) as dst:
+            #     # Materialize a list of destination block windows
+            #     windows = [window for ij, window in dst.block_windows()]
+            #
+            #     # read_lock = threading.Lock()
+            #     # write_lock = threading.Lock()
+            #     #
+            #     # def process(window):
+            #     #     """Read input rasters, compute speed and write output raster"""
+            #     #     with read_lock:
+            #     #         data0 = src0.read(bands, window=window, masked=True).astype(dtype)
+            #     #         data1 = src1.read(bands, window=window, masked=True).astype(dtype)
+            #     #
+            #     #     # The computation can be performed concurrently
+            #     #     result = algo.speed(data0, data1, interval).astype(dtype).filled(src0.nodata)
+            #     #
+            #     #     with write_lock:
+            #     #         dst.write(result, window=window)
+            #
+            #     disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+            #     thread_map(process, windows, disable=disable, desc="speed")
 
-                read_lock = threading.Lock()
-                write_lock = threading.Lock()
-
-                def process(window):
-                    """Read input rasters, compute speed and write output raster"""
-                    with read_lock:
-                        data0 = src0.read(bands, window=window, masked=True).astype(dtype)
-                        data1 = src1.read(bands, window=window, masked=True).astype(dtype)
-
-                    # The computation can be performed concurrently
-                    result = algo.speed(data0, data1, interval).astype(dtype).filled(src0.nodata)
-
-                    with write_lock:
-                        dst.write(result, window=window)
-
-                disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
-                thread_map(process, windows, disable=disable, desc="speed")

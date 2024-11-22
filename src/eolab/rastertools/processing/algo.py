@@ -4,14 +4,16 @@
 Algorithms on raster data
 """
 import math
+from typing import Union
 
 import numpy
 import numpy as np
 import numpy.ma as ma
+import xarray as xr
 from scipy import ndimage, signal
 
 
-def normalized_difference(bands : np.ndarray) -> numpy.ndarray :
+def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Normalized Difference Vegetation Index
     The coefficient ranges from -1 to 1 in each pixel.
@@ -33,7 +35,7 @@ def normalized_difference(bands : np.ndarray) -> numpy.ndarray :
     return (bands[1] - bands[0]) / (bands[1] + bands[0])
 
 
-def tndvi(bands : np.ndarray) -> numpy.ndarray :
+def tndvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Transformed Normalized Difference Vegetation Index
     The coefficient is positive in each pixel.
@@ -59,11 +61,15 @@ def tndvi(bands : np.ndarray) -> numpy.ndarray :
     """
     np.seterr(invalid='ignore')
     ratio = normalized_difference(bands) + 0.5
-    ratio[ratio < 0] = 0
+    if (isinstance(ratio, np.ndarray) or isinstance(ratio, np.ma.masked_array)):
+        ratio[ratio < 0] = 0
+    else:
+        if not ratio.isnull().all():
+            ratio = ratio.where(ratio >= 0, 0)
     return np.sqrt(ratio)
 
 
-def rvi(bands : np.ndarray) -> numpy.ndarray :
+def rvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Ratio Vegetation Index
     The coefficient is positive in each pixel.
@@ -89,7 +95,7 @@ def rvi(bands : np.ndarray) -> numpy.ndarray :
     return bands[1] / bands[0]
 
 
-def pvi(bands : np.ndarray) -> numpy.ndarray :
+def pvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Perpendicular Vegetation Index
     The coefficient ranges from -1 to 1 in each pixel.
@@ -114,7 +120,7 @@ def pvi(bands : np.ndarray) -> numpy.ndarray :
     return (bands[1] - 0.90893 * bands[0] - 7.46216) * 0.74
 
 
-def savi(bands : np.ndarray) -> numpy.ndarray :
+def savi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Soil Adjusted Vegetation Index
     The coefficient ranges from -1 to 1 in each pixel.
@@ -139,7 +145,7 @@ def savi(bands : np.ndarray) -> numpy.ndarray :
     return (1. + 0.5) * (bands[1] - bands[0]) / (bands[1] + bands[0] + 0.5)
 
 
-def tsavi(bands : np.ndarray) -> numpy.ndarray :
+def tsavi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Transformed Soil Adjusted Vegetation Index
     The coefficient ranges from -1 to 1 in each pixel.
@@ -168,7 +174,7 @@ def tsavi(bands : np.ndarray) -> numpy.ndarray :
     return numerator / denominator
 
 
-def _wdvi(bands : numpy.ndarray) -> numpy.ndarray :
+def _wdvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Weighted Difference Vegetation Index of the input data.
 
@@ -188,7 +194,7 @@ def _wdvi(bands : numpy.ndarray) -> numpy.ndarray :
     return bands[1] - 0.4 * bands[0]
 
 
-def msavi(bands : numpy.ndarray) -> numpy.ndarray :
+def msavi(bands : Union[np.ndarray, xr.DataArray] ) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Modified Soil Adjusted Vegetation Index of the input data.
     The coefficient ranges from -1 to 1 in each pixel.
@@ -228,7 +234,7 @@ def msavi(bands : numpy.ndarray) -> numpy.ndarray :
     return (1 + dl) * (bands[1] - bands[0]) / denominator
 
 
-def msavi2(bands : numpy.ndarray) -> numpy.ndarray :
+def msavi2(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Modified Soil Adjusted Vegetation Index of the input data.
     The coefficient ranges from -1 to 1 in each pixel.
@@ -251,7 +257,7 @@ def msavi2(bands : numpy.ndarray) -> numpy.ndarray :
     return (2. * bands[1] + 1) - np.sqrt(dsqrt)
 
 
-def ipvi(bands : numpy.ndarray) -> numpy.ndarray :
+def ipvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Infrared Percentage Vegetation Index of the input data.
     The coefficient ranges from 0 to 1 in each pixel.
@@ -277,7 +283,7 @@ def ipvi(bands : numpy.ndarray) -> numpy.ndarray :
     return bands[1] / (bands[1] + bands[0])
 
 
-def evi(bands : np.ndarray) -> numpy.ndarray :
+def evi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Enhanced vegetation index of the input data.
     The coefficient ranges from -1 to 1 in each pixel.
@@ -304,7 +310,7 @@ def evi(bands : np.ndarray) -> numpy.ndarray :
     return 2.5 * (bands[1] - bands[0]) / ((bands[1] + 6.0 * bands[0] - 7.5 * bands[2]) + 1.0)
 
 
-def redness_index(bands : np.ndarray) -> numpy.ndarray :
+def redness_index(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Redness Index of the input data.
 
@@ -325,7 +331,7 @@ def redness_index(bands : np.ndarray) -> numpy.ndarray :
     return bands[0] ** 2 / bands[1] ** 3
 
 
-def brightness_index(bands : np.ndarray) -> numpy.ndarray :
+def brightness_index(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Brightness Index of the input data.
 
@@ -346,7 +352,7 @@ def brightness_index(bands : np.ndarray) -> numpy.ndarray :
     return np.sqrt(bi)
 
 
-def brightness_index2(bands : np.ndarray) -> numpy.ndarray :
+def brightness_index2(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the Brightness Index of the input data.
 
@@ -367,7 +373,7 @@ def brightness_index2(bands : np.ndarray) -> numpy.ndarray :
     return np.sqrt(bi2)
 
 
-def speed(data0 : np.ndarray, data1 : np.ndarray, interval : float) -> numpy.ndarray :
+def speed(data0 : Union[np.ndarray, xr.DataArray] , data1 : np.ndarray, interval : float) -> Union[np.ndarray, xr.DataArray] :
     """
     Compute the speed of the input data based on the difference between two time points.
 
@@ -392,7 +398,8 @@ def speed(data0 : np.ndarray, data1 : np.ndarray, interval : float) -> numpy.nda
     return (data1 - data0) / interval
 
 
-def interpolated_timeseries(dates : numpy.ma.masked_array, series : numpy.ma.masked_array, output_dates : numpy.array, nodata) -> numpy.ndarray:
+
+def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], series : Union[numpy.ma.masked_array, xr.DataArray], output_dates : numpy.array, nodata) -> Union[np.ndarray, xr.DataArray] :
     """
     Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
 
@@ -443,7 +450,7 @@ def interpolated_timeseries(dates : numpy.ma.masked_array, series : numpy.ma.mas
         -1, stack_shape[1], stack_shape[2], stack_shape[3])
 
 
-def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
+def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Computes the local sums of the input data using a sliding window defined by the kernel size.
     Each element in the output is the sum of the pixels within the specified kernel size window.
@@ -468,6 +475,8 @@ def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
     """
     if kernel_width == 1:
         output = data.copy()
+        if isinstance(data, xr.DataArray):
+            output = xr.DataArray(output)
     else:
         # special case: size = 1 ==> returns data
         if np.issubdtype(data.dtype, np.floating):
@@ -488,6 +497,8 @@ def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
 
         # compute local sum at each pixel from integral image
         output = np.zeros(data.shape, dtype=ii.dtype)
+        if isinstance(data, xr.DataArray):
+            output = xr.DataArray(output)
         posd = (kernel_width + 1) // 2
         posf = kernel_width - posd
         if data.ndim == 3:
@@ -504,7 +515,7 @@ def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
     return output.astype(data.dtype)
 
 
-def median(input_data : np.ndarray, kernel_size : int) -> numpy.ndarray :
+def median(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Applies a Median Filter to the input data using `scipy.ndimage.median_filter <https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html>`_.
     The filter computes the median of the values contained within a sliding window determined by the kernel size.
@@ -530,7 +541,7 @@ def median(input_data : np.ndarray, kernel_size : int) -> numpy.ndarray :
     return output
 
 
-def local_sum(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray :
+def local_sum(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int = 8) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Computes the local sums of the input data using a sliding window defined by the kernel size.
     Each element in the output is the sum of the pixels within the specified kernel size window.
@@ -555,7 +566,7 @@ def local_sum(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray :
     return output
 
 
-def local_mean(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray :
+def local_mean(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int = 8) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Computes the local means of the input data using a sliding window defined by the kernel size.
     Each element in the output is the mean of the pixels within the specified kernel size window.
@@ -586,7 +597,7 @@ def local_mean(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray 
     return np.divide(output, valid, out=np.zeros_like(output), where=valid != 0)
 
 
-def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : int = 1) -> numpy.ndarray :
+def adaptive_gaussian(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int = 8, sigma : int = 1) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Applies an Adaptive Gaussian Filter to the input data that smoothes the input while preserving edges.
 
@@ -611,10 +622,6 @@ def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : in
     if input_data.shape[0] != 1:
         raise ValueError("adaptive_gaussian only accepts numpy arrays with first dim of size 1")
 
-    '''
-    kernel_size = kwargs.get('kernel_size', 8)
-    sigma = kwargs.get('sigma', 1)
-    '''
     dtype = input_data.dtype
 
     w_1 = (input_data[0, :, :-2] - input_data[0, :, 2:]) ** 2
@@ -630,7 +637,7 @@ def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : in
     return out
 
 
-def svf(input_data : np.ndarray, radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> np.ndarray:
+def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> Union[numpy.ndarray, xr.DataArray]:
     """
     Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Height Model (DHM).
 
@@ -662,15 +669,11 @@ def svf(input_data : np.ndarray, radius : int = 8, directions : int = 12, resolu
         raise ValueError("svf only accepts numpy arrays with first dim of size 1")
 
     nb_directions = directions
-    '''
-    radius = kwargs.get('radius', 8)
-    nb_directions = kwargs.get('directions', 12)
-    resolution = kwargs.get('resolution', 0.5)
-    altitude = kwargs.get('altitude', None)
-    '''
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=np.float32)
+    if isinstance(input_data, xr.DataArray) :
+        out = xr.DataArray(out)
 
     # prevent nodata problem
     # change the NaN in the input array to 0
@@ -753,7 +756,7 @@ def _bresenham_line(theta : int, radius : int) -> tuple :
     return pts
 
 
-def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float = 0.0, radius : int = 8, resolution : float = 0.5) -> numpy.ndarray :
+def hillshade(input_data : Union[numpy.ndarray, xr.DataArray], elevation : float = 0.0, azimuth : float = 0.0, radius : int = 8, resolution : float = 0.5) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Computes a mask of cast shadows in a Digital Height Model (DHM).
 
@@ -784,15 +787,12 @@ def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float 
         raise ValueError("hillshade only accepts 3 dims numpy arrays")
     if input_data.shape[0] != 1:
         raise ValueError("hillshade only accepts numpy arrays with first dim of size 1")
-    '''
-    elevation = np.radians(kwargs.get('elevation', 0.0))
-    azimuth = kwargs.get('azimuth', 0.0)
-    radius = kwargs.get('radius', 8)
-    resolution = kwargs.get('resolution', 0.5)
-    '''
+
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=bool)
+    if isinstance(input_data, xr.DataArray):
+        out = xr.DataArray(out)
 
     # prevent nodata problem
     input_band = np.nan_to_num(input_data[0], copy=False, nan=0)

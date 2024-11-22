@@ -107,7 +107,7 @@ class Rastertool(ABC):
             if outputs:
                 all_outputs.extend(outputs)
 
-        # add a postprocessing call
+        # add a postprocessing call of the corresponding class
         outputs = self.postprocess_files(inputfiles, all_outputs)
 
         if outputs:

@@ -124,7 +124,7 @@ class Zonalstats(Rastertool):
         that contains the statistics for each inputfile's date:
 
         - keys are timestamps
-        - values are the statistics at the corresponding timestam
+        - values are the statistics at the corresponding timestamp
 
         Warning:
             When the timestamp of the input raster cannot be retrieved, the dictionary does not
@@ -139,6 +139,12 @@ class Zonalstats(Rastertool):
 
     @property
     def generated_stats(self):
+
+        my_data = truc.compute()
+        result = min(my_data)
+
+        result = min(my_data)
+        my_data = truc.compute()
         """The list of generated stats in the same order as the input files"""
         return self._generated_stats
 

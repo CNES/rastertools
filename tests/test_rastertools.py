@@ -399,6 +399,7 @@ def test_timeseries_command_line_errors(caplog):
         test.run_test(caplog, check_outputs=False)
 
 
+
 def test_zonalstats_command_line_default():
     # create output dir and clear its content if any
     utils4test.create_outdir()

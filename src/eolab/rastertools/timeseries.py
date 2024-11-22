@@ -13,6 +13,7 @@ import logging.config
 import multiprocessing
 import os
 from pathlib import Path
+import xarray as xr
 from typing import Dict, List
 
 import numpy as np
@@ -23,7 +24,6 @@ from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
 from eolab.rastertools.product import RasterProduct
-
 
 _logger = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ class Timeseries(Rastertool, Windowable):
         """List of bands to process"""
         return self._bands
 
-    def postprocess_files(self, inputfiles: List[str], outputfiles: List[str]) -> List[str]:
+    def postprocess_files(self, inputfiles: List[str], outputfiles: List[str], xarray_vers : bool = False) -> List[str]:
         """Generates the timeseries from a list of inputfiles.
 
         Args:
@@ -124,26 +124,34 @@ class Timeseries(Rastertool, Windowable):
 
         # STEP 3: Generate timeseries
         # create the list of output files
-        outdir = Path(self.outputdir)
-        timeseries_images = []
+        outdir = Path("/home/ecadaux/pluto/rastertools/rastertools/tests/tests_out" + "/test_timeseries_xarray") #Path(self.outputdir) # # # # # #
+
+        times_img_np = []
+        times_img_xarray = []
         for date in dates:
-            img_name = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries.tif"
-            timeseries_images.append(outdir.joinpath(img_name).as_posix())
+            img_name_np = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries.tif"
+            times_img_np.append(outdir.joinpath(img_name_np).as_posix())
+            if xarray_vers :
+                img_name_xarray = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries_xarray.tif"
+                times_img_xarray.append(outdir.joinpath(img_name_xarray).as_posix())
 
         # compute the timeseries
-        compute_timeseries(products_per_date, timestamps, timeseries_images,
-                           self.bands, self.window_size)
+        compute_timeseries(products_per_date, timestamps, times_img_np,
+                           self.bands, self.window_size, xarray_vers)
 
         # free resources
         for product in products_per_date.values():
             product.free_in_memory_vrts()
 
-        return timeseries_images
+        if xarray_vers:
+            return times_img_np, times_img_xarray
+        else :
+            return times_img_np
 
 
 def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries_dates: List[float],
                        timeseries_images: List[str],
-                       bands: List[int] = None, window_size: tuple = (1024, 1024)):
+                       bands: List[int] = None, window_size: tuple = (1024, 1024), xarray_vers : bool = False):
     """Generate the timeseries
 
     Args:
@@ -223,13 +231,28 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
         max_workers = os.getenv("RASTERTOOLS_MAXWORKERS")
         if max_workers is not None:
             kwargs["max_workers"] = int(max_workers)
-        process_map(_interpolate,
-                    repeat(products_dates), repeat(products_per_date),
-                    repeat(timeseries_dates), repeat(timeseries_images),
-                    windows, repeat(bands),
-                    repeat(dtype), repeat(nodata),
-                    repeat(write_lock),
-                    **kwargs)
+
+
+        if not(xarray_vers) :
+            #Launch with np
+            print("np")
+            process_map(_interpolate,
+                            repeat(products_dates), repeat(products_per_date),
+                            repeat(timeseries_dates), repeat(timeseries_images),
+                            windows, repeat(bands),
+                            repeat(dtype), repeat(nodata),
+                            repeat(write_lock),
+                            **kwargs)
+        else:
+            # Launch with xarray
+            print("xarray")
+            process_map(_interpolate_xarray,
+                            repeat(products_dates), repeat(products_per_date),
+                            repeat(timeseries_dates), repeat(timeseries_images),
+                            windows, repeat(bands),
+                            repeat(dtype), repeat(nodata),
+                            repeat(write_lock),
+                            **kwargs)
 
 
 def _interpolate(products_dates, products_per_date,
@@ -247,6 +270,38 @@ def _interpolate(products_dates, products_per_date,
         with product.open() as src:
             data = src.read(bands, window=window, masked=True)
             datas.append(data)
+
+    output = algo.interpolated_timeseries(products_dates, datas, timeseries_dates, nodata)
+
+    with write_lock:
+        for i, img in enumerate(timeseries_images):
+            with rasterio.open(img, mode="r+") as dst:
+                dst.write(output[i].astype(dtype), window=window)
+
+
+def _interpolate_xarray(products_dates, products_per_date,
+                 timeseries_dates, timeseries_images,
+                 window, bands,
+                 dtype, nodata,
+                 write_lock):
+    """Internal method that performs the interpolation for a specific window.
+    This method can be called safely by several processes thanks to the locks
+    that prevent from reading / writing files simultaneously.
+    """
+    datas = list()
+    for date in products_dates:
+        product = products_per_date[date]
+
+        src = product.open_xarray()
+        band_data = src.isel(band=slice(0, len(bands)))  # Select the desired bands
+
+        # Process the desired window
+        window_data = band_data.isel(x=slice(window.col_off, window.col_off + window.width),
+                                     y=slice(window.row_off, window.row_off + window.height))
+
+        # data = src.read(bands, window=window, masked=True)
+        datas.append(window_data)
+
 
     output = algo.interpolated_timeseries(products_dates, datas, timeseries_dates, nodata)
 

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 
 from . import cmptools
@@ -14,6 +15,16 @@ __license = "Apache v2.0"
 indir = "tests/tests_data/"
 outdir = "tests/tests_out/"
 __root_refdir = "tests/tests_refs/"
+
+
+@dataclass
+class RastertoolsTestsData:
+
+    project_dir: Path = Path(__file__).parent.parent
+    tests_project_dir:str = str(project_dir)
+    tests_input_data_dir:str = str(project_dir / "tests" / "tests_data" )
+    tests_output_data_dir:str = str(project_dir / "tests" / "tests_out")
+    tests_ref_data_dir:str = str(project_dir / "tests" / "tests_refs")
 
 
 def get_refdir(testname: str):

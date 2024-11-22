@@ -220,8 +220,11 @@ def run_tool(args):
     # call function corresponding to the subcommand
     if "func" in argsdict:
         try:
+            print("before tool = args.func(args)")
             # initialize the rastertool to execute
+            # initialize the rastertool to execut
             tool = args.func(args)
+            print("after tool = args.func(args)")
 
             # handle the input file of type "lst"
             inputs = _extract_files_from_list(args.inputs)
@@ -229,8 +232,11 @@ def run_tool(args):
             # setup debug mode in which intermediate VRT files are stored to disk or not
             tool.with_vrt_stored(args.keep_vrt)
 
+            print("before tool.process_files(inputs)")
             # launch process
             tool.process_files(inputs)
+            print("after tool.process_files(inputs)")
+
             _logger.info("Done!")
         except RastertoolConfigurationException as rce:
             _logger.exception(rce)

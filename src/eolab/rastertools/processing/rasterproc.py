@@ -177,6 +177,7 @@ class RasterProcessing:
         [setattr(self, argument, argsdict[argument])
          for argument in self.arguments if argument in argsdict]
 
+
     def compute(self, input_data: Union[List[np.ndarray], np.ndarray]) -> numpy.ndarray:
         """Compute the output from the different bands of the input data. Output
         data are supposed to be the same size as input_data.
