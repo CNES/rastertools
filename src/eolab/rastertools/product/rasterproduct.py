@@ -216,8 +216,23 @@ class RasterProduct:
         # truc = truc.compute()
         print(truc)
         # pause = input("la")
-        # return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
-        return rioxarray.open_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi),chunks = True)
+        return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
+        # return rioxarray.open_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi),chunks = True)
+
+    def open_xarray(self,
+                    bands: Union[str, List[str]] = "all",
+                    masks: Union[str, List[str]] = "all",
+                    roi: Union[Path, str] = None,
+                    chunks: Union[int, Dict[str, int], Tuple[int]] = None):
+        """Proxy method to xarray.open_rasterio(rasterproduct.get_raster(...))"""
+        raster = self.get_raster(bands=bands, masks=masks, roi=roi, create_maskband=True)
+        ds = rioxarray.open_rasterio(raster, masked=True, chunks=chunks)
+        # ds = xa.to_dataset(dim="band")
+
+        # self.channels = list(range(len(ds.band.values)))
+        # ds = ds.rename({b + 1: self.rastertype.get_band_id(self.channels[b])
+        #                 for b in range(len(ds.band.values))})
+        return ds
 
     def get_raster(self,
                    bands: Union[str, List[str]] = "all",
@@ -424,26 +439,6 @@ class RasterProduct:
 
         return rasterfile
     
-    def open_xarray(self,
-                    bands: Union[str, List[str]] = "all",
-                    masks: Union[str, List[str]] = "all",
-                    roi: Union[Path, str] = None,
-                    chunks: Union[int, Dict[str, int], Tuple[int]] = None):
-        """Proxy method to xarray.open_rasterio(rasterproduct.get_raster(...))"""
-        print(bands)
-        raster = self.get_raster(bands=bands, masks=masks, roi=roi, create_maskband=True)
-        print('hej')
-        ds = rioxarray.open_rasterio(raster, masked=True, chunks=chunks)
-        print('opened with open_rasterio')
-        # ds = xa.to_dataset(dim="band")
-        print('before rename')
-
-        print(ds)
-        # self.channels = list(range(len(ds.band.values)))
-        # ds = ds.rename({b + 1: self.rastertype.get_band_id(self.channels[b])
-        #                 for b in range(len(ds.band.values))})
-        print('after rename')
-        return ds
 
     def __wrap(self, input_vrt: Path, roi: Path, uuid: str = "") -> Path:
         """Clip the image to the given ROI.

@@ -132,12 +132,15 @@ class Timeseries(Rastertool, Windowable):
             img_name_np = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries.tif"
             times_img_np.append(outdir.joinpath(img_name_np).as_posix())
             if xarray_vers :
-                img_name_xarray = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries_xarray.tif"
+                img_name_xarray = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries-xarray.tif"
                 times_img_xarray.append(outdir.joinpath(img_name_xarray).as_posix())
 
         # compute the timeseries
         compute_timeseries(products_per_date, timestamps, times_img_np,
-                           self.bands, self.window_size, xarray_vers)
+                           self.bands, self.window_size, xarray_vers = False)
+        if xarray_vers:
+            compute_timeseries(products_per_date, timestamps, times_img_xarray,
+                               self.bands, self.window_size, xarray_vers =  xarray_vers)
 
         # free resources
         for product in products_per_date.values():
@@ -166,6 +169,8 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
         window_size (tuple(int, int), optional, default=(1024, 1024)):
             Size of windows for splitting the process in small parts
     """
+    print('...'*50)
+    print(timeseries_images)
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
 
         # open all input rasters
@@ -212,6 +217,7 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
         dtype = refprofile.get("dtype")
         nodata = refprofile.get("nodata")
 
+        print("file creation")
         # create empty output files with correct metadata
         for i, img in enumerate(timeseries_images):
             with rasterio.open(img, mode="w", **refprofile) as dst:
@@ -246,6 +252,7 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
         else:
             # Launch with xarray
             print("xarray")
+
             process_map(_interpolate_xarray,
                             repeat(products_dates), repeat(products_per_date),
                             repeat(timeseries_dates), repeat(timeseries_images),
