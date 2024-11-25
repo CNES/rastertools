@@ -76,7 +76,7 @@ class Timeseries(Rastertool, Windowable):
         """List of bands to process"""
         return self._bands
 
-    def postprocess_files(self, inputfiles: List[str], outputfiles: List[str], xarray_vers : bool = False) -> List[str]:
+    def postprocess_files(self, inputfiles: List[str], outputfiles: List[str]) -> List[str]:
         """Generates the timeseries from a list of inputfiles.
 
         Args:
@@ -124,37 +124,27 @@ class Timeseries(Rastertool, Windowable):
 
         # STEP 3: Generate timeseries
         # create the list of output files
-        outdir = Path("/home/ecadaux/pluto/rastertools/rastertools/tests/tests_out" + "/test_timeseries_xarray") #Path(self.outputdir) # # # # # #
+        outdir = Path(self.outputdir)
 
-        times_img_np = []
-        times_img_xarray = []
+        times_img = []
         for date in dates:
-            img_name_np = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries.tif"
-            times_img_np.append(outdir.joinpath(img_name_np).as_posix())
-            if xarray_vers :
-                img_name_xarray = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries-xarray.tif"
-                times_img_xarray.append(outdir.joinpath(img_name_xarray).as_posix())
+            img_name = f"{template_name.format(date.strftime(reftype.date_format))}-timeseries.tif"
+            times_img.append(outdir.joinpath(img_name).as_posix())
 
         # compute the timeseries
-        compute_timeseries(products_per_date, timestamps, times_img_np,
-                           self.bands, self.window_size, xarray_vers = False)
-        if xarray_vers:
-            compute_timeseries(products_per_date, timestamps, times_img_xarray,
-                               self.bands, self.window_size, xarray_vers =  xarray_vers)
+        compute_timeseries(products_per_date, timestamps, times_img,
+                           self.bands)
 
         # free resources
         for product in products_per_date.values():
             product.free_in_memory_vrts()
 
-        if xarray_vers:
-            return times_img_np, times_img_xarray
-        else :
-            return times_img_np
+        return times_img
 
 
-def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries_dates: List[float],
+def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries_dates: np.ndarray,
                        timeseries_images: List[str],
-                       bands: List[int] = None, window_size: tuple = (1024, 1024), xarray_vers : bool = False):
+                       bands: List[int] = None):
     """Generate the timeseries
 
     Args:
@@ -169,8 +159,6 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
         window_size (tuple(int, int), optional, default=(1024, 1024)):
             Size of windows for splitting the process in small parts
     """
-    print('...'*50)
-    print(timeseries_images)
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
 
         # open all input rasters
@@ -178,31 +166,22 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
 
         for i, date in enumerate(products_dates):
             product = products_per_date[date]
-            with product.open() as src:
+            with product.open_xarray() as src:
                 # check if srcs have same size and are geographically overlapping
                 if i == 0:
-                    refcount = src.count
-                    refindexes = src.indexes
-                    refwidth = src.width
-                    refheight = src.height
-                    reftransform = src.transform
-                    refprofile = src.profile
-                    descriptions = src.descriptions
+                    refcount = src.shape[0]
+                    refindexes = src["band"].values
+                    refwidth = src.shape[2]
+                    refheight = src.shape[1]
+                    reftransform = src.rio.transform()
                 else:
-                    if src.count != refcount:
+                    if src.shape[0] != refcount:
                         raise ValueError(f"All images have not the same number of bands")
-                    if src.width != refwidth or src.height != refheight:
+                    if src.shape[2] != refwidth or src.shape[1] != refheight :
                         raise ValueError(f"All images have not the same size")
-                    if src.transform != reftransform:
+                    if src.rio.transform() != reftransform:
                         raise ValueError(f"All images are not fully"
                                          " geographically overlapping")
-
-        # set block size
-        blockxsize, blockysize = window_size
-        if refwidth < blockxsize:
-            blockxsize = utils.highest_power_of_2(refwidth)
-        if refheight < blockysize:
-            blockysize = utils.highest_power_of_2(refheight)
 
         # check band index and handle all bands options (when bands is an empty list)
         if bands is None or len(bands) == 0:
@@ -210,109 +189,28 @@ def compute_timeseries(products_per_date: Dict[float, RasterProduct], timeseries
         elif min(bands) < 1 or max(bands) > refcount:
             raise ValueError(f"Invalid bands, all values are not in range [1, {refcount}]")
 
-        # update the profile to use for opening output files
-        refprofile.update(driver="GTiff",
-                          blockxsize=blockysize, blockysize=blockxsize, tiled=True,
-                          count=len(bands))
-        dtype = refprofile.get("dtype")
-        nodata = refprofile.get("nodata")
+        nodata = src.rio.nodata
 
-        print("file creation")
-        # create empty output files with correct metadata
-        for i, img in enumerate(timeseries_images):
-            with rasterio.open(img, mode="w", **refprofile) as dst:
-                if i == 0:
-                    # with rasterio.open(timeseries_images[0], mode="w", **profile) as dst:
-                    windows = [window for ij, window in dst.block_windows()]
-                for j, band in enumerate(bands, 1):
-                    dst.set_band_description(j, descriptions[band - 1])
+        _interpolate_xarray(products_dates, products_per_date,
+                            timeseries_dates, timeseries_images, bands, nodata)
 
-        m = multiprocessing.Manager()
-        write_lock = m.Lock()
-
-        kwargs = {
-            "total": len(windows),
-            "disable": os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
-        }
-        max_workers = os.getenv("RASTERTOOLS_MAXWORKERS")
-        if max_workers is not None:
-            kwargs["max_workers"] = int(max_workers)
-
-
-        if not(xarray_vers) :
-            #Launch with np
-            print("np")
-            process_map(_interpolate,
-                            repeat(products_dates), repeat(products_per_date),
-                            repeat(timeseries_dates), repeat(timeseries_images),
-                            windows, repeat(bands),
-                            repeat(dtype), repeat(nodata),
-                            repeat(write_lock),
-                            **kwargs)
-        else:
-            # Launch with xarray
-            print("xarray")
-
-            process_map(_interpolate_xarray,
-                            repeat(products_dates), repeat(products_per_date),
-                            repeat(timeseries_dates), repeat(timeseries_images),
-                            windows, repeat(bands),
-                            repeat(dtype), repeat(nodata),
-                            repeat(write_lock),
-                            **kwargs)
-
-
-def _interpolate(products_dates, products_per_date,
-                 timeseries_dates, timeseries_images,
-                 window, bands,
-                 dtype, nodata,
-                 write_lock):
-    """Internal method that performs the interpolation for a specific window.
-    This method can be called safely by several processes thanks to the locks
-    that prevent from reading / writing files simultaneously.
-    """
-    datas = list()
-    for date in products_dates:
-        product = products_per_date[date]
-        with product.open() as src:
-            data = src.read(bands, window=window, masked=True)
-            datas.append(data)
-
-    output = algo.interpolated_timeseries(products_dates, datas, timeseries_dates, nodata)
-
-    with write_lock:
-        for i, img in enumerate(timeseries_images):
-            with rasterio.open(img, mode="r+") as dst:
-                dst.write(output[i].astype(dtype), window=window)
 
 
 def _interpolate_xarray(products_dates, products_per_date,
-                 timeseries_dates, timeseries_images,
-                 window, bands,
-                 dtype, nodata,
-                 write_lock):
+                 timeseries_dates, timeseries_images, bands, nodata):
     """Internal method that performs the interpolation for a specific window.
     This method can be called safely by several processes thanks to the locks
     that prevent from reading / writing files simultaneously.
     """
     datas = list()
     for date in products_dates:
-        product = products_per_date[date]
 
-        src = product.open_xarray()
+        src = products_per_date[date].open_xarray()
         band_data = src.isel(band=slice(0, len(bands)))  # Select the desired bands
 
-        # Process the desired window
-        window_data = band_data.isel(x=slice(window.col_off, window.col_off + window.width),
-                                     y=slice(window.row_off, window.row_off + window.height))
-
-        # data = src.read(bands, window=window, masked=True)
-        datas.append(window_data)
-
+        datas.append(band_data)
 
     output = algo.interpolated_timeseries(products_dates, datas, timeseries_dates, nodata)
 
-    with write_lock:
-        for i, img in enumerate(timeseries_images):
-            with rasterio.open(img, mode="r+") as dst:
-                dst.write(output[i].astype(dtype), window=window)
+    for i, img in enumerate(timeseries_images):
+        output[i].rio.to_raster(img)
