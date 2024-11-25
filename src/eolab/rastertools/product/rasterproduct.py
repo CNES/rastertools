@@ -214,7 +214,6 @@ class RasterProduct:
         print(truc)
         print(dir(truc))
         # truc = truc.compute()
-        print(truc)
         # pause = input("la")
         return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
         # return rioxarray.open_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi),chunks = True)
@@ -226,7 +225,8 @@ class RasterProduct:
                     chunks: Union[int, Dict[str, int], Tuple[int]] = None):
         """Proxy method to xarray.open_rasterio(rasterproduct.get_raster(...))"""
         raster = self.get_raster(bands=bands, masks=masks, roi=roi, create_maskband=True)
-        ds = rioxarray.open_rasterio(raster, masked=True, chunks=chunks)
+        ds = rioxarray.open_rasterio(raster, masked=True, chunks=True)
+        print(ds)
         # ds = xa.to_dataset(dim="band")
 
         # self.channels = list(range(len(ds.band.values)))

@@ -10,6 +10,7 @@ import numpy
 import numpy as np
 import numpy.ma as ma
 import xarray as xr
+from rasterio import rio
 from scipy import ndimage, signal
 
 
@@ -399,7 +400,7 @@ def speed(data0 : Union[np.ndarray, xr.DataArray] , data1 : np.ndarray, interval
 
 
 
-def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], series : Union[numpy.ma.masked_array, xr.DataArray], output_dates : numpy.array, nodata) -> Union[np.ndarray, xr.DataArray] :
+def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], series : list, output_dates : numpy.array, nodata) -> Union[np.ndarray, xr.DataArray] :
     """
     Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
 
@@ -426,6 +427,7 @@ def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], 
     """
     #Create stack, an array of dimension time x band x height x width from a list of band x height x width arrays
     stack = ma.stack(series)
+    type (stack)
     stack_shape = stack.shape
     # flatten the stacked data: shape is pixel x time
     pixel_series = stack.transpose((1, 2, 3, 0)).reshape(
@@ -446,8 +448,65 @@ def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], 
             output.append([default_val] * len(output_dates))
 
     output = np.array(output)
-    return output.transpose(1, 0).reshape(
-        -1, stack_shape[1], stack_shape[2], stack_shape[3])
+    output = output.transpose(1,0).reshape(-1, stack_shape[1], stack_shape[2], stack_shape[3])
+
+    if isinstance(series[0], xr.DataArray):
+        output = xr.DataArray(np.flip(output,2), dims = ['time', 'bands', 'y', 'x'])
+    return output
+
+
+# def interpolated_timeseries_xarray(dates :  xr.DataArray, series : list, output_dates : numpy.array, nodata) -> xr.DataArray :
+#     """
+#     Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
+#
+#     Args:
+#         dates (numpy.ma.masked_array): A masked array of timestamps (dates) corresponding to
+#                                         the input series. Should be in ascending order.
+#
+#         series (numpy.ma.masked_array): A list of 3D masked arrays, each with shape
+#                                          (bands, height, width), containing the raster data
+#                                          for each timestamp in `dates`.
+#
+#         output_dates (numpy.array): A 1D array of timestamps for which to generate the interpolated
+#                                      rasters.
+#
+#         nodata (float): Value to use for pixels where input data is NaN or missing.
+#
+#     Returns:
+#         numpy.ndarray: A 4D numpy array of shape (time, bands, height, width), containing
+#                        the interpolated raster data for each output date. If there are no valid
+#                        data points for a specific pixel, the corresponding pixel will be filled with `nodata`.
+#
+#     Raises:
+#         ValueError: If `series` is empty, or if `dates` and `series` dimensions do not match.
+#     """
+#     #Create stack, an array of dimension time x band x height x width from a list of band x height x width arrays
+#     stack = xr.concat(series, dim="time")
+#     stack_shape = stack.shape
+#
+#     # Flatten spatial dimensions into a single pixel axis (time x pixels)
+#     stack_flat = stack.stack(pixel=("x", "y", "band"))
+#     # Transpose to have shape (pixels x time)
+#     pixel_series = stack_flat.transpose("pixel","time")
+#
+#     output = [] #xr.DataArray(rd2_np, dims=("x", "y", "z"))
+#     for serie in pixel_series:
+#         compressed = serie.compressed()
+#         if serie.count() > 1:
+#             output.append(np.interp(
+#                 output_dates,
+#                 dates.where(serie.mask).compressed(),
+#                 compressed,
+#                 compressed[0],
+#                 compressed[-1]))
+#         else:
+#             default_val = serie.sum() if serie.count() > 0 else nodata
+#             output.append([default_val] * len(output_dates))
+#
+#     # output = np.array(output)
+#
+#     return output.transpose(1, 0).reshape(
+#         -1, stack_shape[1], stack_shape[2], stack_shape[3])
 
 
 def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> Union[numpy.ndarray, xr.DataArray] :
