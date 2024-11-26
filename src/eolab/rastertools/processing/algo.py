@@ -754,20 +754,19 @@ def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, direc
     if input_data.shape[0] != 1:
         raise ValueError("svf only accepts numpy arrays with first dim of size 1")
 
-    nb_directions = directions
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=np.float32)
     if isinstance(input_data, xr.DataArray) :
-        out = xr.DataArray(out)
+        out = xr.DataArray(out, dims=input_data.dims, coords=input_data.coords)
 
     # prevent nodata problem
     # change the NaN in the input array to 0
     input_band = np.nan_to_num(input_data[0], copy=False, nan=0)
 
     # compute directions
-    axes = [_bresenham_line(360 * i / nb_directions, radius)
-            for i in range(nb_directions)]
+    axes = [_bresenham_line(360 * i / directions, radius)
+            for i in range(directions)]
 
     # get altitude of current point to consider for computing elevation angle
     if altitude is None:
@@ -789,7 +788,7 @@ def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, direc
         ratios = 1 / np.sqrt(ratios**2 + 1)  # = np.sin(np.arctan(ratios / self.pixel_size))
         out[0, radius: shape[1] - radius, radius: shape[2] - radius] += ratios
 
-    out /= nb_directions
+    out /= directions
     return out
 
 

@@ -8,12 +8,14 @@ import logging
 import logging.config
 from pathlib import Path
 import numpy as np
+import rasterio
+import rioxarray
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
 from eolab.rastertools.processing import RasterProcessing, compute_sliding
-
+from eolab.rastertools.product import RasterProduct
 
 _logger = logging.getLogger(__name__)
 
@@ -151,11 +153,26 @@ class SVF(Rastertool, Windowable):
             "altitude": self.altitude
         })
 
-        # Run the SVF processing
-        compute_sliding(
-            inputfile, output_image, svf,
-            window_size=self.window_size,
-            window_overlap=self.radius,
-            pad_mode=self.pad_mode)
+        # STEP 1: Prepare the input image so that it can be processed
+        with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
+
+            # STEP 2: apply filter
+            outdir = Path(self.outputdir)
+            output_image = outdir.joinpath(
+                f"{utils.get_basename(inputfile)}-svf.tif")
+
+            input_image = product.get_raster()
+
+            with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
+                print(product)
+                with rioxarray.open_rasterio(input_image, chunks=True) as src:
+                    # dtype and creation options of output data
+                    dtype = svf.dtype or rasterio.float32
+                    src = src.astype(dtype)
+
+                    output = svf.compute(src).astype(dtype)
+
+                    ##Create the file and compute
+                    output.rio.to_raster(output_image)
 
         return [output_image.as_posix()]
