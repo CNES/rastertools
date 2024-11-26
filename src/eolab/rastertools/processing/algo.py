@@ -4,7 +4,7 @@
 Algorithms on raster data
 """
 import math
-from typing import Union
+from typing import Union, List
 
 import numpy
 import numpy as np
@@ -12,6 +12,7 @@ import numpy.ma as ma
 import xarray as xr
 from rasterio import rio
 from scipy import ndimage, signal
+from xarray import DataArray
 
 
 def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
@@ -400,7 +401,7 @@ def speed(data0 : Union[np.ndarray, xr.DataArray] , data1 : np.ndarray, interval
 
 
 
-def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], series : list, output_dates : numpy.array, nodata) -> Union[np.ndarray, xr.DataArray] :
+def interpolated_timeseries(dates : numpy.ma.masked_array, series : List[numpy.ma.masked_array], output_dates : numpy.array, nodata) -> numpy.ndarray:
     """
     Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
 
@@ -427,7 +428,6 @@ def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], 
     """
     #Create stack, an array of dimension time x band x height x width from a list of band x height x width arrays
     stack = ma.stack(series)
-    type (stack)
     stack_shape = stack.shape
     # flatten the stacked data: shape is pixel x time
     pixel_series = stack.transpose((1, 2, 3, 0)).reshape(
@@ -448,65 +448,83 @@ def interpolated_timeseries(dates : Union[numpy.ma.masked_array, xr.DataArray], 
             output.append([default_val] * len(output_dates))
 
     output = np.array(output)
-    output = output.transpose(1,0).reshape(-1, stack_shape[1], stack_shape[2], stack_shape[3])
-
-    if isinstance(series[0], xr.DataArray):
-        output = xr.DataArray(np.flip(output,2), dims = ['time', 'bands', 'y', 'x'])
-    return output
+    return output.transpose(1, 0).reshape(-1, stack_shape[1], stack_shape[2], stack_shape[3])
 
 
-# def interpolated_timeseries_xarray(dates :  xr.DataArray, series : list, output_dates : numpy.array, nodata) -> xr.DataArray :
-#     """
-#     Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
-#
-#     Args:
-#         dates (numpy.ma.masked_array): A masked array of timestamps (dates) corresponding to
-#                                         the input series. Should be in ascending order.
-#
-#         series (numpy.ma.masked_array): A list of 3D masked arrays, each with shape
-#                                          (bands, height, width), containing the raster data
-#                                          for each timestamp in `dates`.
-#
-#         output_dates (numpy.array): A 1D array of timestamps for which to generate the interpolated
-#                                      rasters.
-#
-#         nodata (float): Value to use for pixels where input data is NaN or missing.
-#
-#     Returns:
-#         numpy.ndarray: A 4D numpy array of shape (time, bands, height, width), containing
-#                        the interpolated raster data for each output date. If there are no valid
-#                        data points for a specific pixel, the corresponding pixel will be filled with `nodata`.
-#
-#     Raises:
-#         ValueError: If `series` is empty, or if `dates` and `series` dimensions do not match.
-#     """
-#     #Create stack, an array of dimension time x band x height x width from a list of band x height x width arrays
-#     stack = xr.concat(series, dim="time")
-#     stack_shape = stack.shape
-#
-#     # Flatten spatial dimensions into a single pixel axis (time x pixels)
-#     stack_flat = stack.stack(pixel=("x", "y", "band"))
-#     # Transpose to have shape (pixels x time)
-#     pixel_series = stack_flat.transpose("pixel","time")
-#
-#     output = [] #xr.DataArray(rd2_np, dims=("x", "y", "z"))
-#     for serie in pixel_series:
-#         compressed = serie.compressed()
-#         if serie.count() > 1:
-#             output.append(np.interp(
-#                 output_dates,
-#                 dates.where(serie.mask).compressed(),
-#                 compressed,
-#                 compressed[0],
-#                 compressed[-1]))
-#         else:
-#             default_val = serie.sum() if serie.count() > 0 else nodata
-#             output.append([default_val] * len(output_dates))
-#
-#     # output = np.array(output)
-#
-#     return output.transpose(1, 0).reshape(
-#         -1, stack_shape[1], stack_shape[2], stack_shape[3])
+def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArray], output_dates: numpy.array,
+                                   nodata) -> List[xr.DataArray]:
+    """
+    Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
+
+    Args:
+        dates (numpy.ma.masked_array): A masked array of timestamps (dates) corresponding to
+                                        the input series. Should be in ascending order.
+
+        series (numpy.ma.masked_array): A list of 3D masked arrays, each with shape
+                                         (bands, height, width), containing the raster data
+                                         for each timestamp in `dates`.
+
+        output_dates (numpy.array): A 1D array of timestamps for which to generate the interpolated
+                                     rasters.
+
+        nodata (float): Value to use for pixels where input data is NaN or missing.
+
+    Returns:
+        numpy.ndarray: A 4D numpy array of shape (time, bands, height, width), containing
+                       the interpolated raster data for each output date. If there are no valid
+                       data points for a specific pixel, the corresponding pixel will be filled with `nodata`.
+
+    Raises:
+        ValueError: If `series` is empty, or if `dates` and `series` dimensions do not match.
+    """
+    # Stack input series into a single masked array (time x band x height x width)
+    stack = ma.stack([da.data for da in series])
+    stack_shape = stack.shape
+
+    # Flatten the stacked data: shape is pixel x time
+    pixel_series = stack.transpose((1, 2, 3, 0)).reshape(
+        stack_shape[1] * stack_shape[2] * stack_shape[3], -1
+    )
+
+    output = []
+    for serie in pixel_series:
+        compressed = serie.compressed()
+        if serie.count() > 1:
+            output.append(np.interp(
+                output_dates,
+                ma.masked_array(dates, serie.mask).compressed(),
+                compressed,
+                compressed[0],
+                compressed[-1]
+            ))
+        else:
+            default_val = serie.sum() if serie.count() > 0 else nodata
+            output.append([default_val] * len(output_dates))
+
+    # Reshape the output to match (time, bands, height, width)
+    output = np.array(output)
+    output = output.transpose(1, 0).reshape(
+        -1, stack_shape[1], stack_shape[2], stack_shape[3]
+    )
+
+    # Create a list of xr.DataArray, one for each output date
+    output_xr = []
+    coords = series[0].coords
+    for time, date in enumerate(output_dates):
+        da = xr.DataArray(
+            output[time],
+            dims=["band", "y", "x"],
+            coords={
+                "band": coords["band"],
+                "y": coords["y"],
+                "x": coords["x"],
+                "time": date
+            },
+            attrs=series[0].attrs
+        )
+        output_xr.append(da)
+
+    return output_xr
 
 
 def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> Union[numpy.ndarray, xr.DataArray] :
@@ -535,7 +553,7 @@ def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> 
     if kernel_width == 1:
         output = data.copy()
         if isinstance(data, xr.DataArray):
-            output = xr.DataArray(output)
+            output = xr.DataArray(output, dims = ['bands', 'y', 'x'])
     else:
         # special case: size = 1 ==> returns data
         if np.issubdtype(data.dtype, np.floating):
@@ -556,8 +574,6 @@ def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> 
 
         # compute local sum at each pixel from integral image
         output = np.zeros(data.shape, dtype=ii.dtype)
-        if isinstance(data, xr.DataArray):
-            output = xr.DataArray(output)
         posd = (kernel_width + 1) // 2
         posf = kernel_width - posd
         if data.ndim == 3:
@@ -570,6 +586,9 @@ def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> 
                 + ii[kernel_width:, kernel_width:] \
                 - ii[:-kernel_width, kernel_width:] \
                 - ii[kernel_width:, :-kernel_width]
+
+    if isinstance(data, xr.DataArray):
+        output = xr.DataArray(output, dims=data.dims, coords=data.coords)
 
     return output.astype(data.dtype)
 
@@ -593,10 +612,12 @@ def median(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int) -
                     or if `kernel_size` is not a positive odd integer.
     """
     if len(input_data.shape) != 3:
-        raise ValueError("adaptive_gaussian only accepts 3 dims numpy arrays")
+        raise ValueError("Median only accepts 3 dims numpy arrays")
 
-    #kernel_size = kwargs.get('kernel_size', 8)
     output = ndimage.median_filter(input_data, size=(1, kernel_size, kernel_size))
+
+    if isinstance(input_data, xr.DataArray):
+        output = xr.DataArray(output, dims=input_data.dims, coords=input_data.coords)#, dims = ['bands', 'y', 'x'])
     return output
 
 
@@ -643,7 +664,6 @@ def local_mean(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : in
     Raises:
         ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.
     """
-    #kernel_size = kwargs.get('kernel_size', 8)
     # compute local sum of band pixels
     output = _local_sum(input_data, kernel_size)
     # compute local sum of band mask: number of valid pixels
@@ -677,23 +697,30 @@ def adaptive_gaussian(input_data : Union[numpy.ndarray, xr.DataArray], kernel_si
         ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.
     """
     if len(input_data.shape) != 3:
-        raise ValueError("adaptive_gaussian only accepts 3 dims numpy arrays")
+        raise ValueError("adaptive_gaussian only accepts 3 dims arrays")
     if input_data.shape[0] != 1:
-        raise ValueError("adaptive_gaussian only accepts numpy arrays with first dim of size 1")
+        raise ValueError("adaptive_gaussian only accepts arrays with first dim of size 1")
 
     dtype = input_data.dtype
+    input_np = input_data.values
 
-    w_1 = (input_data[0, :, :-2] - input_data[0, :, 2:]) ** 2
-    w_2 = (input_data[0, :-2, :] - input_data[0, 2:, :]) ** 2
+    w_1 = (input_np[0, :, :-2] - input_np[0, :, 2:]) ** 2
+    w_2 = (input_np[0, :-2, :] - input_np[0, 2:, :]) ** 2
     w = np.exp(-(w_1[1:-1, :] + w_2[:, 1:-1]) / (2 * sigma ** 2))
     w_sum = signal.convolve2d(w, np.ones((3, 3), dtype=dtype), boundary='symm', mode='same')
     w_sum += np.finfo(dtype).eps
-    out = input_data
+
+    print(input_data.values[0, 1:-1, 1:-1].shape)
+    print(input_data.values.shape)
+    out = np.copy(input_np)
+
     for i in range(kernel_size):
-        prod = w * out[0, 1:-1, 1:-1]
+        prod = w * input_np[0, 1:-1, 1:-1]
         conv = signal.convolve2d(prod, np.ones((3, 3), dtype=dtype), boundary='symm', mode='same')
+
+        print((conv / w_sum).shape)
         out[0, 1:-1, 1:-1] = conv / w_sum
-    return out
+    return xr.DataArray(out, dims=input_data.dims, coords=input_data.coords)
 
 
 def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> Union[numpy.ndarray, xr.DataArray]:

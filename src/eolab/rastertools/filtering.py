@@ -8,6 +8,10 @@ import logging
 import logging.config
 from typing import List, Dict
 from pathlib import Path
+import multiprocessing
+
+import rasterio
+from rioxarray import rioxarray
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
@@ -160,8 +164,6 @@ class Filtering(Rastertool, Windowable):
                 Set None if all bands shall be processed.
         """
         super().__init__()
-        # initialize default windowing configuration
-        self.with_windows()
         # the raster filter processing
         self._raster_filter = raster_filter
         self._raster_filter.configure({"kernel_size": kernel_size})
@@ -205,13 +207,6 @@ class Filtering(Rastertool, Windowable):
         """
         _logger.info(f"Processing file {inputfile}")
 
-        overlap = (self.raster_filter.kernel_size + 1) // 2
-        if overlap >= min(self.window_size) / 2:
-            raise ValueError("The kernel size (option --kernel_size, "
-                             f"value={self.raster_filter.kernel_size}) "
-                             "must be strictly less than the window size minus 1 "
-                             f"(option --window_size, value={min(self.window_size)})")
-
         # STEP 1: Prepare the input image so that it can be processed
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
 
@@ -220,11 +215,29 @@ class Filtering(Rastertool, Windowable):
             output_image = outdir.joinpath(
                 f"{utils.get_basename(inputfile)}-{self.raster_filter.name}.tif")
 
-            compute_sliding(
-                product.get_raster(), output_image, self.raster_filter,
-                window_size=self.window_size,
-                window_overlap=(self.raster_filter.kernel_size + 1) // 2,
-                pad_mode=self.pad_mode,
-                bands=self.bands)
+            input_image = product.get_raster()
+            rasterprocessing = self.raster_filter
+
+            with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
+                print(product)
+                with rioxarray.open_rasterio(input_image, chunks=True) as src:
+                    print(src)
+                    # dtype and creation options of output data
+                    dtype = rasterprocessing.dtype or rasterio.float32
+
+                    # check band index and handle all bands options (when bands is an empty list)
+                    bands = self.bands
+                    if bands is None or len(bands) == 0:
+                        bands = src["band"].values
+                    elif min(bands) < 1 or max(bands) > src.shape[0]:
+                        raise ValueError(f"Invalid bands, all values are not in range [1, {src.shape[0]}]")
+
+                    src = src.isel(band=slice(0, len(bands)))
+                    src = src.astype(dtype)
+
+                    output = rasterprocessing.compute(src).astype(dtype)
+
+                    ##Create the file and compute
+                    output.rio.to_raster(output_image)
 
             return [output_image.as_posix()]

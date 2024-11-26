@@ -210,13 +210,7 @@ class RasterProduct:
              masks: Union[str, List[str]] = "all",
              roi: Union[Path, str] = None):
         """Proxy method to rasterio.open(rasterproduct.get_raster(...))"""
-        truc = rioxarray.open_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi),chunks = True)
-        print(truc)
-        print(dir(truc))
-        # truc = truc.compute()
-        # pause = input("la")
         return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
-        # return rioxarray.open_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi),chunks = True)
 
     def open_xarray(self,
                     bands: Union[str, List[str]] = "all",

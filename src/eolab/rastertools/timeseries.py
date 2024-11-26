@@ -210,7 +210,12 @@ def _interpolate_xarray(products_dates, products_per_date,
 
         datas.append(band_data)
 
-    output = algo.interpolated_timeseries(products_dates, datas, timeseries_dates, nodata)
+    output = algo.interpolated_timeseries_xarray(products_dates, datas, timeseries_dates, nodata)
 
-    for i, img in enumerate(timeseries_images):
-        output[i].rio.to_raster(img)
+    m = multiprocessing.Manager()
+    write_lock = m.Lock()
+
+    # Use of the lock to avoid writing in //
+    with write_lock:
+        for i, img in enumerate(timeseries_images):
+            output[i].rio.to_raster(img)

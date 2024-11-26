@@ -10,6 +10,7 @@ import numpy as np
 
 from eolab.rastertools.processing import algo
 from eolab.rastertools.product import BandChannel
+import xarray as xr
 
 
 class RasterProcessing:
@@ -178,7 +179,7 @@ class RasterProcessing:
          for argument in self.arguments if argument in argsdict]
 
 
-    def compute(self, input_data: Union[List[np.ndarray], np.ndarray]) -> numpy.ndarray:
+    def compute(self, input_data: Union[List[np.ndarray], np.ndarray, List[xr.DataArray], xr.DataArray]) -> Union[numpy.ndarray, xr.DataArray]:
         """Compute the output from the different bands of the input data. Output
         data are supposed to be the same size as input_data.
 

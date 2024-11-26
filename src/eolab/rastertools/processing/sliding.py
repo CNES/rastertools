@@ -14,6 +14,7 @@ import numpy as np
 import numpy.ma as ma
 import rasterio
 from rasterio.windows import Window
+from rioxarray import rioxarray
 from tqdm.contrib.concurrent import process_map
 
 from eolab.rastertools import utils
@@ -24,7 +25,6 @@ _logger = logging.getLogger(__name__)
 
 
 def compute_sliding(input_image: str, output_image: str, rasterprocessing: RasterProcessing,
-                    window_size: tuple = (1024, 1024), window_overlap: int = 0,
                     pad_mode: str = "edge", bands: List[int] = None):
     """
     Apply a sliding window raster processing operation on an input image and save the result.
@@ -56,7 +56,9 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
         specified, and sliding window indices are computed internally.
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        with rasterio.open(input_image) as src:
+        with rioxarray.open_rasterio(input_image) as src:
+
+
             profile = src.profile
 
             # set block size

@@ -5,15 +5,11 @@ This module defines a rastertool named speed that computes the time derivative (
 of the radiometry of the input rasters.
 """
 from datetime import datetime
-import logging
 import logging.config
-import os
 from pathlib import Path
-import threading
 from typing import List
 
 import rasterio
-from tqdm.contrib.concurrent import thread_map
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool
