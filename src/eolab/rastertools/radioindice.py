@@ -11,11 +11,14 @@ from pathlib import Path
 from typing import List
 import threading
 
+import numpy as np
 import rasterio
 import numpy.ma as ma
+import rioxarray
 from tqdm import tqdm
 
 from eolab.rastertools import utils
+import xarray as xr
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
 from eolab.rastertools.processing import RadioindiceProcessing
@@ -475,55 +478,26 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
             Size of windows for splitting the processed image in small parts
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        with rasterio.open(input_image) as src:
-            profile = src.profile
-
-            # set block size to the configured window_size of first indice
-            blockxsize, blockysize = window_size
-            if src.width < blockxsize:
-                blockxsize = utils.highest_power_of_2(src.width)
-            if src.height < blockysize:
-                blockysize = utils.highest_power_of_2(src.height)
+        with rioxarray.open_rasterio(input_image, masked=True, chunks=True) as src_array:
 
             # dtype of output data
             dtype = indices[0].dtype or rasterio.float32
+            src_array = src_array.astype(dtype)
 
-            # setup profile for output image
-            profile.update(driver='GTiff',
-                           blockxsize=blockysize, blockysize=blockxsize, tiled=True,
-                           dtype=dtype, nodata=indices[0].nodata,
-                           count=len(indices))
+            # Prepare an empty DataArray for the result
+            result = xr.DataArray(
+                np.zeros((len(indices), src_array.shape[1], src_array.shape[2]), dtype=dtype),
+                dims=["band", "y", "x"],
+                coords={"band": [indice.name for indice in indices],
+                        "y": src_array.coords["y"],
+                        "x": src_array.coords["x"]})
 
-            with rasterio.open(indice_image, "w", **profile) as dst:
-                # Materialize a list of destination block windows
-                windows = [window for ij, window in dst.block_windows()]
+            # compute every indices
+            for i, indice in enumerate(indices, 1):
+                # Get the bands necessary to compute the indice
+                bands = [image_channels.index(channel) + 1 for channel in indice.channels]
 
-                # disable status of tqdm progress bar
-                disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+                result.loc[{"band": indice.name}]  = indice.algo(src_array.sel(band=bands)).astype(dtype).fillna(indice.nodata)
 
-                # compute every indices
-                for i, indice in enumerate(indices, 1):
-                    # Get the bands necessary to compute the indice
-                    bands = [image_channels.index(channel) + 1 for channel in indice.channels]
-
-                    read_lock = threading.Lock()
-                    write_lock = threading.Lock()
-
-                    def process(window):
-                        """Read input raster, compute indice and write output raster"""
-                        with read_lock:
-                            src_array = src.read(bands, window=window, masked=True)
-                            src_array[src_array == src.nodata] = ma.masked
-                            src_array = src_array.astype(dtype)
-
-                        # The computation can be performed concurrently
-                        result = indice.algo(src_array).astype(dtype).filled(indice.nodata)
-
-                        with write_lock:
-                            dst.write_band(i, result, window=window)
-
-                    # compute using concurrent.futures.ThreadPoolExecutor and tqdm
-                    for window in tqdm(windows, disable=disable, desc=f"{indice.name}"):
-                        process(window)
-
-                    dst.set_band_description(i, indice.name)
+            # Create the file and compute
+            result.rio.to_raster(indice_image)

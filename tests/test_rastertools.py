@@ -125,7 +125,7 @@ class TestCase:
             caplog.clear()
 
         # clear output dir
-        # utils4test.clear_outdir()
+        utils4test.clear_outdir()
 
 
 def test_rastertools_command_line_info():
@@ -165,7 +165,7 @@ def test_radioindice_command_line_default():
         " -v ri -o tests/tests_out tests/tests_data/listing.lst",
         # two indices with their own options, merge
         "-v ri --pvi --savi -o tests/tests_out -m tests/tests_data/listing.lst",
-        # indices option, roi
+        # # indices option, roi
         "--verbose ri --indices pvi savi -nd nir red --roi tests/tests_data/COMMUNE_32001.shp"
         " --output tests/tests_out"
         " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
