@@ -8,7 +8,7 @@ a vector file (shapefile, geojson, etc.). If no vector file is provided, the sta
 computed on the whole image.
 
 Statistics inside a geometry can be computed for different categories also defined by a vector
-file. For instance, is is possible to compute the average height of buildings and vegetation of
+file. For instance, it is possible to compute the average height of buildings and vegetation of
 cities using:
 
 - a Digital Height Model (input raster file)

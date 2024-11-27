@@ -14,7 +14,9 @@ import rioxarray
 import shapely.geometry
 from osgeo import gdal
 import rasterio
+from pyproj import Transformer
 from rasterio import features, warp, windows
+from shapely.geometry import Polygon
 
 from eolab.rastertools import utils
 
@@ -66,26 +68,34 @@ def filter(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
     geometries = _get_geoms(geoms)
     geoms_crs = _get_geoms_crs(geometries)
 
-    file = raster.as_posix() if isinstance(raster, Path) else raster
-    with rasterio.open(file) as dataset:
-        l, b, r, t = dataset.bounds
-        px, py = ([l, l, r, r], [b, t, t, b])
+    # Read raster using rioxarray
+    raster_data = rioxarray.open_rasterio(raster, masked=True)
+    raster_crs = raster_data.rio.crs
 
-        if(geoms_crs != dataset.crs):
-            px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
+    # Get the raster bounds
+    left, bottom, right, top = raster_data.rio.bounds()
 
-        polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
-        if within:
-            # convert geometries into GeoPandasBaseExtended to use the new cix property
-            filtered_geoms = geometries[geometries.within(polygon)]
-        else:
-            filtered_geoms = geometries[geometries.intersects(polygon)]
+    # Convert the raster bounds to the geometries' CRS if they are different
+    if geoms_crs != raster_crs:
+        transformer = Transformer.from_crs(raster_crs, geoms_crs, always_xy=True)
+        # Transform raster bounds to the geometry CRS
+        px, py = transformer.transform([left, left, right, right], [bottom, top, top, bottom])
+        polygon = Polygon(zip(px, py))
+    else:
+        polygon = Polygon([(left, bottom), (left, top), (right, top), (right, bottom)])
 
-        if output:
-            outfile = output.as_posix() if isinstance(output, Path) else output
-            filtered_geoms.to_file(outfile, driver=driver)
+    # Filter geometries based on the intersection or containment with the raster bounds
+    if within:
+        filtered_geoms = geometries[geometries.within(polygon)]
+    else:
+        filtered_geoms = geometries[geometries.intersects(polygon)]
 
-        return filtered_geoms
+    # Save the filtered geometries if output path is provided
+    if output:
+        outfile = output.as_posix() if isinstance(output, Path) else output
+        filtered_geoms.to_file(outfile, driver=driver)
+
+    return filtered_geoms
 
 
 def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
@@ -254,16 +264,24 @@ def get_raster_shape(raster: Union[Path, str], output: Union[Path, str] = None,
         :obj:`gpd.GeoDataFrame`: The geometries in the raster CRS
     """
     file = raster.as_posix() if isinstance(raster, Path) else raster
-    with rasterio.open(file) as src:
-        geoms = []
-        for band in range(1, src.count + 1):
-            mask = src.read_masks(band)
-            data = (mask > 0).astype(np.int16)
-            features_gen = features.shapes(data, mask, transform=src.transform)
-            for geom, val in features_gen:
-                if val > 0:
-                    # transform geojson like dict to shapely geometry object
-                    geoms.append(shapely.geometry.shape(geom))
+    src = rioxarray.open_rasterio(file, masked=True)
+
+    # Initialize a list to store the geometries
+    geoms = []
+
+    # Loop through each band in the raster
+    for band in range(1, src.shape[0] + 1):
+        # Read the mask for the current band
+        mask = src.isel(band=band - 1).notnull().astype(np.int16)
+
+        # Convert the mask to geometries using rasterio features
+        features_gen = features.shapes(mask.values, mask=mask.values, transform=src.rio.transform())
+
+        # Collect the geometries where the value is greater than 0
+        for geom, val in features_gen:
+            if val > 0:
+                # Transform the geojson-like geometry to a Shapely geometry object
+                geoms.append(shapely.geometry.shape(geom))
 
         # create geo data frame
         df = pd.DataFrame({'geometry': geoms})

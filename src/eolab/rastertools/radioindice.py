@@ -483,6 +483,9 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
             # dtype of output data
             dtype = indices[0].dtype or rasterio.float32
             src_array = src_array.astype(dtype)
+            nodata = -10000
+            #Replace nodata values with np.nan
+            src_array = src_array.where(src_array != nodata, other=np.nan)
 
             # Prepare an empty DataArray for the result
             result = xr.DataArray(
@@ -497,7 +500,7 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
                 # Get the bands necessary to compute the indice
                 bands = [image_channels.index(channel) + 1 for channel in indice.channels]
 
-                result.loc[{"band": indice.name}]  = indice.algo(src_array.sel(band=bands)).astype(dtype).fillna(indice.nodata)
+                result.loc[{"band": indice.name}]  = indice.algo(src_array.sel(band=bands).values).astype(dtype)
 
             # Create the file and compute
             result.rio.to_raster(indice_image)

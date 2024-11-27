@@ -25,6 +25,7 @@ import numpy as np
 import geopandas as gpd
 
 import rasterio
+import rioxarray
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, RastertoolConfigurationException
@@ -413,14 +414,10 @@ class Zonalstats(Rastertool):
 
             # open raster to get metadata
             raster = product.get_raster()
-            with rasterio.open(raster) as rst:
-                bound = int(rst.count)
-                indexes = rst.indexes
-                descr = rst.descriptions
+            with rioxarray.open_rasterio(product) as rst:
+                bound, width, height = rst.shape
+                indexes = rst["band"].values
 
-                geotransform = rst.get_transform()
-                width = np.abs(geotransform[1])
-                height = np.abs(geotransform[5])
                 area_square_meter = width * height
 
             date_str = product.get_date_string('%Y%m%d-%H%M%S')

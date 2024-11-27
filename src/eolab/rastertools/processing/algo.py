@@ -33,7 +33,10 @@ def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.n
         Numpy array of the size (number of lines, number of columns) containing the computed TNDVI.
     """
     np.seterr(divide='ignore')
-    return (bands[1] - bands[0]) / (bands[1] + bands[0])
+    print(bands[1][:2] )
+    res = (bands[1] - bands[0]) / (bands[1] + bands[0])
+    print(res[:2])
+    return res
 
 
 def tndvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
@@ -67,6 +70,7 @@ def tndvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataA
     else:
         if not ratio.isnull().all():
             ratio = ratio.where(ratio >= 0, 0)
+    print(ratio[:2])
     return np.sqrt(ratio)
 
 

@@ -152,7 +152,7 @@ def compute_zonal_stats_per_category(geoms: gpd.GeoDataFrame, image: str,
             substats.append(s)
 
         offset = 0
-        # re-order output so that all stats of catagorical geometries that correspond
+        # re-order output so that all stats of categorical geometries that correspond
         # to the same input geometry are concatenated in the same list
         for i in range(nb_geoms):
             results_roi = [{}] * nb_bands
