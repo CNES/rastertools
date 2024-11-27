@@ -11,6 +11,8 @@ from pathlib import Path
 import rasterio
 import rasterio.mask
 import geopandas as gpd
+import rioxarray
+from rioxarray.exceptions import NoDataInBounds
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, RastertoolConfigurationException
@@ -153,48 +155,42 @@ class Tiling(Rastertool):
             [str]: The list of generates tiles.
         """
         _logger.info(f"Processing file {inputfile}")
-
+        inputfile = '/home/ecadaux/pluto/rastertools/rastertools/tests/tests_data/tif_file.tif'
         # STEP 1: Prepare the input image so that it can be processed
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
 
+            # Load raster as xarray.DataArray
+            raster = product.open_xarray()
+            output_paths = []
+
             # STEP 2: Prepare grid (reproject it to raster's CRS)
-            grid = vector.reproject(self.grid, inputfile)
+            grid = vector.reproject_geometries_to_raster_crs(self.grid, raster)
 
-            # STEP 3: apply tiling
-            outputs = []
-            with product.open() as dataset:
-                out_meta = dataset.meta
+            for shape, i in zip(grid.geometry, grid.index):
+                _logger.info("Crop and export tile " + str(i) + "...")
 
-                # Crop and export every tiles
-                for shape, i in zip(grid.geometry, grid.index):
-                    _logger.info("Crop and export tile " + str(i) + "...")
-                    try:
-                        # generate crop image
-                        image, transform = rasterio.mask.mask(dataset, [shape],
-                                                              crop=True, all_touched=True)
+                try:
+                    # Generate mask to crop the raster to the geometry
+                    masked_raster = raster.rio.clip([shape], raster.rio.crs, drop=True)
 
-                        # output location
-                        output = Path(self.outputdir)
+                    # output location
+                    output = Path(self.outputdir)
 
-                        if self.output_subdir is not None:  # if we need to export in a subdirectory
-                            output = output.joinpath(self.output_subdir.format(i))
-                            if not output.is_dir():
-                                output.mkdir()
+                    if self.output_subdir is not None:  # if we need to export in a subdirectory
+                        output = output.joinpath(self.output_subdir.format(i))
+                        if not output.is_dir():
+                            output.mkdir()
 
-                        basename = utils.get_basename(inputfile)
-                        output = output.joinpath(self.output_basename.format(basename, i) + ".tif")
+                    basename = utils.get_basename(inputfile)
+                    output = output.joinpath(self.output_basename.format(basename, i) + ".tif")
 
-                        # export
-                        out_meta.update({"height": image.shape[1],
-                                         "width": image.shape[2],
-                                         "transform": transform})
+                    # Save the cropped raster
+                    masked_raster.rio.to_raster(output)
+                    output_paths.append(output.as_posix())
 
-                        with rasterio.open(output, 'w', **out_meta) as dst:
-                            dst.write(image)
+                    _logger.info("Tile " + str(i) + " exported to " + str(output_paths))
+                    print(output)
+                except NoDataInBounds:  # if no overlap
+                    _logger.error("Input shape " + str(i) + " does not overlap raster")
 
-                        outputs.append(output.as_posix())
-                        _logger.info("Tile " + str(i) + " exported to " + str(output))
-                    except ValueError:  # if no overlap
-                        _logger.error("Input shape " + str(i) + " does not overlap raster")
-
-            return outputs
+            return output_paths

@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import geopandas as gpd
+import rioxarray
 import shapely.geometry
 from osgeo import gdal
 import rasterio
@@ -168,6 +169,43 @@ def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
             reprojected_geoms.to_file(outfile, driver=driver)
 
         return reprojected_geoms
+
+
+def reproject_geometries_to_raster_crs(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
+                                       output: Union[Path, str] = None, driver: str = 'GeoJSON') -> gpd.GeoDataFrame:
+    """
+    Reproject the geometries to match the CRS of the raster.
+
+    Args:
+        geoms (str, Path, or gpd.GeoDataFrame): Vector data (filename or GeoDataFrame).
+        raster (str or Path): Raster file.
+        output (str or Path, optional): File to save reprojected geometries.
+        driver (str, optional): File format for saving the output (default is "GeoJSON").
+
+    Returns:
+        gpd.GeoDataFrame: Reprojected geometries in raster CRS.
+    """
+    # Load geometries
+    if isinstance(geoms, (str, Path)):
+        geometries = gpd.read_file(geoms)
+    else:
+        geometries = geoms
+
+    # Extract CRS
+    geoms_crs = geometries.crs
+    raster_crs = raster.rio.crs
+
+    # Reproject geometries to match raster CRS
+    if geoms_crs != raster_crs:
+        reprojected_geoms = geometries.to_crs(raster_crs)
+    else:
+        reprojected_geoms = geometries
+
+    # Optionally save the reprojected geometries
+    if output:
+        reprojected_geoms.to_file(output, driver=driver)
+
+    return reprojected_geoms
 
 
 def dissolve(geoms: Union[gpd.GeoDataFrame, Path, str],
