@@ -10,11 +10,13 @@ from pathlib import Path
 import numpy as np
 import rasterio
 import rioxarray
+import xarray as xr
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
 from eolab.rastertools.processing import RasterProcessing, compute_sliding
+from eolab.rastertools.processing.sliding import _pad_dataset_xarray
 from eolab.rastertools.product import RasterProduct
 
 _logger = logging.getLogger(__name__)
@@ -143,33 +145,34 @@ class SVF(Rastertool, Windowable):
             "radius": None,
             "directions": None,
             "resolution": None,
-            "altitude": None
+            "altitude": None,
+            "pad_mode": None
         })
         # set the configuration of the raster processing
         svf.configure({
             "radius": self.radius,
             "directions": self.nb_directions,
             "resolution": self.resolution,
-            "altitude": self.altitude
+            "altitude": self.altitude,
+            "pad_mode": self.pad_mode
         })
 
         # STEP 1: Prepare the input image so that it can be processed
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
 
-            # STEP 2: apply filter
+            # STEP 2: apply svf
             outdir = Path(self.outputdir)
             output_image = outdir.joinpath(
                 f"{utils.get_basename(inputfile)}-svf.tif")
 
-            input_image = product.get_raster()
 
             with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-                print(product)
-                with rioxarray.open_rasterio(input_image, chunks=True) as src:
+                with product.open_xarray(chunks=True) as src:
                     # dtype and creation options of output data
                     dtype = svf.dtype or rasterio.float32
                     src = src.astype(dtype)
 
+                    #SVF computing
                     output = svf.compute(src).astype(dtype)
 
                     ##Create the file and compute

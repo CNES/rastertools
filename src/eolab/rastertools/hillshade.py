@@ -11,13 +11,14 @@ from pathlib import Path
 import numpy as np
 
 import rasterio
+import rioxarray
 from rasterio.windows import Window
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
 from eolab.rastertools.processing import RasterProcessing, compute_sliding
-
+from eolab.rastertools.product import RasterProduct
 
 _logger = logging.getLogger(__name__)
 
@@ -114,19 +115,15 @@ class Hillshade(Rastertool, Windowable):
         # compute the radius from data range
         # radius represents the max distance of buildings that can create a hillshade
         # considering the sun elevation.
-        wmax = None
-        wmin = None
-        with rasterio.open(inputfile) as src:
-            if src.count != 1:
+
+        with rioxarray.open_rasterio(inputfile, chunks=True) as src:
+            if src.shape[0] != 1:
                 raise ValueError("Invalid input file, it must contain a single band.")
-            for i in range(src.height // self.window_size[0]  + 1):
-                for j in range(src.width // self.window_size[1]  + 1):
-                    # Oversized window (out of source bounds) is handled by Window
-                    win = Window(i*self.window_size[0] , j*self.window_size[1] , self.window_size[0] , self.window_size[1])
-                    data = src.read(1, masked=True, window=win)
-                    if data.size and not np.isnan(data).all():
-                        wmax = np.maximum(wmax, np.nanmax(data)) if wmax is not None else np.nanmax(data)
-                        wmin = np.minimum(wmin, np.nanmin(data)) if wmin is not None else np.nanmin(data)
+            data = src[0]
+            if data.size and not np.isnan(data).all():
+                wmax = np.nanmax(data)
+                wmin = np.nanmin(data)
+
         delta = int((wmax - wmin) / self.resolution)
         optimal_radius = abs(int(delta / np.tan(np.radians(self.elevation))))
 
@@ -138,10 +135,6 @@ class Hillshade(Rastertool, Windowable):
                             f"Oversized radius affects computation time and so radius is set to {self.radius}. "
                             "Result may miss some shadow pixels.")
 
-        if self.radius >= min(self.window_size) / 2:
-            raise ValueError(f"The radius (option --radius, value={self.radius}) must be strictly "
-                             "less than half the size of the window (option --window_size, "
-                             f"value={min(self.window_size)})")
 
         # Configure the processing
         hillshade = RasterProcessing("hillshade", algo=algo.hillshade, dtype=np.int8, in_dtype=np.float32,
@@ -150,22 +143,37 @@ class Hillshade(Rastertool, Windowable):
             "elevation": None,
             "azimuth": None,
             "resolution": None,
-            "radius": None
+            "radius": None,
+            "pad_mode": None
         })
         # set the configuration of the raster processing
         hillshade_conf = {
             "elevation": self.elevation,
             "azimuth": self.azimuth,
             "resolution": self.resolution,
-            "radius": self.radius
+            "radius": self.radius,
+            "pad_mode": self.pad_mode
         }
         hillshade.configure(hillshade_conf)
 
-        # Run the hillshade processing
-        compute_sliding(
-            inputfile, output_image, hillshade,
-            window_size=self.window_size,
-            window_overlap=self.radius,
-            pad_mode=self.pad_mode)
+        # STEP 1: Prepare the input image so that it can be processed
+        with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
+
+            # STEP 2: apply hillshade
+            outdir = Path(self.outputdir)
+            output_image = outdir.joinpath(
+                f"{utils.get_basename(inputfile)}-hillshade.tif")
+
+            with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
+                with product.open_xarray(chunks=True) as src:
+                    # dtype and creation options of output data
+                    dtype = hillshade.dtype or rasterio.float32
+                    src = src.astype(dtype)
+
+                    # Hillshade computing
+                    output = hillshade.compute(src).astype(dtype)
+
+                    ##Create the file and compute
+                    output.rio.to_raster(output_image)
 
         return [output_image.as_posix()]

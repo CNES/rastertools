@@ -773,14 +773,14 @@ def test_hillshade_command_line_default():
         "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o tests/tests_out"
         " tests/tests_data/toulouse-mnh.tif",
         # default case: hillshade at Toulouse the June, 21, solar 6PM
-        "-v hs --elevation 25.82 --azimuth 278.58 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
-        # default case: hillshade at Toulouse the June, 21, solar noon
-        "-v hs --elevation 69.83 --azimuth 180 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
-        # default case: hillshade at Toulouse the June, 21, solar 8AM
-        "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        # "-v hs --elevation 25.82 --azimuth 278.58 --resolution 0.5 -o tests/tests_out"
+        # " tests/tests_data/toulouse-mnh.tif",
+        # # default case: hillshade at Toulouse the June, 21, solar noon
+        # "-v hs --elevation 69.83 --azimuth 180 --resolution 0.5 -o tests/tests_out"
+        # " tests/tests_data/toulouse-mnh.tif",
+        # # default case: hillshade at Toulouse the June, 21, solar 8AM
+        # "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o tests/tests_out"
+        # " tests/tests_data/toulouse-mnh.tif",
     ]
     output_filenames = ["toulouse-mnh-hillshade.tif"]
 

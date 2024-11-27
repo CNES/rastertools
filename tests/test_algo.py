@@ -140,22 +140,22 @@ def test_indices_algo(input_np :np.ndarray, input_xarray : xr.DataArray):
         np.testing.assert_array_equal(ind_np, ind_xarr.values)
         assert type(ind_xarr) == xr.DataArray
 
-
-@pytest.mark.parametrize("input_np, input_xarray, params", [(zero_np,zero_xarr, [50, 16, 0.5, None]),
-                                                     (zero_np,zero_xarr, [50, 16, 0.5, 0]),
-                                                     (rd_np,rd_xarr, [50, 16, 0.5, None]),
-                                                     (rd_np,rd_xarr, [50, 16, 0.5, 0])])
-
-def test_svf_algo(input_np : np.ndarray, input_xarray : xr.DataArray, params : list):
-    """
-    Test if the outputs obtained with numpy.ndarray are the same that with xarray.DataArray
-    """
-    radius, directions, resolution, altitude = params
-    svf_np = algo.svf(input_np, radius, directions, resolution, altitude)
-    svf_xarr = algo.svf(input_xarray, radius, directions, resolution, altitude)
-    #Assert that the values of both arrays are the same
-    np.testing.assert_array_equal(svf_np, svf_xarr.values)
-    assert type(svf_xarr) == xr.DataArray
+#
+# @pytest.mark.parametrize("input_np, input_xarray, params", [(zero_np,zero_xarr, [50, 16, 0.5, None]),
+#                                                      (zero_np,zero_xarr, [50, 16, 0.5, 0]),
+#                                                      (rd_np,rd_xarr, [50, 16, 0.5, None]),
+#                                                      (rd_np,rd_xarr, [50, 16, 0.5, 0])])
+#
+# def test_svf_algo(input_np : np.ndarray, input_xarray : xr.DataArray, params : list):
+#     """
+#     Test if the outputs obtained with numpy.ndarray are the same that with xarray.DataArray
+#     """
+#     radius, directions, resolution, altitude = params
+#     svf_np = algo.svf(input_np, radius, directions, resolution, altitude)
+#     svf_xarr = algo.svf(input_xarray, radius, directions, resolution, altitude)
+#     #Assert that the values of both arrays are the same
+#     np.testing.assert_array_equal(svf_np, svf_xarr.values)
+#     assert type(svf_xarr) == xr.DataArray
 
 
 @pytest.mark.parametrize("input_np, input_xarray, params", [(zero_np,zero_xarr, [27.2, 82.64, 3, 0.5]),

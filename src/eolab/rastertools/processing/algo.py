@@ -10,9 +10,8 @@ import numpy
 import numpy as np
 import numpy.ma as ma
 import xarray as xr
-from rasterio import rio
 from scipy import ndimage, signal
-from xarray import DataArray
+
 
 
 def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
@@ -722,8 +721,19 @@ def adaptive_gaussian(input_data : Union[numpy.ndarray, xr.DataArray], kernel_si
         out[0, 1:-1, 1:-1] = conv / w_sum
     return xr.DataArray(out, dims=input_data.dims, coords=input_data.coords)
 
+def _pad_dataset_xarray(dataset, pad: tuple, pad_mode: str):
+    """
+    To do
+    """
+    # pad the dataset if necessary
+    padx, pady = pad
+    pad_width = {"band" : (0,0), "y": pady, "x": padx}
+    pad_dataset = dataset.pad(pad_width=pad_width, mode=pad_mode)
 
-def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> Union[numpy.ndarray, xr.DataArray]:
+    # dataset = xr.DataArray(dataset, dims=src.dims, coords=src.coords)
+    return pad_dataset
+
+def svf(input_data : Union[numpy.ndarray, xr.DataArray], pad_mode : str, radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> Union[numpy.ndarray, xr.DataArray]:
     """
     Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Height Model (DHM).
 
@@ -755,14 +765,15 @@ def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, direc
         raise ValueError("svf only accepts numpy arrays with first dim of size 1")
 
     # initialize output
-    shape = input_data.shape
-    out = np.zeros(shape, dtype=np.float32)
-    if isinstance(input_data, xr.DataArray) :
-        out = xr.DataArray(out, dims=input_data.dims, coords=input_data.coords)
+    out = np.zeros(input_data.shape, dtype=np.float32)
 
-    # prevent nodata problem
+    #Pad the input data
+    pad = ((radius, radius), (radius, radius))
+    pad_src = _pad_dataset_xarray(input_data, pad, pad_mode)
+    shape = pad_src.shape
+
     # change the NaN in the input array to 0
-    input_band = np.nan_to_num(input_data[0], copy=False, nan=0)
+    input_band = np.nan_to_num(pad_src[0], copy=False, nan=0)
 
     # compute directions
     axes = [_bresenham_line(360 * i / directions, radius)
@@ -786,10 +797,11 @@ def svf(input_data : Union[numpy.ndarray, xr.DataArray], radius : int = 8, direc
 
         # SVF = (cosinus de l'angle avec la relation : cos² = sqrt(1 / (1+tan²))
         ratios = 1 / np.sqrt(ratios**2 + 1)  # = np.sin(np.arctan(ratios / self.pixel_size))
-        out[0, radius: shape[1] - radius, radius: shape[2] - radius] += ratios
+        out[0] += ratios
 
     out /= directions
-    return out
+
+    return xr.DataArray(out, dims = input_data.dims, coords = input_data.coords)
 
 
 def _bresenham_line(theta : int, radius : int) -> tuple :
@@ -841,7 +853,7 @@ def _bresenham_line(theta : int, radius : int) -> tuple :
     return pts
 
 
-def hillshade(input_data : Union[numpy.ndarray, xr.DataArray], elevation : float = 0.0, azimuth : float = 0.0, radius : int = 8, resolution : float = 0.5) -> Union[numpy.ndarray, xr.DataArray] :
+def hillshade(input_data : Union[numpy.ndarray, xr.DataArray], pad_mode : str, elevation : float = 0.0, azimuth : float = 0.0, radius : int = 8, resolution : float = 0.5) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Computes a mask of cast shadows in a Digital Height Model (DHM).
 
@@ -874,13 +886,15 @@ def hillshade(input_data : Union[numpy.ndarray, xr.DataArray], elevation : float
         raise ValueError("hillshade only accepts numpy arrays with first dim of size 1")
 
     # initialize output
-    shape = input_data.shape
-    out = np.zeros(shape, dtype=bool)
-    if isinstance(input_data, xr.DataArray):
-        out = xr.DataArray(out)
+    out = np.zeros(input_data.shape, dtype=np.float32)
+
+    # Pad the input data
+    pad = ((radius, radius), (radius, radius))
+    pad_src = _pad_dataset_xarray(input_data, pad, pad_mode)
+    shape = pad_src.shape
 
     # prevent nodata problem
-    input_band = np.nan_to_num(input_data[0], copy=False, nan=0)
+    input_band = np.nan_to_num(pad_src[0], copy=False, nan=0)
 
     # compute direction
     axe = _bresenham_line(180 - azimuth, radius)
@@ -892,10 +906,10 @@ def hillshade(input_data : Union[numpy.ndarray, xr.DataArray], elevation : float
         new_ratios = input_band[radius + x_tr: shape[1] - radius + x_tr,
                                 radius + y_tr: shape[2] - radius + y_tr] - view
         # tangente de l'angle
-        new_ratios /= (r * resolution)
+        new_ratios = (r * resolution) / new_ratios
         ratios = np.maximum(ratios, new_ratios)
 
     angles = np.arctan(ratios)
-    out[0, radius: shape[1] - radius, radius: shape[2] - radius] = angles > elevation
+    out[0] = angles > elevation
 
-    return out
+    return xr.DataArray(out, dims = input_data.dims, coords = input_data.coords)
