@@ -61,17 +61,15 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
 
         # Select bands
         clipped_data = clipped.sel(band=bands)
-        print(clipped_data.values)
+
 
         clipped_data.rio.to_raster('../view.tif')
         # Compute statistics for each band
         feature_stats = {}
         for band_data in clipped_data.values:
-            # Mask the data with the raster no-data value
-            data = band_data.data
 
             # Compute the statistics
-            feature_stats.update(_compute_stats(data, stats, categorical))
+            feature_stats.update(_compute_stats(band_data, stats, categorical))
 
         # Append the computed statistics for the current geometry
         statistics.append(feature_stats)
@@ -92,9 +90,7 @@ def _compute_stats(data, stats: List[str], categorical: bool = False) -> Dict[st
     """
     feature_stats = {}
 
-    # Apply mask if categorical is True
-    if categorical:
-        data = data[data != 0]  # Example of ignoring zero for categorical values
+    ##IMPLEMENT CATEGORICAL
 
     # List of functions for computing statistics
     functions = {
@@ -106,10 +102,20 @@ def _compute_stats(data, stats: List[str], categorical: bool = False) -> Dict[st
         'median': np.median,
     }
 
+    # Mask out no-data values (if `data` isn't already masked)
+    if not np.ma.isMaskedArray(data):
+        mask = np.isnan(data)  # Create a mask for NaN values (no-data)
+        data = np.ma.masked_array(data, mask=mask)
+
+    print(np.sum(data.mask))
+    print(data.size)
     # Calculate the requested statistics
     for stat in stats:
         if stat in functions:
             feature_stats[stat] = float(functions[stat](data))
+
+            # print(stat)
+            # print(float(functions[stat](data)))
 
     # Compute range if required (max - min)
     if 'range' in stats:

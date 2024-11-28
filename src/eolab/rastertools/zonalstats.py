@@ -555,6 +555,7 @@ class Zonalstats(Rastertool):
                 categorical=self.categorical)
 
         print(statistics)
+        print(len(statistics))
         # apply area
         if self.area:
             [d.update({key: area_square_meter * val})
