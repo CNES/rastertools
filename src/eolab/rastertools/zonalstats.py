@@ -414,10 +414,16 @@ class Zonalstats(Rastertool):
 
             # open raster to get metadata
             raster = product.get_raster()
-            with rioxarray.open_rasterio(product) as rst:
-                bound, width, height = rst.shape
-                indexes = rst["band"].values
 
+            # Open with rasterio to extract metadata
+            with rasterio.open(raster) as rst:
+                bound = int(rst.count)
+                indexes = rst.indexes
+                descr = rst.descriptions
+
+                geotransform = rst.get_transform()
+                width = np.abs(geotransform[1])
+                height = np.abs(geotransform[5])
                 area_square_meter = width * height
 
             date_str = product.get_date_string('%Y%m%d-%H%M%S')
@@ -437,15 +443,14 @@ class Zonalstats(Rastertool):
             # STEP 2: Prepare the geometries where to compute zonal stats
             if self.geometries:
                 # reproject & filter input geometries to fit the raster extent
-                geometries = vector.reproject(
+                geometries = vector.reproject_geom(
                     vector.filter(self.geometries, raster, self.within), raster)
             else:
                 # if no geometry is defined, get the geometry from raster shape
                 geometries = vector.get_raster_shape(raster)
 
             # STEP 3: Compute the statistics
-            geom_stats = self.compute_stats(raster, bands, geometries,
-                                            descr, date_str, area_square_meter)
+            geom_stats = self.compute_stats(raster, bands, geometries, descr, date_str, area_square_meter)
 
             self._generated_stats.append(geom_stats)
             if date_str:
@@ -525,12 +530,12 @@ class Zonalstats(Rastertool):
             # prepare the categories data
             if self.category_file_type == "vector":
                 # clip categories to the raster bounds and reproject in the raster crs
-                class_geom = vector.reproject(
+                class_geom = vector.reproject_geom(
                     vector.clip(self.category_file, raster),
                     raster)
             else:  # filetype is raster
                 # vectorize the raster and reproject in the raster crs
-                class_geom = vector.reproject(
+                class_geom = vector.reproject_geom(
                     vector.vectorize(self.category_file, raster, self.category_index),
                     raster)
 
@@ -549,6 +554,7 @@ class Zonalstats(Rastertool):
                 stats=self.stats,
                 categorical=self.categorical)
 
+        print(statistics)
         # apply area
         if self.area:
             [d.update({key: area_square_meter * val})

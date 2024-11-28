@@ -127,13 +127,13 @@ def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
     filtered_geoms = filter(geometries, raster)
 
     # then clip the resulting geometries to the raster bounds
-    with rasterio.open(file) as dataset:
-        l, b, r, t = dataset.bounds
+    with rioxarray.open_rasterio(file) as dataset:
+        l, b, r, t = dataset.rio.bounds
         px, py = ([l, l, r, r], [b, t, t, b])
 
-        if(geoms_crs != dataset.crs):
+        if (geoms_crs != dataset.rio.crs):
             # reproject bounds in geoms crs
-            px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
+            px, py = warp.transform(dataset.rio.crs, geoms_crs, px, py)
 
         # then clip the resulting geometries to the raster bounds
         polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
@@ -146,42 +146,8 @@ def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
         return clipped_geoms
 
 
-def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
-              output: Union[Path, str] = None, driver: str = 'GeoJSON') -> gpd.GeoDataFrame:
-    """Reproject the geometries in the raster CRS
 
-    Args:
-        geoms (str or Path or :obj:`gpd.GeoDataFrame`):
-            Filename of the vector data (if str) or GeoDataFrame
-        raster (str or Path):
-            Raster image
-        output (str or Path, optional, default=None):
-            File where to save the reprojected geoms
-            If None, nothing written to disk (only in memory)
-        driver (str, optional, default="GeoJSON"):
-            Driver to write the output
-
-    Returns:
-        :obj:`gpd.GeoDataFrame`: The geometries in the raster CRS
-    """
-    geometries = _get_geoms(geoms)
-    geoms_crs = _get_geoms_crs(geometries)
-
-    file = raster.as_posix() if isinstance(raster, Path) else raster
-    with rasterio.open(file) as dataset:
-        if(geoms_crs != dataset.crs):
-            reprojected_geoms = geometries.to_crs(dataset.crs)
-        else:
-            reprojected_geoms = geometries
-
-        if output:
-            outfile = output.as_posix() if isinstance(output, Path) else output
-            reprojected_geoms.to_file(outfile, driver=driver)
-
-        return reprojected_geoms
-
-
-def reproject_geometries_to_raster_crs(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
+def reproject_geom(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
                                        output: Union[Path, str] = None, driver: str = 'GeoJSON') -> gpd.GeoDataFrame:
     """
     Reproject the geometries to match the CRS of the raster.
@@ -196,14 +162,11 @@ def reproject_geometries_to_raster_crs(geoms: Union[gpd.GeoDataFrame, Path, str]
         gpd.GeoDataFrame: Reprojected geometries in raster CRS.
     """
     # Load geometries
-    if isinstance(geoms, (str, Path)):
-        geometries = gpd.read_file(geoms)
-    else:
-        geometries = geoms
+    geometries = _get_geoms(geoms)
+    geoms_crs = _get_geoms_crs(geometries)
 
-    # Extract CRS
-    geoms_crs = geometries.crs
-    raster_crs = raster.rio.crs
+    src = rioxarray.open_rasterio(raster, chunks=True)
+    raster_crs = src.rio.crs
 
     # Reproject geometries to match raster CRS
     if geoms_crs != raster_crs:

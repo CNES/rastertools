@@ -9,6 +9,7 @@ import re
 import datetime
 
 import numpy as np
+import rioxarray
 from scipy.stats import median_abs_deviation
 import pandas as pd
 import geopandas as gpd
@@ -29,38 +30,97 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
     """Compute the statistics of an input image for each feature in the shapefile
 
     Args:
-        geoms (GeoDataFrame):
-            Geometries where to compute stats
-        image (str):
-            Filename of the input image to process
-        bands ([int], optional, default=[1]):
-            List of bands to process in the input image
-        stats ([str], optional, default=["min", "max","mean", "std"]):
-            List of stats to computed
-        categorical (bool, optional, default=False):
-            Whether to treat the input raster as categorical
+        geoms (GeoDataFrame): Geometries where to compute stats
+        image (str): Filename of the input image to process
+        bands (list, optional, default=[1]): List of bands to process in the input image
+        stats (list, optional, default=["min", "max", "mean", "std"]): List of stats to computed
+        categorical (bool, optional, default=False): Whether to treat the input raster as categorical
 
     Returns:
-        statistics: a list of list of dictionnaries. First list on ROI, second on bands.
-        Dict associates the stat names and the stat values.
+        statistics: a list of lists of dictionaries. The first list corresponds to the geometries, the second corresponds to the bands.
+        Each dictionary associates the stat names and the stat values.
     """
+    # Open the raster image using rioxarray
+    raster = rioxarray.open_rasterio(image, masked=True)
+
+    # Initialize statistics list
     statistics = []
-    nb_geoms = len(geoms)
-    with rasterio.open(image) as src:
-        geom_gen = (geoms.iloc[i].geometry for i in range(nb_geoms))
-        geom_windows = ((geom, features.geometry_window(src, [geom])) for geom in geom_gen)
 
-        statistics = []
-        disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
-        for geom, window in tqdm(geom_windows, total=nb_geoms, disable=disable, desc="zonalstats"):
-            data = src.read(bands, window=window)
-            transform = src.window_transform(window)
+    # Get the CRS of the geometries
+    geoms_crs = geoms.crs
 
-            s = _compute_stats((data, transform, [geom], window),
-                               src.nodata, stats, categorical)
-            statistics.append(s)
+    # Prepare progress bar
+    disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+
+    # Iterate through geometries
+    for _, geom in tqdm(geoms.iterrows(), total=len(geoms), disable=disable, desc="zonalstats"):
+        geom = geom.geometry
+
+        # Clip the raster using the geometry
+        clipped = raster.rio.clip([geom], geoms.crs, drop=True)
+
+        # Select bands
+        clipped_data = clipped.sel(band=bands)
+        print(clipped_data.values)
+
+        clipped_data.rio.to_raster('../view.tif')
+        # Compute statistics for each band
+        feature_stats = {}
+        for band_data in clipped_data.values:
+            # Mask the data with the raster no-data value
+            data = band_data.data
+
+            # Compute the statistics
+            feature_stats.update(_compute_stats(data, stats, categorical))
+
+        # Append the computed statistics for the current geometry
+        statistics.append(feature_stats)
 
     return statistics
+
+
+def _compute_stats(data, stats: List[str], categorical: bool = False) -> Dict[str, float]:
+    """Compute the statistics for a single band (numpy array).
+
+    Args:
+        data: numpy array (masked or not) containing the raster values for the current geometry.
+        stats: List of statistics to compute (e.g., "mean", "min", "max", etc.).
+        categorical: Whether to compute categorical statistics (default False).
+
+    Returns:
+        Dictionary with statistics for the current data array (band).
+    """
+    feature_stats = {}
+
+    # Apply mask if categorical is True
+    if categorical:
+        data = data[data != 0]  # Example of ignoring zero for categorical values
+
+    # List of functions for computing statistics
+    functions = {
+        'min': np.min,
+        'max': np.max,
+        'mean': np.mean,
+        'sum': np.sum,
+        'std': np.std,
+        'median': np.median,
+    }
+
+    # Calculate the requested statistics
+    for stat in stats:
+        if stat in functions:
+            feature_stats[stat] = float(functions[stat](data))
+
+    # Compute range if required (max - min)
+    if 'range' in stats:
+        feature_stats['range'] = feature_stats.get('max', np.max(data)) - feature_stats.get('min', np.min(data))
+
+    # Compute percentiles if requested
+    for pctile in [s for s in stats if s.startswith('percentile_')]:
+        q = float(pctile.replace("percentile_", ''))
+        feature_stats[pctile] = np.percentile(data, q)
+
+    return feature_stats
 
 
 def compute_zonal_stats_per_category(geoms: gpd.GeoDataFrame, image: str,
@@ -269,72 +329,6 @@ def plot_stats(chartfile: str, stats_per_date: Dict[datetime.datetime, gpd.GeoDa
     plt.savefig(chartfile, bbox_inches='tight')
     if display:
         plt.show()
-
-
-def _compute_stats(pack, nodata, stats: List[str] = None,
-                   categorical: bool = False, prefix_stats: str = ""):
-    """Compute the statistics.
-
-    Args:
-        pack:
-            A quadruplet containing an array of data (1 per band), the geo transform, the geometry
-            where to compute stats, and the window corresponding to the geometry
-        nodata:
-            The value that corresponds to nodata
-        stats:
-            The list of stats to compute
-        categorical:
-            Whether to consider the input raster as categorical
-        prefix_stats:
-            A prefix to name the stats
-
-    Returns:
-        A list of statistics (one item per band). Statistics are provided as a dict that associates
-        the stats names and the stats values.
-    """
-    datas, transform, geom, window = pack
-
-    # prepare the mask to apply to input dataset: any pixel outside the geom shall be masked
-    all_geoms = [(g, 1) for g in geom]
-    mask = features.rasterize(shapes=all_geoms,
-                              fill=0, out_shape=rasterio.windows.shape(window),
-                              transform=transform,
-                              dtype=rasterio.uint8).astype(bool)
-
-    # list of stats computed, one item per band
-    all_stats = []
-    # for every bands
-    for data in datas:
-        # create the dataset on which stats will be computed
-        if nodata and np.isnan(nodata):
-            dataset = np.ma.MaskedArray(data, mask=(np.isnan(data) | ~mask))
-        else:
-            dataset = np.ma.MaskedArray(data, mask=((data == nodata) | ~mask))
-
-        count = dataset.count()
-        if count == 0:
-            # nothing here, fill with None and move on
-            feature_stats = dict([(stat, None) for stat in stats])
-        else:
-            # generate the statistics
-            feature_stats = _gen_stats(dataset, stats, categorical, prefix_stats)
-            # generate the categorical statistics
-            feature_stats.update(_gen_stats_cat(dataset, stats, categorical, prefix_stats))
-
-        # generate the counting stats
-        if "count" in stats:
-            feature_stats[f'{prefix_stats}count'] = count
-        if 'valid' in stats or 'nodata' in stats:
-            all_count = np.count_nonzero(mask)
-            if 'nodata' in stats:
-                feature_stats[f'{prefix_stats}nodata'] = all_count - count
-            if 'valid' in stats:
-                valid = 1.0 * count / (all_count + 1e-5)
-                feature_stats[f'{prefix_stats}valid'] = valid
-
-        # append the generated stats to the structure that contains the stats for all bands
-        all_stats.append(feature_stats)
-    return all_stats
 
 
 def _gen_stats(dataset, stats: List[str] = None,
