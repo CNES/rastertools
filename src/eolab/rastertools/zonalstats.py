@@ -428,9 +428,10 @@ class Zonalstats(Rastertool):
 
             date_str = product.get_date_string('%Y%m%d-%H%M%S')
 
+
             # check band index and handle all bands options (when bands is None)
             if self.bands is None or len(self.bands) == 0:
-                bands = indexes
+                bands = list(indexes)
             else:
                 bands = self.bands
             if min(bands) < 1 or max(bands) > bound:
@@ -545,8 +546,7 @@ class Zonalstats(Rastertool):
                 bands=bands,
                 stats=self.stats,
                 categories=class_geom,
-                category_index=self.category_index,
-                category_labels=self.category_labels)
+                category_index=self.category_index)
         else:
             statistics = compute_zonal_stats(
                 geometries, raster,
@@ -554,8 +554,7 @@ class Zonalstats(Rastertool):
                 stats=self.stats,
                 categorical=self.categorical)
 
-        print(statistics)
-        print(len(statistics))
+
         # apply area
         if self.area:
             [d.update({key: area_square_meter * val})
