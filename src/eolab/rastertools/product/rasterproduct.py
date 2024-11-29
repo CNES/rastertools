@@ -12,11 +12,8 @@ import tarfile
 import zipfile
 import tempfile
 from uuid import uuid4
-import xml.etree.ElementTree as ET
 
-from numpy import dtype
 from rasterio.io import MemoryFile
-from rasterio.vrt import WarpedVRT
 from osgeo import gdal
 import rasterio
 
@@ -24,6 +21,7 @@ from eolab.rastertools import utils
 from eolab.rastertools.product import RasterType
 from eolab.rastertools.product.vrt import add_masks_to_vrt, set_band_descriptions
 from eolab.rastertools.processing.vector import crop
+from eolab.rastertools.utils import vsimem_to_rasterio
 
 __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
@@ -229,8 +227,7 @@ class RasterProduct:
              bands: Union[str, List[str]] = "all",
              masks: Union[str, List[str]] = "all",
              roi: Union[Path, str] = None):
-        """Proxy method to rasterio.open(rasterproduct.get_raster(...))"""
-        return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
+        return vsimem_to_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi))
 
     def get_raster(self,
                    bands: Union[str, List[str]] = "all",
@@ -304,7 +301,6 @@ class RasterProduct:
                 set_band_descriptions(masked_image, band_descriptions)
 
                 rasterfile = masked_image
-
         return rasterfile.as_posix()
 
     def __get_bands(self, bands: Union[str, List[str]] = "all"):

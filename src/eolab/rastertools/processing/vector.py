@@ -66,25 +66,26 @@ def filter(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
     geoms_crs = _get_geoms_crs(geometries)
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
-    with rasterio.open(file) as dataset:
-        l, b, r, t = dataset.bounds
-        px, py = ([l, l, r, r], [b, t, t, b])
 
-        if(geoms_crs != dataset.crs):
-            px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
+    dataset = utils.vsimem_to_rasterio(file)
+    l, b, r, t = dataset.bounds
+    px, py = ([l, l, r, r], [b, t, t, b])
 
-        polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
-        if within:
-            # convert geometries into GeoPandasBaseExtended to use the new cix property
-            filtered_geoms = geometries[geometries.within(polygon)]
-        else:
-            filtered_geoms = geometries[geometries.intersects(polygon)]
+    if(geoms_crs != dataset.crs):
+        px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
 
-        if output:
-            outfile = output.as_posix() if isinstance(output, Path) else output
-            filtered_geoms.to_file(outfile, driver=driver)
+    polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
+    if within:
+        # convert geometries into GeoPandasBaseExtended to use the new cix property
+        filtered_geoms = geometries[geometries.within(polygon)]
+    else:
+        filtered_geoms = geometries[geometries.intersects(polygon)]
 
-        return filtered_geoms
+    if output:
+        outfile = output.as_posix() if isinstance(output, Path) else output
+        filtered_geoms.to_file(outfile, driver=driver)
+    dataset.close()
+    return filtered_geoms
 
 
 def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],

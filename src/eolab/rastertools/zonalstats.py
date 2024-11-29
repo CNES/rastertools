@@ -17,7 +17,6 @@ Several options are provided:
 """
 from typing import List, Dict
 import datetime
-import logging
 import logging.config
 from pathlib import Path
 import json
@@ -33,6 +32,7 @@ from eolab.rastertools.processing import compute_zonal_stats, compute_zonal_stat
 from eolab.rastertools.processing import extract_zonal_outliers, plot_stats
 from eolab.rastertools.processing import vector
 from eolab.rastertools.product import RasterProduct
+from eolab.rastertools.utils import vsimem_to_rasterio
 
 
 _logger = logging.getLogger(__name__)
@@ -408,15 +408,17 @@ class Zonalstats(Rastertool):
 
             # open raster to get metadata
             raster = product.get_raster()
-            with rasterio.open(raster) as rst:
-                bound = int(rst.count)
-                indexes = rst.indexes
-                descr = rst.descriptions
 
-                geotransform = rst.get_transform()
-                width = np.abs(geotransform[1])
-                height = np.abs(geotransform[5])
-                area_square_meter = width * height
+            rst = vsimem_to_rasterio(raster)
+            bound = int(rst.count)
+            indexes = rst.indexes
+            descr = rst.descriptions
+
+            geotransform = rst.get_transform()
+            width = np.abs(geotransform[1])
+            height = np.abs(geotransform[5])
+            area_square_meter = width * height
+            rst.close()
 
             date_str = product.get_date_string('%Y%m%d-%H%M%S')
 
