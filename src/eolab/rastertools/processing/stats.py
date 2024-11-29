@@ -63,14 +63,14 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
 
             clipped_data.rio.to_raster('../view.tif')
             # Compute statistics for each band
-            feature_stats = {}
+            band_stat = []
             for band_data in clipped_data.values:
-
                 # Compute the statistics
-                feature_stats.update(_compute_stats(band_data, stats, categorical))
+                feature_stats = _compute_stats(band_data, stats, categorical)
+                band_stat.append(feature_stats)
 
-                # Append the computed statistics for the current geometry
-                statistics.append([feature_stats])
+            # Append the computed statistics for the current geometry
+            statistics.append(band_stat)
 
     return statistics
 
@@ -132,7 +132,7 @@ def _compute_stats(data, stats: List[str], categorical: bool = False) -> Dict[st
             feature_stats[f'valid'] = valid
 
     feature_stats.update(_gen_stats_cat(data, stats, categorical))
-
+    print(feature_stats)
     return feature_stats
 
 

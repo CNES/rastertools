@@ -236,7 +236,7 @@ def get_raster_shape(raster: Union[Path, str], output: Union[Path, str] = None,
     # Loop through each band in the raster
     for band in range(1, src.shape[0] + 1):
         # Read the mask for the current band
-        mask = src.isel(band=band - 1).notnull().astype(np.int16)
+        mask = src.isel(band=band - 1).notnull().astype("uint8")
 
         # Convert the mask to geometries using rasterio features
         features_gen = features.shapes(mask.values, mask=mask.values, transform=src.rio.transform())
@@ -251,7 +251,7 @@ def get_raster_shape(raster: Union[Path, str], output: Union[Path, str] = None,
         df = pd.DataFrame({'geometry': geoms})
         gdf = gpd.GeoDataFrame(df, geometry='geometry')
         # set crs
-        gdf.crs = src.crs
+        gdf.crs = src.rio.crs
         # dissolve all shapes per band in one shape
         gdf['COMMON'] = 0
         raster_shape = gdf.dissolve(by='COMMON', as_index=False)
