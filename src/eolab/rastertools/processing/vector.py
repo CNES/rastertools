@@ -127,13 +127,13 @@ def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
     filtered_geoms = filter(geometries, raster)
 
     # then clip the resulting geometries to the raster bounds
-    with rioxarray.open_rasterio(file) as dataset:
-        l, b, r, t = dataset.rio.bounds
+    with rasterio.open(file) as dataset:
+        l, b, r, t = dataset.bounds
         px, py = ([l, l, r, r], [b, t, t, b])
 
-        if (geoms_crs != dataset.rio.crs):
+        if (geoms_crs != dataset.crs):
             # reproject bounds in geoms crs
-            px, py = warp.transform(dataset.rio.crs, geoms_crs, px, py)
+            px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
 
         # then clip the resulting geometries to the raster bounds
         polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
@@ -143,7 +143,7 @@ def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
             outfile = output.as_posix() if isinstance(output, Path) else output
             clipped_geoms.to_file(outfile, driver=driver)
 
-        return clipped_geoms
+    return clipped_geoms
 
 
 

@@ -120,19 +120,19 @@ def _compute_stats(data, stats: List[str], categorical: bool = False) -> Dict[st
         feature_stats[pctile] = np.percentile(data, q)
 
     count = data.count()
+    print()
     # generate the counting stats
     if "count" in stats:
-        feature_stats[f'count'] = count
+        feature_stats['count'] = count
     if 'valid' in stats or 'nodata' in stats:
         all_count = np.count_nonzero(mask)
         if 'nodata' in stats:
-            feature_stats[f'nodata'] = all_count - count
+            feature_stats['nodata'] = all_count - count
         if 'valid' in stats:
             valid = 1.0 * count / (all_count + 1e-5)
-            feature_stats[f'valid'] = valid
+            feature_stats['valid'] = valid
 
     feature_stats.update(_gen_stats_cat(data, stats, categorical))
-    print(feature_stats)
     return feature_stats
 
 
@@ -155,7 +155,7 @@ def _gen_stats_cat(dataset, stats: List[str] = None,
         stats names and the stats values.
 
     """
-
+    pixel_count = {}
     # if categorical stats is requested, extract all unique values from the dataset
     if categorical or 'majority' in stats or 'minority' in stats or 'unique' in stats:
         keys, counts = np.unique(dataset.compressed(), return_counts=True)
@@ -213,7 +213,7 @@ def compute_zonal_stats_per_category(geoms: gpd.GeoDataFrame, image: str,
     statistics = []
     # Process geometries one by one
     nb_geoms = len(geoms)
-    nb_bands = len(bands)
+    print(nb_geoms)
 
     # Open raster using rioxarray
     with rioxarray.open_rasterio(image, masked=True) as src:

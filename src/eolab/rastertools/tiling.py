@@ -164,7 +164,7 @@ class Tiling(Rastertool):
             output_paths = []
 
             # STEP 2: Prepare grid (reproject it to raster's CRS)
-            grid = vector.reproject(self.grid, raster)
+            grid = vector.reproject(self.grid, product.get_raster())
 
             for shape, i in zip(grid.geometry, grid.index):
                 _logger.info("Crop and export tile " + str(i) + "...")
