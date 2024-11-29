@@ -125,7 +125,7 @@ class TestCase:
             caplog.clear()
 
         # clear output dir
-        # utils4test.clear_outdir()
+        utils4test.clear_outdir()
 
 
 def test_rastertools_command_line_info():

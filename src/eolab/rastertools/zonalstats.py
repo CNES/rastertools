@@ -555,6 +555,7 @@ class Zonalstats(Rastertool):
                 categorical=self.categorical)
 
         print(statistics)
+        print(len(statistics))
         # apply area
         if self.area:
             [d.update({key: area_square_meter * val})
@@ -588,12 +589,15 @@ class Zonalstats(Rastertool):
             successively the band name, the date and the statistics names (min, mean, max, median, std)
         """
         prefix = self.prefix or [""] * len(bands)
+        print(bands)
         for i, band in enumerate(bands):
             # add general metadata to geometries
             if descr and descr[i]:
                 geometries[utils.get_metadata_name(band, prefix[i], "name")] = descr[i]
             if date:
                 geometries[utils.get_metadata_name(band, prefix[i], "date")] = date
+
+
 
             # get all statistics names since additional statistics coming from categorical
             # option may have been computed

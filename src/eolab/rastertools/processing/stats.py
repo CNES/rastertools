@@ -40,36 +40,37 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
         statistics: a list of lists of dictionaries. The first list corresponds to the geometries, the second corresponds to the bands.
         Each dictionary associates the stat names and the stat values.
     """
-    # Open the raster image using rioxarray
-    raster = rioxarray.open_rasterio(image, masked=True)
+    with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
+        # Open the raster image using rioxarray
+        raster = rioxarray.open_rasterio(image, masked=True)
 
-    # Initialize statistics list
-    statistics = []
+        # Initialize statistics list
+        statistics = []
 
-    # Prepare progress bar
-    disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+        # Prepare progress bar
+        disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
 
-    # Iterate through geometries
-    for _, geom in tqdm(geoms.iterrows(), total=len(geoms), disable=disable, desc="zonalstats"):
-        geom = geom.geometry
+        # Iterate through geometries
+        for _, geom in tqdm(geoms.iterrows(), total=len(geoms), disable=disable, desc="zonalstats"):
+            geom = geom.geometry
 
-        # Clip the raster using the geometry
-        clipped = raster.rio.clip([geom], geoms.crs, drop=True)
+            # Clip the raster using the geometry
+            clipped = raster.rio.clip([geom], geoms.crs, drop=True)
 
-        # Select bands
-        clipped_data = clipped.sel(band=bands)
+            # Select bands
+            clipped_data = clipped.sel(band=bands)
 
 
-        clipped_data.rio.to_raster('../view.tif')
-        # Compute statistics for each band
-        feature_stats = {}
-        for band_data in clipped_data.values:
+            clipped_data.rio.to_raster('../view.tif')
+            # Compute statistics for each band
+            feature_stats = {}
+            for band_data in clipped_data.values:
 
-            # Compute the statistics
-            feature_stats.update(_compute_stats(band_data, stats, categorical))
+                # Compute the statistics
+                feature_stats.update(_compute_stats(band_data, stats, categorical))
 
-        # Append the computed statistics for the current geometry
-        statistics.append([feature_stats])
+                # Append the computed statistics for the current geometry
+                statistics.append([feature_stats])
 
     return statistics
 
