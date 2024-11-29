@@ -118,6 +118,18 @@ def _compute_stats(data, stats: List[str], categorical: bool = False) -> Dict[st
         q = float(pctile.replace("percentile_", ''))
         feature_stats[pctile] = np.percentile(data, q)
 
+    count = data.count()
+    # generate the counting stats
+    if "count" in stats:
+        feature_stats[f'count'] = count
+    if 'valid' in stats or 'nodata' in stats:
+        all_count = np.count_nonzero(mask)
+        if 'nodata' in stats:
+            feature_stats[f'nodata'] = all_count - count
+        if 'valid' in stats:
+            valid = 1.0 * count / (all_count + 1e-5)
+            feature_stats[f'valid'] = valid
+
     feature_stats.update(_gen_stats_cat(data, stats, categorical))
 
     return feature_stats

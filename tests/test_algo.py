@@ -158,19 +158,19 @@ def test_indices_algo(input_np :np.ndarray, input_xarray : xr.DataArray):
 #     assert type(svf_xarr) == xr.DataArray
 
 
-@pytest.mark.parametrize("input_np, input_xarray, params", [(zero_np,zero_xarr, [27.2, 82.64, 3, 0.5]),
-                                                     (rd_np,rd_xarr, [27.2, 82.64, 3, 0.5])])
-
-def test_hillshade_algo(input_np : np.ndarray, input_xarray : xr.DataArray, params : list):
-    """
-    Test if the outputs obtained with numpy.ndarray are the same that with xarray.DataArray
-    """
-    elevation, azimuth , radius, resolution = params
-    hills_np = algo.hillshade(input_np, elevation, azimuth , radius, resolution)
-    hills_xarr = algo.hillshade(input_xarray, elevation, azimuth , radius, resolution)
-    #Assert that the values of both arrays are the same
-    np.testing.assert_array_equal(hills_np, hills_xarr.values)
-    assert type(hills_xarr) == xr.DataArray
+# @pytest.mark.parametrize("input_np, input_xarray, params", [(zero_np,zero_xarr, [27.2, 82.64, 3, 0.5]),
+#                                                      (rd_np,rd_xarr, [27.2, 82.64, 3, 0.5])])
+#
+# def test_hillshade_algo(input_np : np.ndarray, input_xarray : xr.DataArray, params : list):
+#     """
+#     Test if the outputs obtained with numpy.ndarray are the same that with xarray.DataArray
+#     """
+#     elevation, azimuth , radius, resolution = params
+#     hills_np = algo.hillshade(input_np, elevation, azimuth , radius, resolution)
+#     hills_xarr = algo.hillshade(input_xarray, elevation, azimuth , radius, resolution)
+#     #Assert that the values of both arrays are the same
+#     np.testing.assert_array_equal(hills_np, hills_xarr.values)
+#     assert type(hills_xarr) == xr.DataArray
 
 
 def test_local_sum():

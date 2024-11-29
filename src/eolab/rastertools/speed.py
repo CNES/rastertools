@@ -145,7 +145,7 @@ def compute_speed(date0: datetime, date1: datetime,
             src0 = src0.isel(band=slice(0, len(bands)))
             src1 = src1.isel(band=slice(0, len(bands)))
 
-            result = algo.speed(src0, src1, interval).astype(dtype).fillna(src0.nodata)
+            result = algo.speed(src0, src1, interval).astype(dtype)#.fillna(src0.nodata)
             print(result.dims)
             ##Create the file and compute
             result.rio.to_raster(speed_image)

@@ -147,7 +147,7 @@ def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
 
 
 
-def reproject_geom(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
+def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
                                        output: Union[Path, str] = None, driver: str = 'GeoJSON') -> gpd.GeoDataFrame:
     """
     Reproject the geometries to match the CRS of the raster.
@@ -165,8 +165,9 @@ def reproject_geom(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path
     geometries = _get_geoms(geoms)
     geoms_crs = _get_geoms_crs(geometries)
 
-    src = rioxarray.open_rasterio(raster, chunks=True)
-    raster_crs = src.rio.crs
+    # Extract raster CRS using rasterio to avoid error caused by different dtypes in bands
+    with rasterio.open(raster) as src:
+        raster_crs = src.crs
 
     # Reproject geometries to match raster CRS
     if geoms_crs != raster_crs:
