@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import pytest
 import os
-import filecmp
 import zipfile
 from pathlib import Path
 from datetime import datetime
@@ -12,7 +10,7 @@ import rasterio
 
 from eolab.rastertools.product import RasterType, BandChannel
 from eolab.rastertools.product import RasterProduct
-
+from eolab.rastertools.utils import vsimem_to_rasterio
 from . import utils4test
 
 __author__ = "Olivier Queyrut"
@@ -362,10 +360,10 @@ def test_create_product_special_cases():
 
         # check if product can be opened by rasterio
         with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-            with rasterio.open(raster) as dataset:
-                data = dataset.read([1], masked=True)
-                # pixel corresponding to a value > 0 for a band mask => masked value
-                assert data.mask[0][350][250]
+            dataset = vsimem_to_rasterio(raster, nodata=-10000)
+            data = dataset.read([1], masked=True)
+            # pixel corresponding to a value > 0 for a band mask => masked value
+            assert data.mask[0][350][250]
 
     # creation from a vrt
     file = "S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.vrt"
