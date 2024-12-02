@@ -76,6 +76,7 @@ def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9) -> tuple:
         new = os.path.join(a, x)
         golden = os.path.join(b, x)
         res[_cmp(golden, new, tolerance)].append(x)
+        print(res)
     return res
 
 

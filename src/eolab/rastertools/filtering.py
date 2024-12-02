@@ -4,7 +4,6 @@
 This module defines a rastertool named Filtering that can apply different kind
 of filters on raster images.
 """
-import logging
 import logging.config
 from typing import List, Dict
 from pathlib import Path

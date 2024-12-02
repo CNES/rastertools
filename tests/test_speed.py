@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pytest
-import filecmp
 from eolab.rastertools import Speed
 from eolab.rastertools.product import RasterType
 

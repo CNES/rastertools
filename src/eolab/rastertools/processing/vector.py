@@ -13,6 +13,7 @@ import geopandas as gpd
 import shapely.geometry
 from osgeo import gdal
 import rasterio
+from eolab.rastertools.utils import vsimem_to_rasterio
 from rasterio import features, warp, windows
 
 from eolab.rastertools import utils
@@ -158,34 +159,21 @@ def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
     geoms_crs = _get_geoms_crs(geometries)
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
-    print(file)
 
+    dataset = vsimem_to_rasterio(file)
 
-    # with rasterio.open(file) as dataset:
-    #     print(type(dataset.crs))
-    #     print(geoms_crs)
-    #     if (geoms_crs != dataset.crs):
-    #         reprojected_geoms = geometries.to_crs(dataset.crs)
-    #     else:
-    #         reprojected_geoms = geometries
-    #     print(reprojected_geoms)
-    #     if output:
-    #         outfile = output.as_posix() if isinstance(output, Path) else output
-    #         reprojected_geoms.to_file(outfile, driver=driver)
-
-    dataset =  gdal.Open(file)
-    print(dataset.GetProjection())
-    if(geoms_crs != dataset.GetProjection()):
-        reprojected_geoms = geometries.to_crs(dataset.GetProjection())
+    if(geoms_crs != dataset.crs):
+        reprojected_geoms = geometries.to_crs(dataset.crs)
     else:
         reprojected_geoms = geometries
-    print(reprojected_geoms)
 
     if output:
         outfile = output.as_posix() if isinstance(output, Path) else output
         reprojected_geoms.to_file(outfile, driver=driver)
 
+    dataset.close()
     return reprojected_geoms
+
 
 
 def dissolve(geoms: Union[gpd.GeoDataFrame, Path, str],
@@ -207,7 +195,6 @@ def dissolve(geoms: Union[gpd.GeoDataFrame, Path, str],
     geometries = _get_geoms(geoms)
 
     geometries['COMMON'] = 0
-    print(geometries)
     union = geometries.dissolve(by='COMMON', as_index=False)
     union = union.drop(columns='COMMON')
 
@@ -215,7 +202,6 @@ def dissolve(geoms: Union[gpd.GeoDataFrame, Path, str],
         outfile = output.as_posix() if isinstance(output, Path) else output
         union.to_file(outfile, driver=driver)
 
-    print(union)
     return union
 
 
@@ -314,6 +300,7 @@ def rasterize(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
         return burned
 
 
+
 def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
          output_image: Union[Path, str]):
     """Crops an input image to the roi bounds.
@@ -328,46 +315,18 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
     """
 
     pinput = input_image.as_posix() if isinstance(input_image, Path) else input_image
-    print(pinput)
     poutput = output_image.as_posix() if isinstance(output_image, Path) else output_image
 
     geometries = reproject(dissolve(roi), pinput)
     geom_bounds = geometries.total_bounds
 
-    # with rasterio.open(pinput) as raster:
-    #     rst_bounds = raster.bounds
-    #
-    #     print(rst_bounds)
-    #     bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
-    #               math.floor(max(rst_bounds[1], geom_bounds[1])),
-    #               math.ceil(min(rst_bounds[2], geom_bounds[2])),
-    #               math.ceil(min(rst_bounds[3], geom_bounds[3])))
-    #     geotransform = raster.get_transform()
-    #
-    #     print(geotransform)
-    #     width = np.abs(geotransform[1])
-    #     height = np.abs(geotransform[5])
-    #
-    #     ds = gdal.Warp(destNameOrDestDS=poutput,
-    #                    srcDSOrSrcDSTab=pinput,
-    #                    outputBounds=bounds, targetAlignedPixels=True,
-    #                    cutlineDSName=roi,
-    #                    cropToCutline=False,
-    #                    xRes=width, yRes=height,
-    #                    format="VRT")
-    #     del ds
-
-    raster = gdal.Open(pinput)
-    geotransform = list(raster.GetGeoTransform())
-    bottom = geotransform[3] + raster.RasterYSize * geotransform[5]
-    right = geotransform[0] + raster.RasterXSize * geotransform[1]
-    rst_bounds = [geotransform[0],bottom,right,geotransform[3]]
-    print(rst_bounds)
-
+    raster = vsimem_to_rasterio(pinput)
+    rst_bounds = raster.bounds
     bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
               math.floor(max(rst_bounds[1], geom_bounds[1])),
               math.ceil(min(rst_bounds[2], geom_bounds[2])),
               math.ceil(min(rst_bounds[3], geom_bounds[3])))
+    geotransform = raster.get_transform()
     width = np.abs(geotransform[1])
     height = np.abs(geotransform[5])
 
@@ -379,6 +338,7 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
                    xRes=width, yRes=height,
                    format="VRT")
     del ds
+    raster.close()
 
 
 

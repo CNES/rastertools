@@ -181,7 +181,7 @@ def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
 
         utils4test.clear_outdir(subdirs=False)
 
-    # delete the dir resulting from unzip
+# delete the dir resulting from unzip
     utils4test.delete_dir(RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
 
 
@@ -376,11 +376,9 @@ def test_create_product_special_cases():
         dataset.close()
 
     # creation from a directory
-    # unzip S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip
     file = RastertoolsTestsData.tests_input_data_dir + "/" + "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
     with zipfile.ZipFile(file) as myzip:
         myzip.extractall(RastertoolsTestsData.tests_output_data_dir + "/")
-    dirname = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.SAFE"
 
     with RasterProduct(file, vrt_outputdir=Path(RastertoolsTestsData.tests_output_data_dir + "/")) as prod:
         raster = prod.get_raster()

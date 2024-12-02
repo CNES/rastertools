@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import filecmp
 import geopandas as gpd
 from pathlib import Path
 

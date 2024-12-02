@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import pytest
-import filecmp
 from pathlib import Path
 from eolab.rastertools import Zonalstats
 from eolab.rastertools import RastertoolConfigurationException

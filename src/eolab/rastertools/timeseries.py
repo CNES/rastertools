@@ -8,7 +8,6 @@ thus enabling to fill gaps.
 """
 from datetime import datetime, timedelta
 from itertools import repeat
-import logging
 import logging.config
 import multiprocessing
 import os

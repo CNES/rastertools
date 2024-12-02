@@ -99,7 +99,7 @@ def vsimem_to_rasterio(vsimem_file:str, nodata=None) -> rasterio.io.DatasetReade
             dst.write(band_data, i)
             # Si un masque est défini, l'écrire
             if masks[i - 1] is not None:
-                dst.write_mask((masks[i - 1]).astype("uint8") * 255)
+                dst.write_mask((~masks[i - 1]).astype("uint8") * 255)
 
     return rasterio.open(temp_filename)
 

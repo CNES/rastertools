@@ -133,9 +133,6 @@ class RasterProduct:
         for vrt in self._in_memory_vrts:
             gdal.Unlink(vrt.as_posix())
         self._in_memory_vrts = []
-        # for vrt in self._in_memory_vrts:
-        #     vrt.close()  # Closes and cleans up the memory file
-        # self._in_memory_vrts = []
 
     @property
     def file(self) -> Path:
@@ -397,8 +394,6 @@ class RasterProduct:
         """
         # convert parameters defined as str to Path
         outdir = utils.to_path(self._vrt_outputdir, "/vsimem/")
-        print(bands_files)
-        print(outdir)
         basename = utils.get_basename(self.file)
 
         _logger.debug("Creating a VRT that handles the bands of the archive product")
@@ -423,7 +418,6 @@ class RasterProduct:
 
         # Create a VRT image with GDAL
         rasterfile = outdir.joinpath(f"{uuid}{basename}.vrt")
-        # rasterfile = rasterfile.as_posix()
         ds = gdal.BuildVRT(rasterfile.as_posix(),
                            bands,
                            VRTNodata=' '.join(nodatavals),
@@ -434,79 +428,6 @@ class RasterProduct:
         # free resource from GDAL
         del ds
 
-        # with rasterio.open(list(bands_files.values())[0]) as src:
-        #     width = src.width
-        #     height = src.height
-        #
-        # # with rasterio.open(rasterfile, 'w', driver="GTiff", width=width, height=height, count=1) as dataset:
-        # #     dataset.write(bands[0])
-        #
-        # with rasterio.open(rasterfile, 'w', driver="GTiff", width=width, height=height) as src:
-        #     with WarpedVRT(src) as vrt:
-        #         print("VRT created with dimensions:", vrt.width, vrt.height)
-
-
-        # free resource from GDAL
-        # - - - - - -
-        # # convert parameters defined as str to Path
-        # outdir = utils.to_path(self._vrt_outputdir, "/vsimem/")
-        # print(outdir)
-        # basename = utils.get_basename(self.file)
-        # rasterfile = outdir.joinpath(f"{uuid}{basename}.vrt")
-        #
-        # _logger.debug("Creating a VRT that handles the bands of the archive product")
-        #
-        # # Initialize VRT XML structure
-        # vrt_root = ET.Element("VRTDataset")
-        #
-        # # Open the first band to get metadata
-        # with rasterio.open(list(bands_files.values())[0]) as src:
-        #     vrt_root.set("rasterXSize", str(src.width))
-        #     vrt_root.set("rasterYSize", str(src.height))
-        #     vrt_root.set("subClass", "VRTDataset")
-        #     crs_element = ET.SubElement(vrt_root, "SRS")
-        #     crs_element.text = src.crs.to_wkt()
-        #
-        # # Add bands
-        # for i, (band_id, band_path) in enumerate(bands_files.items(), start=1):
-        #     with rasterio.open(band_path) as src_band:
-        #         band_element = ET.SubElement(vrt_root, "VRTRasterBand", attrib={
-        #             "dataType": src_band.dtypes[0].upper(),
-        #             "band": str(i)
-        #         })
-        #         source_element = ET.SubElement(band_element, "SimpleSource")
-        #         ET.SubElement(source_element, "SourceFilename", attrib={"relativeToVRT": "1"}).text = str(band_path)
-        #         ET.SubElement(source_element, "SourceBand").text = "1"
-        #         ET.SubElement(source_element, "SourceProperties", attrib={
-        #             "RasterXSize": str(src_band.width),
-        #             "RasterYSize": str(src_band.height),
-        #             "DataType": src_band.dtypes[0].upper(),
-        #             "BlockXSize": str(src_band.block_shapes[0][0]),
-        #             "BlockYSize": str(src_band.block_shapes[0][1])
-        #         })
-        #         ET.SubElement(source_element, "SrcRect", attrib={
-        #             "xOff": "0", "yOff": "0",
-        #             "xSize": str(src_band.width), "ySize": str(src_band.height)
-        #         })
-        #         ET.SubElement(source_element, "DstRect", attrib={
-        #             "xOff": "0", "yOff": "0",
-        #             "xSize": str(src_band.width), "ySize": str(src_band.height)
-        #         })
-        #
-        # # Add masks
-        # for i, (mask_id, mask_path) in enumerate(masks_files.items(), start=len(bands_files) + 1):
-        #     mask_element = ET.SubElement(vrt_root, "VRTRasterBand", attrib={
-        #         "dataType": "Byte",
-        #         "band": str(i)
-        #     })
-        #     source_element = ET.SubElement(mask_element, "SimpleSource")
-        #     ET.SubElement(source_element, "SourceFilename", attrib={"relativeToVRT": "1"}).text = str(mask_path)
-        #     ET.SubElement(source_element, "SourceBand").text = "1"
-        #
-        # # Write the VRT to file
-        # tree = ET.ElementTree(vrt_root)
-        # with open(rasterfile, "wb") as f:
-        #     tree.write(f, encoding="utf-8", xml_declaration=True)
         return rasterfile
 
     def __wrap(self, input_vrt: Path, roi: Path, uuid: str = "") -> Path:
@@ -582,33 +503,6 @@ class RasterProduct:
         del vrt
 
         return masked_image
-
-        # # convert parameters defined as str to Path
-        # outdir = utils.to_path(self._vrt_outputdir, "/vsimem/")
-        # basename = utils.get_basename(self.file)
-        #
-        # # create a tempdir for generated temporary files
-        # tempdir = Path(tempfile.gettempdir())
-        # temp_image = tempdir.joinpath(f"{uuid}{basename}-temp.vrt")
-        # with rasterio.open(input_vrt) as src:
-        #     # Create a new in-memory VRT for the bands
-        #     with WarpedVRT(src, crs=src.crs, transform=src.transform, width=src.width, height=src.height,
-        #                    count=nb_bands) as vrt:
-        #         # Here you would apply any mask band logic. For simplicity, we assume a method that adds the masks.
-        #         # For each mask, you could apply it using rasterio to create new bands with the mask applied.
-        #         # Add the masks to the VRT using the provided add_masks_to_vrt function
-        #         _logger.debug("Adding mask bands to VRT")
-        #         masks_index = list(range(nb_bands + 1, nb_bands + nb_masks + 1))
-        #         vrt_new_content = add_masks_to_vrt(temp_image, input_vrt, masks_index,
-        #                                    self.rastertype.maskfunc)
-        #
-        #         # Now save this VRT to a file
-        #         masked_image = outdir.joinpath(f"{uuid}{basename}-mask.vrt")
-        #         with open(masked_image, 'wb') as out_vrt:
-        #             out_vrt.write(vrt_new_content)
-        #
-        # _logger.debug(f"Generated masked VRT saved to {masked_image}")
-        # return masked_image
 
 
 def _extract_bands(inputfile: Path,
