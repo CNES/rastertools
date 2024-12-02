@@ -1,2 +1,2 @@
-[rasterio.plugins]
-rastertools = src.eolab.rastertools.main:rastertools
+[rasterio.rio_plugins]
+rastertools = eolab.rastertools.main:rastertools

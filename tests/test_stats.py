@@ -212,7 +212,6 @@ def test_compute_zonal_stats_per_category():
     catlabels = RastertoolsTestsData.tests_input_data_dir + "/" + "OSO_nomenclature_2017.json"
     stats_to_compute = DEFAULT_STATS
     bands = [1]
-    print(vector.clip(catgeojson, raster))
     geometries = vector.reproject(vector.filter(geojson, raster), raster)
     categories = vector.reproject(vector.clip(catgeojson, raster), raster)
 
@@ -221,7 +220,6 @@ def test_compute_zonal_stats_per_category():
                                                         stats=stats_to_compute,
                                                         categories=categories,
                                                         category_index="Classe")
-    print(f"{statistics}")
     # statistics is a list of list of dict.
     # First list iterates over geometries
     # Second list iterates over bands.

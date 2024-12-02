@@ -16,8 +16,6 @@ import os
 import sys
 import json
 import click
-from pkg_resources import iter_entry_points
-from click_plugins import with_plugins
 from eolab.rastertools.cli.filtering import filter
 from eolab.rastertools.cli.hillshade import hillshade
 from eolab.rastertools.cli.speed import speed
@@ -232,13 +230,6 @@ rastertools.add_command(timeseries, name = "timeseries")
 rastertools.add_command(zonalstats, name = "zs")
 rastertools.add_command(zonalstats, name = "zonalstats")
 
-
-# @rastertools.result_callback()
-# @click.pass_context
-# def handle_result(ctx):
-#     if ctx.invoked_subcommand is None:
-#         click.echo(ctx.get_help())
-#         ctx.exit()
 
 def run(*args, **kwargs):
     """

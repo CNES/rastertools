@@ -5,7 +5,6 @@ This module defines a rastertool named speed that computes the time derivative (
 of the radiometry of the input rasters.
 """
 from datetime import datetime
-import logging
 import logging.config
 import os
 from pathlib import Path

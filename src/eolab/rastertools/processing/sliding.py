@@ -4,7 +4,6 @@
 This module defines a method to run a RasterProcessing on sliding windows.
 """
 from itertools import repeat
-import logging
 import logging.config
 import os
 from typing import List
@@ -18,7 +17,7 @@ from tqdm.contrib.concurrent import process_map
 
 from eolab.rastertools import utils
 from eolab.rastertools.processing import RasterProcessing
-
+from eolab.rastertools.utils import vsimem_to_rasterio
 
 _logger = logging.getLogger(__name__)
 
@@ -56,46 +55,48 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
         specified, and sliding window indices are computed internally.
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        with rasterio.open(input_image) as src:
-            profile = src.profile
 
-            # set block size
-            blockxsize, blockysize = window_size
-            if src.width < blockxsize:
-                blockxsize = utils.highest_power_of_2(src.width)
-            if src.height < blockysize:
-                blockysize = utils.highest_power_of_2(src.height)
+        src = vsimem_to_rasterio(input_image)
+        profile = src.profile
 
-            # dtype and creation options of output data
-            dtype = rasterprocessing.dtype or rasterio.float32
-            in_dtype = rasterprocessing.in_dtype or dtype
-            nbits = rasterprocessing.nbits
-            compress = rasterprocessing.compress or src.compression or 'lzw'
-            nodata = rasterprocessing.nodata or src.nodata
+        # set block size
+        blockxsize, blockysize = window_size
+        if src.width < blockxsize:
+            blockxsize = utils.highest_power_of_2(src.width)
+        if src.height < blockysize:
+            blockysize = utils.highest_power_of_2(src.height)
 
-            # check band index and handle all bands options (when bands is an empty list)
-            if bands is None or len(bands) == 0:
-                bands = src.indexes
-            elif min(bands) < 1 or max(bands) > src.count:
-                raise ValueError(f"Invalid bands, all values are not in range [1, {src.count}]")
+        # dtype and creation options of output data
+        dtype = rasterprocessing.dtype or rasterio.float32
+        in_dtype = rasterprocessing.in_dtype or dtype
+        nbits = rasterprocessing.nbits
+        compress = rasterprocessing.compress or src.compression or 'lzw'
+        nodata = rasterprocessing.nodata or src.nodata
 
-            # setup profile for output image
-            profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
-                           tiled=True, dtype=dtype, nbits=nbits, compress=compress,
-                           nodata=nodata, count=len(bands))
+        # check band index and handle all bands options (when bands is an empty list)
+        if bands is None or len(bands) == 0:
+            bands = src.indexes
+        elif min(bands) < 1 or max(bands) > src.count:
+            raise ValueError(f"Invalid bands, all values are not in range [1, {src.count}]")
 
-            with rasterio.open(output_image, "w", **profile):
-                # file is created
-                pass
+        # setup profile for output image
+        profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
+                       tiled=True, dtype=dtype, nbits=nbits, compress=compress,
+                       nodata=nodata, count=len(bands))
 
-            # create the generator of sliding windows
-            sliding_gen = _sliding_windows((src.width, src.height),
-                                           window_size, window_overlap)
+        with rasterio.open(output_image, "w", **profile):
+            # file is created
+            pass
 
-            if rasterprocessing.per_band_algo:
-                sliding_windows_bands = [(w, [b]) for w in sliding_gen for b in bands]
-            else:
-                sliding_windows_bands = [(w, bands) for w in sliding_gen]
+        # create the generator of sliding windows
+        sliding_gen = _sliding_windows((src.width, src.height),
+                                       window_size, window_overlap)
+
+        if rasterprocessing.per_band_algo:
+            sliding_windows_bands = [(w, [b]) for w in sliding_gen for b in bands]
+        else:
+            sliding_windows_bands = [(w, bands) for w in sliding_gen]
+        src.close()
 
     m = multiprocessing.Manager()
     write_lock = m.Lock()

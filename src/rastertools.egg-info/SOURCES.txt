@@ -7,7 +7,6 @@ README.rst
 env_test.yml
 env_update.yml
 environment.yml
-pyproject.toml
 setup.cfg
 setup.py
 tox.ini

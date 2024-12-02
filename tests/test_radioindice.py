@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 import os
 
-import pytest
-import filecmp
 import logging
 from eolab.rastertools import Radioindice
 from eolab.rastertools.processing.rasterproc import RadioindiceProcessing
@@ -40,10 +38,7 @@ def test_radioindice_process_file_merge():
 
     origin_path = RastertoolsTestsData.tests_input_data_dir + "/".split(os.getcwd() + "/")[-1]
 
-    inputfile = RastertoolsTestsData.tests_input_data_dir + "/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
-    print(inputfile)
-    inputfile = origin_path+ "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
-    print(inputfile)
+    inputfile = origin_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
     indices = [indice for indice in Radioindice.get_default_indices()]
 
     tool = Radioindice(indices)
@@ -99,7 +94,7 @@ def test_radioindice_process_file_separate(compare : bool, save_gen_as_ref : boo
         # save the generated files in the refdir => make them the new refs.
         utils4test.copy_to_ref(gen_files, __refdir)
 
-    utils4test.clear_outdir()
+    # utils4test.clear_outdir()
 
 
 def test_radioindice_process_files():

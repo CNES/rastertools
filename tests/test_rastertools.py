@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pytest
 import logging
-import filecmp
+import os
+
 from click.testing import CliRunner
 from pathlib import Path
 
@@ -113,6 +113,7 @@ class TestCase:
 
         if compare:
             match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", self._refdir, self._outputs)
+
             assert len(match) == 3
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -283,9 +284,9 @@ def test_speed_command_line_default():
         # default with a listing of S2A products
         f"-v sp -b 1 -o {RastertoolsTestsData.tests_output_data_dir} {lst_file_path}",
         # default with a list of files
-        # f"--verbose speed --output {RastertoolsTestsData.tests_output_data_dir}"
-        # f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        # f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        f"--verbose speed --output {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
     ]
     speed_filenames = [
         ["SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-speed-20180928-105515.tif"],
@@ -299,6 +300,7 @@ def test_speed_command_line_default():
     # execute test cases with logging level set to INFO
     for test in tests:
         test.run_test()
+    os.remove(lst_file_path)
 
 
 def test_speed_command_line_errors(caplog):
@@ -339,6 +341,7 @@ def test_speed_command_line_errors(caplog):
     # execute test cases with logging level set to INFO
     for test in tests:
         test.run_test(caplog, check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_timeseries_command_line_default(compare, save_gen_as_ref):
@@ -428,6 +431,7 @@ def test_timeseries_command_line_errors(caplog):
     # execute test cases with logging level set to INFO
     for test in tests:
         test.run_test(caplog, check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_zonalstats_command_line_default():
@@ -462,7 +466,7 @@ def test_zonalstats_command_line_default():
     # execute test cases
     for test in tests:
         test.run_test()
-
+    os.remove(lst_file_path)
 
 def test_zonalstats_command_line_product():
     utils4test.create_outdir()
@@ -558,6 +562,7 @@ def test_zonalstats_command_line_errors():
     # execute test cases
     for test in tests:
         test.run_test(check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_tiling_command_line_default():
@@ -603,6 +608,7 @@ def test_tiling_command_line_default():
     subdir = Path(f"{RastertoolsTestsData.tests_output_data_dir}/tile77")
     subdir.mkdir()
     test.run_test(check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_tiling_command_line_special_case(caplog):

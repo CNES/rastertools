@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import filecmp
 from eolab.rastertools import Tiling
 
 from . import utils4test

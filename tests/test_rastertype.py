@@ -7,7 +7,6 @@ from pathlib import Path
 from datetime import datetime
 from eolab.rastertools import add_custom_rastertypes
 from eolab.rastertools.product import RasterType, BandChannel
-from . import utils4test
 
 __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
