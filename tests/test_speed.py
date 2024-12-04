@@ -40,6 +40,8 @@ def test_speed_process_files(compare : bool, save_gen_as_ref : bool):
     assert outputs == [utils4test.outdir + exp_out for exp_out in exp_outs]
 
     if compare:
+        print('...'*50)
+        print(__refdir)
         match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, exp_outs)
         assert len(match) == 1
         assert len(mismatch) == 0
@@ -48,4 +50,4 @@ def test_speed_process_files(compare : bool, save_gen_as_ref : bool):
         # save the generated files in the refdir => make them the new refs.
         utils4test.copy_to_ref(exp_outs, __refdir)
 
-    utils4test.clear_outdir()
+    # utils4test.clear_outdir()

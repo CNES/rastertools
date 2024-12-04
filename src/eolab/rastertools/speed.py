@@ -9,6 +9,7 @@ import logging.config
 from pathlib import Path
 from typing import List
 
+import numpy
 import rasterio
 
 from eolab.rastertools import utils
@@ -142,11 +143,18 @@ def compute_speed(date0: datetime, date1: datetime,
                 raise ValueError(f"Invalid bands, all values are not in range [1, {src1.shape[0]}]")
 
             dtype = rasterio.float32
-            src0 = src0.isel(band=slice(0, len(bands)))
-            src1 = src1.isel(band=slice(0, len(bands)))
+            src0 = src0.isel(band=slice(0, len(bands))).astype(dtype)
+            src1 = src1.isel(band=slice(0, len(bands))).astype(dtype)
 
-            result = algo.speed(src0, src1, interval).astype(dtype)#.fillna(src0.nodata)
-            print(result.dims)
+            print('....'*20)
+            print(numpy.nanmin(src0.values))
+            print(numpy.nanmin(src0.values))
+
+            print(numpy.nanmin(src1.values))
+            print(numpy.nanmin(src1.values))
+            result = algo.speed(src0, src1, interval).astype(dtype)
+
             ##Create the file and compute
+            result.rio.write_nodata(-2, inplace=True)
             result.rio.to_raster(speed_image)
 

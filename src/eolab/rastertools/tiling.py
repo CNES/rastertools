@@ -8,10 +8,12 @@ import logging
 from typing import List
 from pathlib import Path
 
+import numpy as np
 import rasterio
 import rasterio.mask
 import geopandas as gpd
 import rioxarray
+from rasterio.rio.options import all_touched_opt
 from rioxarray.exceptions import NoDataInBounds
 
 from eolab.rastertools import utils
@@ -161,6 +163,11 @@ class Tiling(Rastertool):
 
             # Load raster as xarray.DataArray
             raster = product.open_xarray()
+            crs = raster.rio.crs
+
+            with rasterio.open(product.get_raster()) as src:
+                out_meta = src.meta
+
             output_paths = []
 
             # STEP 2: Prepare grid (reproject it to raster's CRS)
@@ -171,7 +178,12 @@ class Tiling(Rastertool):
 
                 try:
                     # Generate mask to crop the raster to the geometry
-                    masked_raster = raster.rio.clip([shape], raster.rio.crs, drop=True)
+                    masked_raster = raster.rio.clip([shape], crs, from_disk=True, all_touched=True)
+
+                    # Get the original raster's transform and resolution
+                    original_transform = raster.rio.transform()
+                    # Update the clipped raster with the original resolution
+                    masked_raster = masked_raster.rio.write_transform(original_transform)
 
                     # output location
                     output = Path(self.outputdir)
@@ -184,8 +196,10 @@ class Tiling(Rastertool):
                     basename = utils.get_basename(inputfile)
                     output = output.joinpath(self.output_basename.format(basename, i) + ".tif")
 
+
                     # Save the cropped raster
-                    masked_raster.rio.to_raster(output)
+                    masked_raster.rio.write_crs(crs, inplace=True)
+                    masked_raster.rio.to_raster(output, meta=out_meta, recalc_transform = False)
                     output_paths.append(output.as_posix())
 
                     _logger.info("Tile " + str(i) + " exported to " + str(output_paths))

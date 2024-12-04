@@ -95,3 +95,4 @@ def _cmp(gld, new, tolerance):
         return not cmp(gld, new, tolerance=tolerance)
     except OSError:
         return 2
+
