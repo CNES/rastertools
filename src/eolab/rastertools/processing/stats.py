@@ -18,7 +18,7 @@ import rasterio
 from rasterio import features
 from tqdm import tqdm
 
-from eolab.rastertools.utils import get_metadata_name, vsimem_to_rasterio
+from eolab.rastertools.utils import get_metadata_name
 from eolab.rastertools.processing.vector import rasterize, filter_dissolve
 
 
@@ -71,7 +71,7 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
     """
     nb_geoms = len(geoms)
 
-    src = vsimem_to_rasterio(image)
+    src = rasterio.open(image)
     geom_gen = (geoms.iloc[i].geometry for i in range(nb_geoms))
     geom_windows = ((geom, features.geometry_window(src, [geom])) for geom in geom_gen)
 

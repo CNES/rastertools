@@ -13,7 +13,6 @@ import threading
 
 import rasterio
 import numpy.ma as ma
-from eolab.rastertools.utils import vsimem_to_rasterio
 from tqdm import tqdm
 
 from eolab.rastertools import utils
@@ -520,7 +519,7 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
             Size of windows for splitting the processed image in small parts
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        src = vsimem_to_rasterio(input_image)
+        src = rasterio.open(input_image)
         profile = src.profile
 
         # set block size to the configured window_size of first indice

@@ -21,7 +21,6 @@ from eolab.rastertools import utils
 from eolab.rastertools.product import RasterType
 from eolab.rastertools.product.vrt import add_masks_to_vrt, set_band_descriptions
 from eolab.rastertools.processing.vector import crop
-from eolab.rastertools.utils import vsimem_to_rasterio
 
 __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
@@ -224,7 +223,7 @@ class RasterProduct:
              bands: Union[str, List[str]] = "all",
              masks: Union[str, List[str]] = "all",
              roi: Union[Path, str] = None):
-        return vsimem_to_rasterio(self.get_raster(bands=bands, masks=masks, roi=roi))
+        return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
 
     def get_raster(self,
                    bands: Union[str, List[str]] = "all",

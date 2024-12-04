@@ -17,7 +17,6 @@ from tqdm.contrib.concurrent import process_map
 
 from eolab.rastertools import utils
 from eolab.rastertools.processing import RasterProcessing
-from eolab.rastertools.utils import vsimem_to_rasterio
 
 _logger = logging.getLogger(__name__)
 
@@ -56,7 +55,7 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
 
-        src = vsimem_to_rasterio(input_image)
+        src = rasterio.open(input_image)
         profile = src.profile
 
         # set block size
