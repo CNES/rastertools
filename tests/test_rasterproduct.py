@@ -10,7 +10,6 @@ import rasterio
 
 from eolab.rastertools.product import RasterType, BandChannel
 from eolab.rastertools.product import RasterProduct
-from eolab.rastertools.utils import vsimem_to_rasterio
 from . import utils4test
 
 __author__ = "Olivier Queyrut"
@@ -360,7 +359,7 @@ def test_create_product_special_cases():
 
         # check if product can be opened by rasterio
         with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-            dataset = vsimem_to_rasterio(raster, nodata=-10000)
+            dataset = rasterio.open(raster)
             data = dataset.read([1], masked=True)
             # pixel corresponding to a value > 0 for a band mask => masked value
             assert data.mask[0][350][250]

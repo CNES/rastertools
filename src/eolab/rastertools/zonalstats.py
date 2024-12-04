@@ -32,7 +32,6 @@ from eolab.rastertools.processing import compute_zonal_stats, compute_zonal_stat
 from eolab.rastertools.processing import extract_zonal_outliers, plot_stats
 from eolab.rastertools.processing import vector
 from eolab.rastertools.product import RasterProduct
-from eolab.rastertools.utils import vsimem_to_rasterio
 
 
 _logger = logging.getLogger(__name__)
@@ -409,7 +408,7 @@ class Zonalstats(Rastertool):
             # open raster to get metadata
             raster = product.get_raster()
 
-            rst = vsimem_to_rasterio(raster)
+            rst = rasterio.open(raster)
             bound = int(rst.count)
             indexes = rst.indexes
             descr = rst.descriptions

@@ -1,5 +1,4 @@
 click
-rasterio==1.3.0
 pytest>=3.6
 pytest-cov
 geopandas==0.13
@@ -11,10 +10,11 @@ packaging==24.1
 Shapely==1.8.5.post1
 tomli==2.0.2
 Rtree==1.3.0
+fiona==1.8.21
 Pillow==9.2.0
+sphinx_rtd_theme==3.0.1
 pip==24.2
 pyproj==3.4.0
-matplotlib
 sphinx==7.1.2
 scipy==1.8
 pyscaffold

@@ -13,7 +13,6 @@ import geopandas as gpd
 import shapely.geometry
 from osgeo import gdal
 import rasterio
-from eolab.rastertools.utils import vsimem_to_rasterio
 from rasterio import features, warp, windows
 
 from eolab.rastertools import utils
@@ -68,7 +67,7 @@ def filter(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
 
-    dataset = utils.vsimem_to_rasterio(file)
+    dataset = rasterio.open(file)
     l, b, r, t = dataset.bounds
     px, py = ([l, l, r, r], [b, t, t, b])
 
@@ -160,7 +159,7 @@ def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
 
-    dataset = vsimem_to_rasterio(file)
+    dataset = rasterio.open(file)
 
     if(geoms_crs != dataset.crs):
         reprojected_geoms = geometries.to_crs(dataset.crs)
@@ -320,7 +319,7 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
     geometries = reproject(dissolve(roi), pinput)
     geom_bounds = geometries.total_bounds
 
-    raster = vsimem_to_rasterio(pinput)
+    raster = rasterio.open(pinput)
     rst_bounds = raster.bounds
     bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
               math.floor(max(rst_bounds[1], geom_bounds[1])),
