@@ -206,8 +206,9 @@ def _interpolate_xarray(products_dates, products_per_date,
     for date in products_dates:
 
         src = products_per_date[date].open_xarray()
+        dtype = src.dtype or rasterio.float32
         band_data = src.isel(band=slice(0, len(bands)))  # Select the desired bands
-
+        crs = src.rio.crs
         datas.append(band_data)
 
     output = algo.interpolated_timeseries_xarray(products_dates, datas, timeseries_dates, nodata)
@@ -218,4 +219,12 @@ def _interpolate_xarray(products_dates, products_per_date,
     # Use of the lock to avoid writing in //
     with write_lock:
         for i, img in enumerate(timeseries_images):
-            output[i].rio.to_raster(img)
+            # Remove unexpected keys
+            unwanted_keys = ['long_name', 'STATISTICS_APPROXIMATE', 'STATISTICS_MAXIMUM',
+                             'STATISTICS_MEAN', 'STATISTICS_MINIMUM', 'STATISTICS_STDDEV',
+                             'STATISTICS_VALID_PERCENT']
+            output[i].attrs = {k: v for k, v in output[i].attrs.items() if k not in unwanted_keys}
+
+            output[i].rio.write_crs(crs, inplace=True)
+            output[i].rio.write_nodata(-2.0, inplace=True)
+            output[i].rio.to_raster(img, nodata=-2.0, dtype=dtype)

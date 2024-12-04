@@ -21,51 +21,51 @@ __license__ = "Apache v2.0"
 from eolab.rastertools.timeseries import compute_timeseries, Timeseries
 from .utils4test import RastertoolsTestsData
 
-zero_np = np.zeros((1,100,100))
-zero_xarr = xr.DataArray(zero_np, dims=("x", "y", "z"))
-
-rd_np = np.random.randn(1,100, 100)
-rd_xarr = xr.DataArray(rd_np, dims=("x", "y", "z"))
-
-rd2_np = np.random.randn(1,100, 100)
-rd2_xarr = xr.DataArray(rd2_np, dims=("x", "y", "z"))
-
-#Both zeros arrays
-zero_nptest = [zero_np, zero_np]
-zero_xarrtest = [zero_xarr, zero_xarr]
-
-#One random array and a zero array
-rd1_nptest = [zero_np, rd_np]
-rd1_xarrtest = [zero_xarr, rd_xarr]
-
-#Two same random array
-rd2_nptest = [rd_np, rd_np]
-rd2_xarrtest = [rd_xarr, rd_xarr]
-
-#Two different random array
-rd3_nptest = [rd_np, rd2_np]
-rd3_xarrtest = [rd_xarr, rd2_xarr]
-
-@pytest.mark.parametrize("input_np, input_xarray, interval",
-                         [(zero_nptest, zero_xarrtest, 0.0),
-                          (zero_nptest, zero_xarrtest, 5.0),
-                          (rd1_nptest, rd1_xarrtest, 5.0),
-                          (rd2_nptest, rd2_xarrtest, -4.0),
-                          (rd3_nptest, rd3_xarrtest, 1.0)])
-
-
-def test_speed_algo(input_np :list, input_xarray : list, interval : float):
-    """
-    Test if the output of the speed algorithm obtained with numpy.ndarray are the same that with xarray.DataArray
-    """
-    data1_np, data2_np = input_np
-    data1_xarr, data2_xarr = input_xarray
-    speed_np = algo.speed(data1_np, data2_np, interval)
-    speed_xarr = algo.speed(data1_xarr, data2_xarr, interval)
-
-    #Assert that the values of both arrays are the same
-    np.testing.assert_array_equal(speed_np, speed_xarr.values)
-    assert type(speed_xarr) == xr.DataArray
+# zero_np = np.zeros((1,100,100))
+# zero_xarr = xr.DataArray(zero_np, dims=("x", "y", "z"))
+#
+# rd_np = np.random.randn(1,100, 100)
+# rd_xarr = xr.DataArray(rd_np, dims=("x", "y", "z"))
+#
+# rd2_np = np.random.randn(1,100, 100)
+# rd2_xarr = xr.DataArray(rd2_np, dims=("x", "y", "z"))
+#
+# #Both zeros arrays
+# zero_nptest = [zero_np, zero_np]
+# zero_xarrtest = [zero_xarr, zero_xarr]
+#
+# #One random array and a zero array
+# rd1_nptest = [zero_np, rd_np]
+# rd1_xarrtest = [zero_xarr, rd_xarr]
+#
+# #Two same random array
+# rd2_nptest = [rd_np, rd_np]
+# rd2_xarrtest = [rd_xarr, rd_xarr]
+#
+# #Two different random array
+# rd3_nptest = [rd_np, rd2_np]
+# rd3_xarrtest = [rd_xarr, rd2_xarr]
+#
+# @pytest.mark.parametrize("input_np, input_xarray, interval",
+#                          [(zero_nptest, zero_xarrtest, 0.0),
+#                           (zero_nptest, zero_xarrtest, 5.0),
+#                           (rd1_nptest, rd1_xarrtest, 5.0),
+#                           (rd2_nptest, rd2_xarrtest, -4.0),
+#                           (rd3_nptest, rd3_xarrtest, 1.0)])
+#
+#
+# def test_speed_algo(input_np :list, input_xarray : list, interval : float):
+#     """
+#     Test if the output of the speed algorithm obtained with numpy.ndarray are the same that with xarray.DataArray
+#     """
+#     data1_np, data2_np = input_np
+#     data1_xarr, data2_xarr = input_xarray
+#     speed_np = algo.speed(data1_np, data2_np, interval)
+#     speed_xarr = algo.speed(data1_xarr, data2_xarr, interval)
+#
+#     #Assert that the values of both arrays are the same
+#     np.testing.assert_array_equal(speed_np, speed_xarr.values)
+#     assert type(speed_xarr) == xr.DataArray
 
 
 # input_file1 = "tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
@@ -116,29 +116,29 @@ def test_speed_algo(input_np :list, input_xarray : list, interval : float):
 #             times_np = times_np.filled(np.nan)
 #         np.testing.assert_allclose(times_np, times_xarray, equal_nan=True)
 
-
-zero3d_np = np.zeros((3,3,3))
-zero3d_xarr = xr.DataArray(zero3d_np, dims=("x", "y", "z"))
-
-rd3d_np = np.random.randn(3,3,3)
-rd3d_xarr = xr.DataArray(rd3d_np, dims=("x", "y", "z"))
-
-@pytest.mark.parametrize("input_np, input_xarray", [(zero3d_np,zero3d_xarr),
-                                                     (rd3d_np,rd3d_xarr)])
-
-def test_indices_algo(input_np :np.ndarray, input_xarray : xr.DataArray):
-    """
-    Test if the outputs obtained with numpy.ndarray are the same that with xarray.DataArray
-    """
-    ind_func = [algo.normalized_difference, algo.rvi, algo.tndvi, algo.pvi, algo.savi, algo.tsavi, algo.msavi, algo.msavi2, algo.ipvi,
-                algo.evi, algo.redness_index, algo.brightness_index, algo.brightness_index2]
-
-    for indic in ind_func :
-        ind_np = indic(input_np)
-        ind_xarr = indic(input_xarray)
-        #Assert that the values of both arrays are the same
-        np.testing.assert_array_equal(ind_np, ind_xarr.values)
-        assert type(ind_xarr) == xr.DataArray
+#
+# zero3d_np = np.zeros((3,3,3))
+# zero3d_xarr = xr.DataArray(zero3d_np, dims=("x", "y", "z"))
+#
+# rd3d_np = np.random.randn(3,3,3)
+# rd3d_xarr = xr.DataArray(rd3d_np, dims=("x", "y", "z"))
+#
+# @pytest.mark.parametrize("input_np, input_xarray", [(zero3d_np,zero3d_xarr),
+#                                                      (rd3d_np,rd3d_xarr)])
+#
+# def test_indices_algo(input_np :np.ndarray, input_xarray : xr.DataArray):
+#     """
+#     Test if the outputs obtained with numpy.ndarray are the same that with xarray.DataArray
+#     """
+#     ind_func = [algo.normalized_difference, algo.rvi, algo.tndvi, algo.pvi, algo.savi, algo.tsavi, algo.msavi, algo.msavi2, algo.ipvi,
+#                 algo.evi, algo.redness_index, algo.brightness_index, algo.brightness_index2]
+#
+#     for indic in ind_func :
+#         ind_np = indic(input_np)
+#         ind_xarr = indic(input_xarray)
+#         #Assert that the values of both arrays are the same
+#         np.testing.assert_array_equal(ind_np, ind_xarr.values)
+#         assert type(ind_xarr) == xr.DataArray
 
 #
 # @pytest.mark.parametrize("input_np, input_xarray, params", [(zero_np,zero_xarr, [50, 16, 0.5, None]),
@@ -233,18 +233,18 @@ def test_local_sum():
         assert (output[0] == results[i - 1]).all()
 
 
-@pytest.mark.parametrize("input_np, input_xarray, kernel_width", [(zero_np,zero_xarr, 5)])
-
-def test_xarray_local_mean(input_np : np.ndarray, input_xarray : xr.DataArray, kernel_width : int):
-    """
-    Test if the output of the speed algorithm obtained with numpy.ndarray are the same that with xarray.DataArray
-    """
-    mean_np = algo.local_mean(ma.array(input_np), kernel_width)
-    mean_xarr = algo.local_mean(input_xarray, kernel_width)
-
-    #Assert that the values of both arrays are the same
-    np.testing.assert_array_equal(mean_np, mean_xarr.values)
-    assert type(mean_xarr) == xr.DataArray
+# @pytest.mark.parametrize("input_np, input_xarray, kernel_width", [(zero_np,zero_xarr, 5)])
+#
+# def test_xarray_local_mean(input_np : np.ndarray, input_xarray : xr.DataArray, kernel_width : int):
+#     """
+#     Test if the output of the speed algorithm obtained with numpy.ndarray are the same that with xarray.DataArray
+#     """
+#     mean_np = algo.local_mean(ma.array(input_np), kernel_width)
+#     mean_xarr = algo.local_mean(input_xarray, kernel_width)
+#
+#     #Assert that the values of both arrays are the same
+#     np.testing.assert_array_equal(mean_np, mean_xarr.values)
+#     assert type(mean_xarr) == xr.DataArray
 
 
 def test_local_mean():

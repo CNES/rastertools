@@ -19,6 +19,7 @@ from rasterio import features, warp, windows
 from shapely.geometry import Polygon
 
 from eolab.rastertools import utils
+from eolab.rastertools.utils import vsimem_to_rasterio
 
 
 def _get_geoms(geoms: Union[gpd.GeoDataFrame, Path, str]) -> gpd.GeoDataFrame:
@@ -165,9 +166,9 @@ def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
     geometries = _get_geoms(geoms)
     geoms_crs = _get_geoms_crs(geometries)
 
-    # Extract raster CRS using rasterio to avoid error caused by different dtypes in bands
-    with rasterio.open(raster) as src:
-        raster_crs = src.crs
+    file = raster.as_posix() if isinstance(raster, Path) else raster
+    raster = vsimem_to_rasterio(file)
+    raster_crs = raster.crs
 
     # Reproject geometries to match raster CRS
     if geoms_crs != raster_crs:
@@ -333,24 +334,24 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
     geometries = reproject(dissolve(roi), pinput)
     geom_bounds = geometries.total_bounds
 
-    with rasterio.open(pinput) as raster:
-        rst_bounds = raster.bounds
-        bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
-                  math.floor(max(rst_bounds[1], geom_bounds[1])),
-                  math.ceil(min(rst_bounds[2], geom_bounds[2])),
-                  math.ceil(min(rst_bounds[3], geom_bounds[3])))
-        geotransform = raster.get_transform()
-        width = np.abs(geotransform[1])
-        height = np.abs(geotransform[5])
+    raster = vsimem_to_rasterio(pinput)
+    rst_bounds = raster.bounds
+    bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
+              math.floor(max(rst_bounds[1], geom_bounds[1])),
+              math.ceil(min(rst_bounds[2], geom_bounds[2])),
+              math.ceil(min(rst_bounds[3], geom_bounds[3])))
+    geotransform = raster.get_transform()
+    width = np.abs(geotransform[1])
+    height = np.abs(geotransform[5])
 
-        ds = gdal.Warp(destNameOrDestDS=poutput,
-                       srcDSOrSrcDSTab=pinput,
-                       outputBounds=bounds, targetAlignedPixels=True,
-                       cutlineDSName=roi,
-                       cropToCutline=False,
-                       xRes=width, yRes=height,
-                       format="VRT")
-        del ds
+    ds = gdal.Warp(destNameOrDestDS=poutput,
+                   srcDSOrSrcDSTab=pinput,
+                   outputBounds=bounds, targetAlignedPixels=True,
+                   cutlineDSName=roi,
+                   cropToCutline=False,
+                   xRes=width, yRes=height,
+                   format="VRT")
+    del ds
 
 
 def vectorize(category_raster: Union[Path, str], raster: Union[Path, str],

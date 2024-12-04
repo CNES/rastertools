@@ -554,7 +554,7 @@ class Zonalstats(Rastertool):
                 stats=self.stats,
                 categorical=self.categorical)
 
-        print(statistics)
+
         # print(len(statistics))
         # apply area
         if self.area:

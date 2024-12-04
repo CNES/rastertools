@@ -408,7 +408,7 @@ class Radioindice(Rastertool, Windowable):
 
         outdir = Path(self.outputdir)
 
-
+        print(inputfile)
         # Prepare the input image so that it can be processed
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
             _logger.debug(f"Raster product is : {product}")
@@ -480,10 +480,12 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
             Size of windows for splitting the processed image in small parts
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        with rioxarray.open_rasterio(input_image, masked=True, chunks=True) as src_array:
+        print(input_image)
+        with rioxarray.open_rasterio(input_image, masked=True, chunks=True, cache=False, lock = False) as src_array:
 
             # dtype of output data
             dtype = indices[0].dtype or rasterio.float32
+            src_array.load()
             src_array = src_array.astype(dtype)
             nodata = -10000
             crs = src_array.rio.crs
@@ -503,13 +505,12 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
                 # Get the bands necessary to compute the indice
                 bands = [image_channels.index(channel) + 1 for channel in indice.channels]
 
-                print(src_array.values[0,200,:100])
-                input('vf')
+
                 result.loc[{"band": indice.name}]  = indice.algo(src_array.sel(band=bands).values).astype(dtype)
 
             # Create the file and compute
             result.rio.write_crs(crs, inplace=True)
-            result.rio.to_raster(indice_image)
+            result.rio.to_raster(indice_image, nodata=-2.0, dtype=dtype)
 
             # Attach statistics to the raster using Rasterio
             with rasterio.open(indice_image, "r+") as dataset:
