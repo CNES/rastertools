@@ -451,50 +451,6 @@ class Radioindice(Rastertool, Windowable):
         # return the list of generated files
         return outputs
 
-def get_raster_profile(raster):
-    # Open the dataset
-
-    # Get the raster driver
-    driver = raster.GetDriver().ShortName
-
-    # Get raster dimensions
-    width = raster.RasterXSize
-    height = raster.RasterYSize
-    count = raster.RasterCount
-
-    # Get geotransform and projection
-    geotransform = raster.GetGeoTransform()
-    crs = raster.GetProjection()
-
-    # Get data type and block size from the first band
-    band = raster.GetRasterBand(1)
-    dtype_rasterio = rasterio.dtypes.get_minimum_dtype(band.DataType)
-    nodata = band.GetNoDataValue()
-
-    # Get block size and tiled status
-    blockxsize, blockysize = band.GetBlockSize()
-    tiled = raster.GetMetadata('IMAGE_STRUCTURE').get('TILED', 'NO') == 'YES'
-
-    # Convert geotransform to Rasterio-compatible affine transform
-    transform = rasterio.Affine.from_gdal(*geotransform)
-
-    # Build a profile dictionary similar to rasterio
-    profile = {
-        "driver": driver,  # e.g., "GTiff"
-        "width": width,
-        "height": height,
-        "count": count,
-        "crs": crs,
-        "transform": transform,  # Affine geotransform
-        "dtype": dtype_rasterio,
-        "nodata": nodata,  # Nodata value
-        "blockxsize": blockxsize,  # Block width
-        "blockysize": blockysize,  # Block height
-        "tiled": tiled  # Whether the raster is tiled
-    }
-
-    return profile
-
 def compute_indices(input_image: str, image_channels: List[BandChannel],
                     indice_image: str, indices: List[RadioindiceProcessing],
                     window_size: tuple = (1024, 1024)):

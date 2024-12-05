@@ -13,7 +13,6 @@ import zipfile
 import tempfile
 from uuid import uuid4
 
-from rasterio.io import MemoryFile
 from osgeo import gdal
 import rasterio
 
@@ -111,19 +110,6 @@ class RasterProduct:
     def __exit__(self, *args):
         """Exit method for with statement, it cleans the in memory vrt products"""
         self.free_in_memory_vrts()
-
-    def create_in_memory_vrt(self, vrt_content):
-        """
-        Create an in-memory VRT using Rasterio's MemoryFile.
-
-        Args:
-            vrt_content (str): The XML content of the VRT file.
-        """
-        with MemoryFile() as memfile:
-            # Write the VRT content into the memory file
-            memfile.write(vrt_content.encode('utf-8'))
-            dataset = memfile.open()  # Open the VRT as a dataset
-            self._in_memory_vrts.append(memfile)
 
     def free_in_memory_vrts(self):
         """
