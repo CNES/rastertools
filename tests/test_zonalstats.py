@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 
 import pytest
 from pathlib import Path
@@ -131,23 +132,26 @@ def test_zonalstats_zonal(compare, save_gen_as_ref):
 
 def test_zonalstats_process_files(compare, save_gen_as_ref):
     # create output dir and clear its content if any
+    data_path = RastertoolsTestsData.tests_input_data_dir.replace(os.getcwd() + "/", "") + "/"
+    out_path = RastertoolsTestsData.tests_output_data_dir.replace(os.getcwd() + "/", "") + "/"
+
     utils4test.create_outdir()
 
-    inputfiles = [RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif",
-                  RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"]
+    inputfiles = [data_path + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif",
+                  data_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"]
     outformat = "GeoJSON"
     statistics = "min max mean std count range sum".split()
 
     tool = Zonalstats(statistics, prefix="indice")
     tool.with_output(None, output_format=outformat)
-    tool.with_geometries(geometries=RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_32xxx.geojson")
-    tool.with_chart(chart_file=RastertoolsTestsData.tests_output_data_dir + "/" + "chart.png")
+    tool.with_geometries(geometries=data_path + "COMMUNE_32xxx.geojson")
+    tool.with_chart(chart_file=out_path + "chart.png")
     tool.process_files(inputfiles)
 
     gen_files = ["chart.png"]
-    assert Path(RastertoolsTestsData.tests_output_data_dir + "/" + "chart.png").exists()
+    assert Path(out_path + "chart.png").exists()
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, gen_files)
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0

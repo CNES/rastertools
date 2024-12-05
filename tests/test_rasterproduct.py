@@ -18,7 +18,7 @@ __license__ = "Apache v2.0"
 
 from .utils4test import RastertoolsTestsData
 
-__refdir = utils4test.get_refdir("test_rasterproduct/")
+__refdir = RastertoolsTestsData.tests_ref_data_dir.replace(os.getcwd() + "/", "") + "/test_rasterproduct/"
 
 
 def test_rasterproduct_valid_parameters():
@@ -138,35 +138,38 @@ def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
         - Comparison or saving of reference files completes without errors.
         - Raster data can be opened without errors.
     """
+    data_path = RastertoolsTestsData.tests_input_data_dir.replace(os.getcwd() + "/", "") + "/"
+    out_path = RastertoolsTestsData.tests_output_data_dir.replace(os.getcwd() + "/", "") + "/"
+
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
     # unzip SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip
-    file = RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+    file = data_path + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
     with zipfile.ZipFile(file) as myzip:
-        myzip.extractall(RastertoolsTestsData.tests_output_data_dir + "/")
+        myzip.extractall(out_path)
 
     # creation of S2 L2A MAJA products
-    files = [Path(RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"),
-             Path(RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_tar.tar"),
-             Path(RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_targz.TAR.GZ"),
-             Path(RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")]
+    files = [Path(data_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"),
+             Path(data_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_tar.tar"),
+             Path(data_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_targz.TAR.GZ"),
+             Path(out_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")]
 
     for file in files:
-        with RasterProduct(file, vrt_outputdir=Path(RastertoolsTestsData.tests_output_data_dir + "/")) as prod:
-            raster = prod.get_raster(roi=Path(RastertoolsTestsData.tests_input_data_dir + "/" + "COMMUNE_32001.shp"),
+        with RasterProduct(file, vrt_outputdir=Path(out_path)) as prod:
+            raster = prod.get_raster(roi=Path(data_path + "COMMUNE_32001.shp"),
                                      masks="all")
 
             assert Path(raster).exists()
-            assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(file) + "-mask.vrt"
+            assert raster == out_path + utils4test.basename(file) + "-mask.vrt"
 
             ref = [utils4test.basename(file) + ".vrt",
                    utils4test.basename(file) + "-clipped.vrt",
                    utils4test.basename(file) + "-mask.vrt"]
 
             if compare:
-                print(f"compare {RastertoolsTestsData.tests_output_data_dir} ,{__refdir}, {ref}")
-                match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, ref)
+                print(f"compare {out_path} ,{__refdir}, {ref}")
+                match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, ref)
                 assert len(match) == len(ref)
                 assert len(mismatch) == 0
                 assert len(err) == 0
@@ -180,8 +183,9 @@ def test_create_product_S2_L2A_MAJA(compare, save_gen_as_ref):
 
         utils4test.clear_outdir(subdirs=False)
 
-# delete the dir resulting from unzip
-    utils4test.delete_dir(RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
+    # delete the dir resulting from unzip
+    utils4test.delete_dir(out_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_V1-9")
+
 
 
 def test_create_product_S2_L1C(compare, save_gen_as_ref):
@@ -202,22 +206,25 @@ def test_create_product_S2_L1C(compare, save_gen_as_ref):
         - Reference comparison or saving completes as expected.
         - Raster data can be loaded and accessed without errors.
     """
+    data_path = RastertoolsTestsData.tests_input_data_dir.replace(os.getcwd() + "/", "") + "/"
+    out_path = RastertoolsTestsData.tests_output_data_dir.replace(os.getcwd() + "/", "") + "/"
+
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
     # creation of S2 L1C product
-    infile = RastertoolsTestsData.tests_input_data_dir + "/" + "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
+    infile = data_path +  "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
 
-    with RasterProduct(infile, vrt_outputdir=RastertoolsTestsData.tests_output_data_dir + "/") as prod:
-        raster = prod.get_raster(roi=RastertoolsTestsData.tests_input_data_dir + "/" + "/COMMUNE_32001.shp",
+    with RasterProduct(infile, vrt_outputdir= out_path) as prod:
+        raster = prod.get_raster(roi= data_path + "/COMMUNE_32001.shp",
                                  masks="all")
         assert Path(raster).exists()
-        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(infile) + "-clipped.vrt"
+        assert raster == out_path + utils4test.basename(infile) + "-clipped.vrt"
 
         gen_files = [utils4test.basename(infile) + ".vrt",
                      utils4test.basename(infile) + "-clipped.vrt"]
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+            match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, gen_files)
             assert len(match) == 2
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -250,20 +257,23 @@ def test_create_product_S2_L2A_SEN2CORE(compare, save_gen_as_ref):
         - Reference file operations are successful.
         - The VRT file can be accessed with `rasterio` without issues.
     """
+    data_path = RastertoolsTestsData.tests_input_data_dir.replace(os.getcwd() + "/", "") + "/"
+    out_path = RastertoolsTestsData.tests_output_data_dir.replace(os.getcwd() + "/", "") + "/"
+
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
     # creation of S2 L2A SEN2CORE product
-    infile = RastertoolsTestsData.tests_input_data_dir + "/" + "S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip"
-    with RasterProduct(infile, vrt_outputdir=RastertoolsTestsData.tests_output_data_dir + "/") as prod:
+    infile = data_path + "S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip"
+    with RasterProduct(infile, vrt_outputdir= out_path) as prod:
         raster = prod.get_raster()
 
         assert Path(raster).exists()
-        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(infile) + ".vrt"
+        assert raster == out_path + utils4test.basename(infile) + ".vrt"
 
         gen_files = [utils4test.basename(infile) + ".vrt"]
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+            match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, gen_files)
             assert len(match) == 1
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -296,20 +306,23 @@ def test_create_product_SPOT67(compare, save_gen_as_ref):
         - Reference file comparison and saving are correctly performed.
         - Raster data opens without errors in `rasterio`.
     """
+    data_path = RastertoolsTestsData.tests_input_data_dir.replace(os.getcwd() + "/", "") + "/"
+    out_path = RastertoolsTestsData.tests_output_data_dir.replace(os.getcwd() + "/", "") + "/"
+
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
     # creation of SPOT67 product
     infile = "SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz"
-    with RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + infile, vrt_outputdir=RastertoolsTestsData.tests_output_data_dir + "/") as prod:
+    with RasterProduct(data_path + infile, vrt_outputdir= out_path) as prod:
         raster = prod.get_raster()
 
         assert Path(raster).exists()
-        assert raster == RastertoolsTestsData.tests_output_data_dir + "/" + utils4test.basename(infile) + ".vrt"
+        assert raster == out_path + utils4test.basename(infile) + ".vrt"
 
         gen_files = [utils4test.basename(infile) + ".vrt"]
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+            match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, gen_files)
             assert len(match) == 1
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -339,7 +352,6 @@ def test_create_product_special_cases():
         - Raster files can be opened without errors in `rasterio`.
     """
     # SUPPORTED CASES
-
     # creation in memory (without masks)
     file = "S2B_MSIL1C_20191008T105029_N0208_R051_T30TYP_20191008T125041.zip"
     with RasterProduct(RastertoolsTestsData.tests_input_data_dir + "/" + file) as prod:

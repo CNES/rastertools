@@ -11,6 +11,10 @@ __author = "Olivier Queyrut"
 __copyright = "Copyright 2019, CNES"
 __license = "Apache v2.0"
 
+indir = "tests/tests_data/"
+outdir = "tests/tests_out/"
+__root_refdir = "tests/tests_refs/"
+
 
 @dataclass
 class RastertoolsTestsData:
@@ -76,7 +80,6 @@ def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9) -> tuple:
         new = os.path.join(a, x)
         golden = os.path.join(b, x)
         res[_cmp(golden, new, tolerance)].append(x)
-        print(res)
     return res
 
 
