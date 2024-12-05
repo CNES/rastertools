@@ -427,7 +427,6 @@ class Radioindice(Rastertool, Windowable):
                         indices.append(indice)
 
             # get the raster
-            print(self.roi)
             raster = product.get_raster(roi=self.roi)
 
             # STEP 2: Compute the indices
@@ -545,6 +544,10 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
             # disable status of tqdm progress bar
             disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
 
+            # Dictionary to store statistics for each band
+            band_stats = {i: {"min": float('inf'), "max": float('-inf'), "sum": 0, "total_pix": 0, "count": 0}
+                          for i in range(1, len(indices) + 1)}
+
             # compute every indices
             for i, indice in enumerate(indices, 1):
                 # Get the bands necessary to compute the indice
@@ -563,6 +566,15 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
                     # The computation can be performed concurrently
                     result = indice.algo(src_array).astype(dtype).filled(indice.nodata)
 
+                    # Update statistics
+                    valid_pixels = result[result != indice.nodata]
+                    if valid_pixels.size > 0:
+                        band_stats[i]["min"] = min(band_stats[i]["min"], valid_pixels.min())
+                        band_stats[i]["max"] = max(band_stats[i]["max"], valid_pixels.max())
+                        band_stats[i]["sum"] += valid_pixels.sum()
+                        band_stats[i]["total_pix"] += result.size
+                        band_stats[i]["count"] += valid_pixels.size
+
                     with write_lock:
                         dst.write_band(i, result, window=window)
 
@@ -571,4 +583,19 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
                     process(window)
 
                 dst.set_band_description(i, indice.name)
-        src.close()
+
+            # Compute and set metadata tags
+            for i, stats in band_stats.items():
+                # Compute and set metadata tags
+                mean = stats["sum"] / stats["count"]
+                sum_sq = (stats["sum"] - mean * stats["count"]) ** 2
+                variance = sum_sq / stats["count"]
+                stddev = variance ** 0.5 if variance > 0 else 0
+
+                dst.update_tags(i,
+                                STATISTICS_MINIMUM=f"{stats['min']:.14g}",
+                                STATISTICS_MAXIMUM=f"{stats['max']:.14g}",
+                                STATISTICS_MEAN=mean,
+                                STATISTICS_STDDEV=stddev,
+                                STATISTICS_VALID_PERCENT=(stats["count"] / stats["total_pix"] * 100))
+

@@ -139,6 +139,7 @@ def compute_speed(date0: datetime, date1: datetime,
 
             profile = src0.profile
             dtype = rasterio.float32
+            nodata = src0.nodata
 
             # set block size
             blockysize = 1024 if src0.width > 1024 else utils.highest_power_of_2(src0.width)
@@ -154,6 +155,9 @@ def compute_speed(date0: datetime, date1: datetime,
                            blockxsize=blockysize, blockysize=blockxsize, tiled=True,
                            dtype=dtype, count=len(bands))
 
+            # Dictionary to store statistics for each band
+            stats = {"min": float('inf'), "max": float('-inf'), "sum": 0, "total_pix": 0, "count": 0}
+
             with rasterio.open(speed_image, "w", **profile) as dst:
                 # Materialize a list of destination block windows
                 windows = [window for ij, window in dst.block_windows()]
@@ -168,10 +172,33 @@ def compute_speed(date0: datetime, date1: datetime,
                         data1 = src1.read(bands, window=window, masked=True).astype(dtype)
 
                     # The computation can be performed concurrently
-                    result = algo.speed(data0, data1, interval).astype(dtype).filled(src0.nodata)
+                    result = algo.speed(data0, data1, interval).astype(dtype).filled(nodata)
+
+                    # Update statistics
+                    valid_pixels = result[result != nodata]
+                    if valid_pixels.size > 0:
+                        stats["min"] = min(stats["min"], valid_pixels.min())
+                        stats["max"] = max(stats["max"], valid_pixels.max())
+                        stats["sum"] += valid_pixels.sum()
+                        stats["total_pix"] += result.size
+                        stats["count"] += valid_pixels.size
 
                     with write_lock:
                         dst.write(result, window=window)
 
                 disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
                 thread_map(process, windows, disable=disable, desc="speed")
+
+                # Compute and set metadata tags
+                mean = stats["sum"] / stats["count"]
+                sum_sq = (stats["sum"] - mean * stats["count"])**2
+                variance = sum_sq / stats["count"]
+                stddev = variance ** 0.5 if variance > 0 else 0
+
+                dst.update_tags(1,
+                                STATISTICS_MINIMUM=f"{stats['min']:.14g}",
+                                STATISTICS_MAXIMUM=f"{stats['max']:.14g}",
+                                STATISTICS_MEAN=mean,
+                                STATISTICS_STDDEV=stddev,
+                                STATISTICS_VALID_PERCENT=(stats["count"] / stats["total_pix"] * 100),
+                                STATISTICS_APPROXIMATE="YES")
