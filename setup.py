@@ -18,6 +18,7 @@ if __name__ == "__main__":
               setup_requires = ["setuptools_scm"],
               install_requires=[
                   'click',
+                  'rasterio',
                   'pytest>=3.6',
                   'pytest-cov',
                   'geopandas==0.13',
