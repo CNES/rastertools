@@ -64,7 +64,7 @@ def basename(infile):
     return file.name if suffix == 0 else file.name[:-suffix]
 
 
-def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9) -> tuple:
+def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9, **kwargs) -> tuple:
     """
     Compare common files in two directories.
 
@@ -79,17 +79,17 @@ def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9) -> tuple:
     for x in common:
         new = os.path.join(a, x)
         golden = os.path.join(b, x)
-        res[_cmp(golden, new, tolerance)].append(x)
+        res[_cmp(golden, new, tolerance, **kwargs)].append(x)
     return res
 
 
-def _cmp(gld, new, tolerance):
+def _cmp(gld, new, tolerance, **kwargs):
     """
 
     """
     ftype = os.path.splitext(gld)[-1].lower()
     cmp = cmptools.CMP_FUN[ftype]
     try:
-        return not cmp(gld, new, tolerance=tolerance)
+        return not cmp(gld, new, tolerance=tolerance, **kwargs)
     except OSError:
         return 2

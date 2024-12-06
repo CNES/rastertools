@@ -3,7 +3,6 @@ import logging
 import sys
 import click
 
-#TO DO
 _logger = logging.getLogger(__name__)
 
 all_opt = click.option('-a', '--all','all_bands', type=bool, is_flag=True, help="Process all bands")
