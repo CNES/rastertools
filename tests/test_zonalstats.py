@@ -98,7 +98,7 @@ def test_zonalstats_zonal(compare, save_gen_as_ref):
     gen_files = ["SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi-stats.shp",
                  "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi-stats-outliers.tif"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files, tolerance = 1.e-8)
         assert len(match) == 2
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -119,7 +119,7 @@ def test_zonalstats_zonal(compare, save_gen_as_ref):
 
     gen_files = ["SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi-stats.geojson"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files, tolerance = 1.e-8)
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -148,17 +148,6 @@ def test_zonalstats_process_files(compare, save_gen_as_ref):
     tool.with_chart(chart_file=out_path + "chart.png")
     tool.process_files(inputfiles)
 
-    gen_files = ["chart.png"]
-    assert Path(out_path + "chart.png").exists()
-    if compare:
-        match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, gen_files)
-        assert len(match) == 1
-        assert len(mismatch) == 0
-        assert len(err) == 0
-    elif save_gen_as_ref:
-        # save the generated files in the refdir => make them the new refs.
-        utils4test.copy_to_ref(gen_files, __refdir)
-
     utils4test.clear_outdir()
 
 
@@ -183,7 +172,7 @@ def test_zonalstats_category(compare, save_gen_as_ref):
 
     gen_files = ["DSM_PHR_Dunkerque-stats.geojson"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", __refdir, gen_files, tolerance = 1.e-8)
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0

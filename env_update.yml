@@ -1,9 +1,0 @@
-name: rastertools
-
-channels:
-  - conda-forge
-
-dependencies:
-  - pyscaffold
-  - geopandas ==0.13
-  - rasterio ==1.3
