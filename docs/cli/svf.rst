@@ -40,8 +40,8 @@ too many points, the "radius" parameter defines the max distance of the pixel to
 
 .. code-block:: console
 
-  $ rastertools svf --help
-  usage: rastertools svf [-h] --radius RADIUS --directions DIRECTIONS
+  $ georastertools svf --help
+  usage: georastertools svf [-h] --radius RADIUS --directions DIRECTIONS
                          --resolution RESOLUTION [--altitude ALTITUDE]
                          [-o OUTPUT] [-ws WINDOW_SIZE]
                          [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
@@ -102,7 +102,7 @@ of buildings (for the highest building, SVF is thus 1).
 
 .. code-block:: console
 
-  $ rastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
+  $ georastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
 
 This command generates the following SVF:
 
@@ -112,7 +112,7 @@ It is also possible to compute the SVF at a specified height, for instance on gr
 
 .. code-block:: console
 
-  $ rastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
+  $ georastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
 
 The SVF is the following:
 

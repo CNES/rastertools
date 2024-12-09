@@ -5,8 +5,8 @@ import pytest
 import json
 from pathlib import Path
 from datetime import datetime
-from eolab.rastertools import add_custom_rastertypes
-from eolab.rastertools.product import RasterType, BandChannel
+from eolab.georastertools import add_custom_rastertypes
+from eolab.georastertools.product import RasterType, BandChannel
 
 __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
@@ -204,7 +204,7 @@ def test_rastertype_S2_L2A_MAJA():
     s2_l2a = RasterType.find(file)
     assert s2_l2a.name == "S2_L2A_MAJA"
 
-    assert s2_l2a.maskfunc == "eolab.rastertools.product.s2_maja_mask"
+    assert s2_l2a.maskfunc == "eolab.georastertools.product.s2_maja_mask"
     assert s2_l2a.get_date(file) == datetime(2019, 10, 25, 10, 49, 3)
     assert s2_l2a.get_group(file, "tile") == "31TCJ"
     assert s2_l2a.get_group(file, "satellite") == "SENTINEL2B"

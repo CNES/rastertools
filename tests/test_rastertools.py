@@ -7,8 +7,8 @@ import os
 from click.testing import CliRunner
 from pathlib import Path
 
-from eolab.rastertools import rastertools
-from eolab.rastertools.product import RasterType
+from eolab.georastertools import georastertools
+from eolab.georastertools.product import RasterType
 
 from . import utils4test
 
@@ -29,7 +29,7 @@ class TestCase:
         self._sys_exit = 0
 
     def __repr__(self):
-        return (f"rastertools {' '.join(self._args)}"
+        return (f"georastertools {' '.join(self._args)}"
                 f"[outputs={self._outputs}][logs={self._logs}][sys_exit={self._sys_exit}]")
 
     @property
@@ -99,7 +99,7 @@ class TestCase:
             check_logs = False
 
         try:
-            rastertools(self.args)
+            georastertools(self.args)
 
         except SystemExit as wrapped_exception:
             if check_sys_exit:
@@ -249,14 +249,14 @@ def test_radioindice_command_line_errors(caplog):
     # expected logs
     logslist = [
         [],
-        [("eolab.rastertools.cli.radioindice", logging.ERROR, "Invalid indice name: strange")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.radioindice", logging.ERROR, "Invalid indice name: strange")],
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
            "Unsupported input file, no matching raster type identified to handle the file")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           f"Unsupported input file {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.aaa")],
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.cli.radioindice", logging.ERROR,
+        [("eolab.georastertools.cli.radioindice", logging.ERROR,
           "Invalid band(s) in normalized difference: unknown and/or red")]
     ]
     sysexitlist = [2, 2, 1, 1, 2, 2]
@@ -325,11 +325,11 @@ def test_speed_command_line_errors(caplog):
     ]
     # expected logs
     logslist = [
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Can not compute speed with 1 input image. Provide at least 2 images.")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Speed can only be computed with images of the same type")]
     ]
     sysexitlist = [2, 1, 1]
@@ -409,17 +409,17 @@ def test_timeseries_command_line_errors(caplog):
     ]
     # expected logs
     logslist = [
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Can not compute a timeseries with 1 input image. Provide at least 2 images.")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           f"Unknown rastertype for input file {RastertoolsTestsData.tests_input_data_dir}/DSM_PHR_Dunkerque.tif")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Timeseries can only be computed with images of the same type")],
-        [("eolab.rastertools.cli.timeseries", logging.ERROR,
+        [("eolab.georastertools.cli.timeseries", logging.ERROR,
           "Invalid format for start date: 20180926 (must be %Y-%m-%d)")],
-        [("eolab.rastertools.cli.timeseries", logging.ERROR,
+        [("eolab.georastertools.cli.timeseries", logging.ERROR,
           "Invalid format for end date: 20181107 (must be %Y-%m-%d)")]
     ]
     sysexitlist = [2, 1, 1, 1, 2, 2]
@@ -540,16 +540,16 @@ def test_zonalstats_command_line_errors():
     ]
 
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Invalid bands, all values are not in range [1, 1]")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Unrecognized output format Truc. Possible values are ")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Index 'truc' is not present in the geometries."
           " Please provide a valid value for -gi option.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Number of prefix does not equal the number of bands.")],
     ]
 
@@ -627,9 +627,9 @@ def test_tiling_command_line_special_case(caplog):
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "The grid column \"id\" does not contain the following values: [1, 2]")],
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "Input shape 78 does not overlap raster")]
     ]
 
@@ -662,13 +662,13 @@ def test_tiling_command_line_errors(caplog):
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "Ids cannot be specified when id_col is not defined")],
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "Invalid id column named \"truc\": it does not exist in the grid")],
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "No value in the grid column \"id\" are matching the given list of ids [1, 2]")]
     ]
     sysexitlist = [2, 2, 2, 2]
@@ -732,10 +732,10 @@ def test_filtering_command_line_errors(caplog):
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "The kernel size (option --kernel_size, value=15) must be strictly less than the "
           "window size minus 1 (option --window_size, value=16)")]
     ]
@@ -793,10 +793,10 @@ def test_svf_command_line_errors(caplog):
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "The radius (option --radius, value=100) must be strictly less than half the"
           " size of the window (option --window_size, value=128)")]
     ]
@@ -865,12 +865,12 @@ def test_hillshade_command_line_errors(caplog):
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.rastertools", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Invalid input file, it must contain a single band.")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "The radius (option --radius, value=100) must be strictly less than half"
           " the size of the window (option --window_size, value=128)")]
     ]

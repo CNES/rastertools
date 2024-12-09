@@ -15,9 +15,9 @@ and may thus contain the same gaps as the input raster.
 
 .. code-block:: console
 
-  $ rastertools timeseries --help
+  $ georastertools timeseries --help
 
-  usage: rastertools timeseries [-h] [-b BANDS [BANDS ...]] [-a] [-o OUTPUT]
+  usage: georastertools timeseries [-h] [-b BANDS [BANDS ...]] [-a] [-o OUTPUT]
                                 [-s START_DATE] [-e END_DATE] [-p TIME_PERIOD]
                                 [-ws WINDOW_SIZE]
                                 inputs [inputs ...]
@@ -57,7 +57,7 @@ and may thus contain the same gaps as the input raster.
 
 .. warning::
   At least two input rasters must be given. The rasters must match one of the configured raster types,
-  either a built-in raster type or a custom raster type defined with option -t of ``rastertools``.
+  either a built-in raster type or a custom raster type defined with option -t of ``georastertools``.
   See section "Raster types". The raster type must define where to get the date of the product
   in the filename.
 
@@ -65,7 +65,7 @@ Example:
 
 .. code-block:: console
 
-  $ rastertools timeseries ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D-ndvi.zip ./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif -s 2018-05-21 -e 2018-10-25 -p 10 -ws 512
+  $ georastertools timeseries ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D-ndvi.zip ./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif -s 2018-05-21 -e 2018-10-25 -p 10 -ws 512
 
 This command generates rasters from 2018-05-21 until 2018-10-25 with a timeperiod between
 two consecutive images of 10 days (2018-05-21, 2018-05-31, 2018-06-10, ...).

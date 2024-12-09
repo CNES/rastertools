@@ -3,7 +3,7 @@
 
 import rasterio as rio
 
-from eolab.rastertools.processing import RasterProcessing, compute_sliding
+from eolab.georastertools.processing import RasterProcessing, compute_sliding
 
 from . import utils4test
 

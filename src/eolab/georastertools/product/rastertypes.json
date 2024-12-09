@@ -1,0 +1,298 @@
+{
+	"rastertypes": [
+		{
+			"name": "S2_L1C",
+			"product_pattern": "^(?P<satellite>S2[AB])_MSIL1C_(?P<date>[0-9T]*)_N\\d*_R(?P<relorbit>\\d*)_T(?P<tile>.*)_.*$",
+			"bands_pattern": "^.*_[0-9T]*_(?P<bands>{})\\.jp2$",
+			"bands": [
+				{
+					"channel": "blue",
+					"identifier": "B02",
+					"description": "Band 2 (490nm)"
+				},
+				{
+					"channel": "green",
+					"identifier": "B03",
+					"description": "Band 3 (560nm)"
+				},
+				{
+					"channel": "red",
+					"identifier": "B04",
+					"description": "Band 4 (665nm)"
+				},
+				{
+					"channel": "nir",
+					"identifier": "B08",
+					"description": "Band 8 (842nm)"
+				},
+				{
+					"channel": "mir",
+					"identifier": "B11",
+					"description": "Band 11 (1610nm)"
+				},
+				{
+					"channel": "swir",
+					"identifier": "B12",
+					"description": "Band 12 (2190nm)"
+				},
+				{
+					"channel": "red_edge1",
+					"identifier": "B05",
+					"description": "Band 5 (705nm)"
+				},
+				{
+					"channel": "red_edge2",
+					"identifier": "B06",
+					"description": "Band 6 (740nm)"
+				},
+				{
+					"channel": "red_edge3",
+					"identifier": "B07",
+					"description": "Band 7 (783nm)"
+				},
+				{
+					"channel": "red_edge4",
+					"identifier": "B8A",
+					"description": "Band 8a (865nm)"
+				},
+				{
+					"channel": "blue_60m",
+					"identifier": "B01",
+					"description": "Band 1 (443nm)"
+				},
+				{
+					"channel": "nir_60m",
+					"identifier": "B09",
+					"description": "Band 9 (940nm)"
+				},
+				{
+					"channel": "mir_60m",
+					"identifier": "B10",
+					"description": "Band 10 (1375nm)"
+				}
+			],
+			"date_format": "%Y%m%dT%H%M%S",
+			"nodata": 0
+		},
+		{
+			"name": "S2_L2A_SEN2CORE",
+			"product_pattern": "^(?P<satellite>S2[AB])_MSIL2A_(?P<date>[0-9T]*)_N\\d*_R(?P<relorbit>\\d*)_T(?P<tile>.*)_.*$",
+			"bands_pattern": "^.*_[0-9T]*_(?P<bands>{})\\.jp2$",
+			"bands": [
+				{
+					"channel": "blue",
+					"identifier": "B02_10m",
+					"description": "Band 2 (490nm)"
+				},
+				{
+					"channel": "green",
+					"identifier": "B03_10m",
+					"description": "Band 3 (560nm)"
+				},
+				{
+					"channel": "red",
+					"identifier": "B04_10m",
+					"description": "Band 4 (665nm)"
+				},
+				{
+					"channel": "nir",
+					"identifier": "B08_10m",
+					"description": "Band 8 (842nm)"
+				},
+				{
+					"channel": "mir",
+					"identifier": "B11_20m",
+					"description": "Band 11 (1610nm)"
+				},
+				{
+					"channel": "swir",
+					"identifier": "B12_20m",
+					"description": "Band 12 (2190nm)"
+				},
+				{
+					"channel": "red_edge1",
+					"identifier": "B05_20m",
+					"description": "Band 5 (705nm)"
+				},
+				{
+					"channel": "red_edge2",
+					"identifier": "B06_20m",
+					"description": "Band 6 (740nm)"
+				},
+				{
+					"channel": "red_edge3",
+					"identifier": "B07_20m",
+					"description": "Band 7 (783nm)"
+				},
+				{
+					"channel": "red_edge4",
+					"identifier": "B8A_20m",
+					"description": "Band 8a (865nm)"
+				},
+				{
+					"channel": "blue_60m",
+					"identifier": "B01_60m",
+					"description": "Band 1 (443nm)"
+				},
+				{
+					"channel": "nir_60m",
+					"identifier": "B09_60m",
+					"description": "Band 9 (940nm)"
+				}
+			],
+			"date_format": "%Y%m%dT%H%M%S",
+			"nodata": 0
+		},
+		{
+			"name": "S2_L2A_MAJA",
+			"product_pattern": "^(?P<satellite>SENTINEL2[AB])_(?P<date>[0-9\\-]{15}).*_L2A_T(?P<tile>.*)_.*$",
+			"bands_pattern": "^SENTINEL2.*_(?P<bands>{})\\.(tif|TIF|vrt|VRT)$",
+			"bands": [
+				{
+					"channel": "blue",
+					"identifier": "FRE_B2",
+					"description": "Band 2 (490nm)"
+				},
+				{
+					"channel": "green",
+					"identifier": "FRE_B3",
+					"description": "Band 3 (560nm)"
+				},
+				{
+					"channel": "red",
+					"identifier": "FRE_B4",
+					"description": "Band 4 (665nm)"
+				},
+				{
+					"channel": "nir",
+					"identifier": "FRE_B8",
+					"description": "Band 8 (842nm)"
+				},
+				{
+					"channel": "mir",
+					"identifier": "FRE_B11",
+					"description": "Band 11 (1610nm)"
+				},
+				{
+					"channel": "swir",
+					"identifier": "FRE_B12",
+					"description": "Band 12 (2190nm)"
+				},
+				{
+					"channel": "red_edge1",
+					"identifier": "FRE_B5",
+					"description": "Band 5 (705nm)"
+				},
+				{
+					"channel": "red_edge2",
+					"identifier": "FRE_B6",
+					"description": "Band 6 (740nm)"
+				},
+				{
+					"channel": "red_edge3",
+					"identifier": "FRE_B7",
+					"description": "Band 7 (783nm)"
+				},
+				{
+					"channel": "red_edge4",
+					"identifier": "FRE_B8A",
+					"description": "Band 8a (865nm)"
+				}
+			],
+			"masks": [
+				{
+					"identifier": "CLM_R1"
+				},
+				{
+					"identifier": "SAT_R1"
+				},
+				{
+					"identifier": "EDG_R1"
+				}
+			],
+			"date_format": "%Y%m%d-%H%M%S",
+			"maskfunc": "eolab.georastertools.product.s2_maja_mask"
+		},
+		{
+			"name": "S2_L3A_THEIA",
+			"product_pattern": "^(?P<satellite>SENTINEL2X)_(?P<date>[0-9\\-]{15}).*_L3A_T(?P<tile>.*)_.*$",
+			"bands_pattern": "^SENTINEL2.*_(?P<bands>{})\\.(tif|TIF|vrt|VRT)$",
+			"bands": [
+				{
+					"channel": "blue",
+					"identifier": "FRC_B2",
+					"description": "Band 2 (490nm)"
+				},
+				{
+					"channel": "green",
+					"identifier": "FRC_B3",
+					"description": "Band 3 (560nm)"
+				},
+				{
+					"channel": "red",
+					"identifier": "FRC_B4",
+					"description": "Band 4 (665nm)"
+				},
+				{
+					"channel": "nir",
+					"identifier": "FRC_B8",
+					"description": "Band 8 (842nm)"
+				},
+				{
+					"channel": "mir",
+					"identifier": "FRC_B11",
+					"description": "Band 11 (1610nm)"
+				},
+				{
+					"channel": "swir",
+					"identifier": "FRC_B12",
+					"description": "Band 12 (2190nm)"
+				},
+				{
+					"channel": "red_edge1",
+					"identifier": "FRC_B5",
+					"description": "Band 5 (705nm)"
+				},
+				{
+					"channel": "red_edge2",
+					"identifier": "FRC_B6",
+					"description": "Band 6 (740nm)"
+				},
+				{
+					"channel": "red_edge3",
+					"identifier": "FRC_B7",
+					"description": "Band 7 (783nm)"
+				},
+				{
+					"channel": "red_edge4",
+					"identifier": "FRC_B8A",
+					"description": "Band 8a (865nm)"
+				}
+			],
+			"date_format": "%Y%m%d-%H%M%S"
+		},
+		{
+			"name": "SPOT67_GEOSUD",
+			"product_pattern": "^(?P<satellite>SPOT.)_[0-9]{4}_.*_GEOSUD_MS_.*$",
+			"bands_pattern": "^.*IMG_SPOT._MS_.*\\.(tif|TIF)$",
+			"bands": [
+				{
+					"channel": "red",
+					"description": "Rouge (625-695 nm)"
+				},
+				{
+					"channel": "green",
+					"description": "Vert (530-590 nm)"
+				},
+				{
+					"channel": "blue",
+					"description": "Bleu (450-520 nm)"
+				},
+				{
+					"channel": "nir",
+					"description": "Infrarouge proche (760-890 nm)"
+				}
+			]
+		}
+	]
+}

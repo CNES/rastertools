@@ -3,9 +3,9 @@
 import os
 
 import logging
-from eolab.rastertools import Radioindice
-from eolab.rastertools.processing.rasterproc import RadioindiceProcessing
-from eolab.rastertools.product.rastertype import BandChannel
+from eolab.georastertools import Radioindice
+from eolab.georastertools.processing.rasterproc import RadioindiceProcessing
+from eolab.georastertools.product.rastertype import BandChannel
 
 from . import utils4test
 
@@ -158,7 +158,7 @@ def test_radioindice_incompatible_indice_rastertype(caplog):
     outputs = tool.process_file(inputfile)
 
     assert len(outputs) == 0
-    exp_log = ("eolab.rastertools.radioindice", logging.ERROR,
+    exp_log = ("eolab.georastertools.radioindice", logging.ERROR,
                f"Can not compute my_indice for {file}: "
                "raster product does not contain all required bands.")
     assert caplog.record_tuples[0] == exp_log

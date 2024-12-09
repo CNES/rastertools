@@ -4,7 +4,7 @@
 Raster types
 ============
 
-Some of the **rastertools** can only handle input raster files of a recognized raster type.
+Some of the **georastertools** can only handle input raster files of a recognized raster type.
 
 This concerns ``radioindice``, ``speed`` and also ``zonalstats`` when this latter is asked to plot the statistics. 
 In these 3 cases, the tool needs to know the available raster bands (``radioindice``) or to extract the
@@ -23,7 +23,7 @@ can be read by rasterio.
 Built-in raster types
 ---------------------
 
-**rastertools** has several built-in raster types:
+**georastertools** has several built-in raster types:
 
 .. list-table:: Built-in raster types
    :widths: 20 20 15 15 15 15
@@ -39,7 +39,7 @@ Built-in raster types
      - ^SENTINEL2._(?P<date>[0-9\-]{15}).*_L2A_T(?P<tile>.*)_.*$
      - ^SENTINEL2.*_(?P<bands>{})\.(tif|TIF|vrt|VRT)$
      - %Y%m%d-%H%M%S
-     - eolab.rastertools.product.vrt.s2_maja_mask
+     - eolab.georastertools.product.vrt.s2_maja_mask
      - -10000
    * - Sentinel-2 L3A THEIA
      - ^SENTINEL2X_(?P<date>[0-9\-]{15}).*_L3A_T(?P<tile>.*)_.*$
@@ -69,7 +69,7 @@ Built-in raster types
 Add custom raster types
 -----------------------
 
-**rastertools** CLI has a special argument ``-t`` that allows to define custom raster types. This argument must
+**georastertools** CLI has a special argument ``-t`` that allows to define custom raster types. This argument must
 be set with the path to a JSON file that contains the new raster types definitions.
 
-The structure of the JSON file is described in :obj:`eolab.rastertools.add_custom_rastertypes`
+The structure of the JSON file is described in :obj:`eolab.georastertools.add_custom_rastertypes`
