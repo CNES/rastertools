@@ -7,6 +7,7 @@ to clouds for instance). The timeseries is generated with a linear interpolation
 thus enabling to fill gaps.
 """
 from datetime import datetime, timedelta
+from idlelib.format import reformat_paragraph
 from itertools import repeat
 import logging
 import logging.config
@@ -18,6 +19,7 @@ from typing import Dict, List
 
 import numpy as np
 import rasterio
+from osgeo import gdal
 from tqdm.contrib.concurrent import process_map
 
 from eolab.rastertools import utils
@@ -219,12 +221,22 @@ def _interpolate_xarray(products_dates, products_per_date,
     # Use of the lock to avoid writing in //
     with write_lock:
         for i, img in enumerate(timeseries_images):
-            # Remove unexpected keys
-            unwanted_keys = ['long_name', 'STATISTICS_APPROXIMATE', 'STATISTICS_MAXIMUM',
-                             'STATISTICS_MEAN', 'STATISTICS_MINIMUM', 'STATISTICS_STDDEV',
-                             'STATISTICS_VALID_PERCENT']
-            output[i].attrs = {k: v for k, v in output[i].attrs.items() if k not in unwanted_keys}
-
             output[i].rio.write_crs(crs, inplace=True)
-            output[i].rio.write_nodata(-2.0, inplace=True)
-            output[i].rio.to_raster(img, nodata=-2.0, dtype=dtype)
+            output[i].rio.write_nodata(0, inplace=True)
+            output[i].rio.to_raster(img, nodata=0, dtype=dtype)
+
+    # ref_path = 'tests/tests_refs/test_timeseries/SENTINEL2A_20181016-000000-685_L2A_T30TYP_D-ndvi-timeseries.tif'
+    # ref = gdal.Open(ref_path)
+    # band_ref = ref.GetRasterBand(1)
+    #
+    # # Read the band as a NumPy array
+    # band_ref = band_ref.ReadAsArray()
+    #
+    # out_path = 'tests/tests_out/SENTINEL2A_20181016-000000-685_L2A_T30TYP_D-ndvi-timeseries.tif'
+    # out = gdal.Open(out_path)
+    # band_out = ref.GetRasterBand(1)
+    #
+    # # Read the band as a NumPy array
+    # band_out = band_out.ReadAsArray()
+    #
+    # print(np.sum(band_out == band_ref))

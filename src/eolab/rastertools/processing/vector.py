@@ -19,7 +19,6 @@ from rasterio import features, warp, windows
 from shapely.geometry import Polygon
 
 from eolab.rastertools import utils
-from eolab.rastertools.utils import vsimem_to_rasterio
 
 
 def _get_geoms(geoms: Union[gpd.GeoDataFrame, Path, str]) -> gpd.GeoDataFrame:
@@ -167,18 +166,29 @@ def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
     geoms_crs = _get_geoms_crs(geometries)
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
-    raster = vsimem_to_rasterio(file)
-    raster_crs = raster.crs
+    with rasterio.open(file) as dataset:
+        if (geoms_crs != dataset.crs):
+            reprojected_geoms = geometries.to_crs(dataset.crs)
+        else:
+            reprojected_geoms = geometries
 
-    # Reproject geometries to match raster CRS
-    if geoms_crs != raster_crs:
-        reprojected_geoms = geometries.to_crs(raster_crs)
-    else:
-        reprojected_geoms = geometries
+        if output:
+            outfile = output.as_posix() if isinstance(output, Path) else output
+            reprojected_geoms.to_file(outfile, driver=driver)
 
-    # Optionally save the reprojected geometries
-    if output:
-        reprojected_geoms.to_file(output, driver=driver)
+    # file = raster.as_posix() if isinstance(raster, Path) else raster
+    # raster = vsimem_to_rasterio(file)
+    # raster_crs = raster.crs
+    #
+    # # Reproject geometries to match raster CRS
+    # if geoms_crs != raster_crs:
+    #     reprojected_geoms = geometries.to_crs(raster_crs)
+    # else:
+    #     reprojected_geoms = geometries
+    #
+    # # Optionally save the reprojected geometries
+    # if output:
+    #     reprojected_geoms.to_file(output, driver=driver)
 
     return reprojected_geoms
 
@@ -334,23 +344,24 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
     geometries = reproject(dissolve(roi), pinput)
     geom_bounds = geometries.total_bounds
 
-    raster = vsimem_to_rasterio(pinput)
-    rst_bounds = raster.bounds
-    bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
-              math.floor(max(rst_bounds[1], geom_bounds[1])),
-              math.ceil(min(rst_bounds[2], geom_bounds[2])),
-              math.ceil(min(rst_bounds[3], geom_bounds[3])))
-    geotransform = raster.get_transform()
-    width = np.abs(geotransform[1])
-    height = np.abs(geotransform[5])
+    with rasterio.open(pinput) as raster:
+        rst_bounds = raster.bounds
+        bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
+                  math.floor(max(rst_bounds[1], geom_bounds[1])),
+                  math.ceil(min(rst_bounds[2], geom_bounds[2])),
+                  math.ceil(min(rst_bounds[3], geom_bounds[3])))
+        geotransform = raster.get_transform()
+        width = np.abs(geotransform[1])
+        height = np.abs(geotransform[5])
 
-    ds = gdal.Warp(destNameOrDestDS=poutput,
-                   srcDSOrSrcDSTab=pinput,
-                   outputBounds=bounds, targetAlignedPixels=True,
-                   cutlineDSName=roi,
-                   cropToCutline=False,
-                   xRes=width, yRes=height,
-                   format="VRT")
+        ds = gdal.Warp(destNameOrDestDS=poutput,
+                       srcDSOrSrcDSTab=pinput,
+                       outputBounds=bounds, targetAlignedPixels=True,
+                       cutlineDSName=roi,
+                       cropToCutline=False,
+                       xRes=width, yRes=height,
+                       format="VRT")
+
     del ds
 
 

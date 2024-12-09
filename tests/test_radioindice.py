@@ -84,6 +84,7 @@ def test_radioindice_process_file_separate(compare : bool, save_gen_as_ref : boo
     gen_files = [inputfile + "-ndvi.tif", inputfile + "-ndwi.tif"]
     if compare:
         match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+        print(mismatch)
         assert len(match) == 2
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -91,7 +92,7 @@ def test_radioindice_process_file_separate(compare : bool, save_gen_as_ref : boo
         # save the generated files in the refdir => make them the new refs.
         utils4test.copy_to_ref(gen_files, __refdir)
 
-    # utils4test.clear_outdir()
+    utils4test.clear_outdir()
 
 
 def test_radioindice_process_files():

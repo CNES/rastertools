@@ -177,8 +177,10 @@ class Tiling(Rastertool):
                 _logger.info("Crop and export tile " + str(i) + "...")
 
                 try:
+                    print(raster.rio.crs)
+                    print(shape)
                     # Generate mask to crop the raster to the geometry
-                    masked_raster = raster.rio.clip([shape], crs, from_disk=True, all_touched=True)
+                    masked_raster = raster.rio.clip([shape], crs, from_disk=True, all_touched=True, drop=False)
 
                     # Get the original raster's transform and resolution
                     original_transform = raster.rio.transform()

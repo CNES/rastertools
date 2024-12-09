@@ -34,7 +34,6 @@ Requires-Dist: Pillow==9.2.0
 Requires-Dist: sphinx_rtd_theme==3.0.1
 Requires-Dist: pip==24.2
 Requires-Dist: dask
-Requires-Dist: rioxarray
 Requires-Dist: xarray==2022.11.0
 Requires-Dist: pyproj==3.4.0
 Requires-Dist: sphinx==7.1.2

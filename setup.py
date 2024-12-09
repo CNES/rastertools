@@ -43,7 +43,7 @@ if __name__ == "__main__":
                   'sphinx_rtd_theme==3.0.1',
                   'pip==24.2',
                   'dask',
-                  'rioxarray',
+                  # 'rioxarray',
                   'xarray==2022.11.0',
                   'pyproj==3.4.0',
                   'sphinx==7.1.2',

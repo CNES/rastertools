@@ -514,7 +514,11 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
 
             # Attach statistics to the raster using Rasterio
             with rasterio.open(indice_image, "r+") as dataset:
+
+                dataset.nodata = -2.0
                 for band_idx in range(1, dataset.count + 1):
+                    print(dataset.tags(band_idx))
+
                     band = dataset.read(band_idx, masked=True)
                     band = np.ma.masked_invalid(band)  # Handle NaN values
 

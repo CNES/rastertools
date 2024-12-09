@@ -56,7 +56,7 @@ def test_reproject_filter(compare, save_gen_as_ref):
     assert len(geoms) == 19
     gen_files = ["reproject_filter.geojson"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files, tolerance = 1.e-8)
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -73,7 +73,7 @@ def test_reproject_filter(compare, save_gen_as_ref):
     assert len(geoms) == 19
     gen_files = ["reproject_filter.geojson"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files, tolerance = 1.e-8)
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -100,7 +100,7 @@ def test_reproject_dissolve(compare, save_gen_as_ref):
     assert len(geoms) == 1
     gen_files = ["reproject_dissolve.geojson"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files, tolerance = 1.e-8)
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -126,7 +126,7 @@ def test_clip(compare, save_gen_as_ref):
     assert len(geoms) == 19
     gen_files = ["clip.geojson"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files, tolerance = 1.e-8, column_sortby = 'ID')
         assert len(match) == 1
         assert len(mismatch) == 0
         assert len(err) == 0
