@@ -17,8 +17,8 @@ cities using:
 
 .. code-block:: console
 
-  $ rastertools zonalstats --help
-  usage: rastertools zonalstats [-h] [-o OUTPUT] [-f OUTPUT_FORMAT]
+  $ georastertools zonalstats --help
+  usage: georastertools zonalstats [-h] [-o OUTPUT] [-f OUTPUT_FORMAT]
                                 [-g GEOMETRIES] [-w] [--stats STATS [STATS ...]]
                                 [--categorical]
                                 [--valid_threshold VALID_THRESHOLD] [--area]
@@ -120,7 +120,7 @@ The first command generates statistics of ndvi values for several cities
 
 .. code-block:: console
 
-  $ rastertools zs -f GeoJSON -g COMMUNE_32.geojson --stats min max mean std SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif
+  $ georastertools zs -f GeoJSON -g COMMUNE_32.geojson --stats min max mean std SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif
 
 This generates a new vector file that contains for each entity the stats values.
 
@@ -131,7 +131,7 @@ To disable the computation for these cities, use option --within.
 
 .. code-block:: console
 
-  $ rastertools zs -f GeoJSON -g COMMUNE_32.geojson --within --stats min max mean std SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif
+  $ georastertools zs -f GeoJSON -g COMMUNE_32.geojson --within --stats min max mean std SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif
 
 The new vector file is now:
 
@@ -144,7 +144,7 @@ The following command line enables to count the pixels of every classes:
 
 .. code-block:: console
 
-  $ rastertools zs -f GeoJSON --categorical OCS_2017_CESBIO.tif
+  $ georastertools zs -f GeoJSON --categorical OCS_2017_CESBIO.tif
 
 The generated vector file contains one geometry (a green square that corresponds to the shape of the
 input raster) with the number of pixels for each category:

@@ -7,8 +7,8 @@ radioindice
 
 .. code-block:: console
 
-  $ rastertools radioindice --help
-  usage: rastertools radioindice [-h] [-o OUTPUT] [-m] [-r ROI]
+  $ georastertools radioindice --help
+  usage: georastertools radioindice [-h] [-o OUTPUT] [-m] [-r ROI]
                                  [-i INDICES [INDICES ...]] [--ndvi] [--tndvi]
                                  [--rvi] [--pvi] [--savi] [--tsavi] [--msavi]
                                  [--msavi2] [--ipvi] [--evi] [--ndwi] [--ndwi2]
@@ -70,7 +70,7 @@ radioindice
                                       bands defineda s parameter of this option,
                                       e.g. "-nd red nir" will compute (red-
                                       nir)/(red+nir). See
-                                      eolab.rastertools.product.rastertype.
+                                      eolab.georastertools.product.rastertype.
                                       BandChannel for the list of
                                       bands names. Several nd options can be set
                                       to compute several normalized differences.
@@ -80,7 +80,7 @@ radioindice
 
 .. warning::
   ``radioindice`` only accepts input files that match one of the configured raster types, either a built-in raster type
-  or a custom raster type defined with option -t of ``rastertools``. See section "Raster types".
+  or a custom raster type defined with option -t of ``georastertools``. See section "Raster types".
 
 Examples :
 
@@ -94,7 +94,7 @@ a black line.
 
 .. code-block:: console
 
-  $ rastertools radioindice -r "./COMMUNE_32001.shp" --ndvi ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
+  $ georastertools radioindice -r "./COMMUNE_32001.shp" --ndvi ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
 
 The generated NDVI image is:
 
@@ -104,7 +104,7 @@ The second command computes two indices (NDVI and NDWI) of the same input image.
 
 .. code-block:: console
   
-  $ rastertools radioindice -i ndvi ndwi -m ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
+  $ georastertools radioindice -i ndvi ndwi -m ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
 
 The generated image has two bands (because option -m is activated): first one is the ndvi, second one is the ndwi. If -m option
 is not activated, two images would be generated, one image per indice.

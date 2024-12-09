@@ -8,8 +8,8 @@ file.
 
 .. code-block:: console
 
-  $ rastertools tiling --help
-  usage: rastertools tiling [-h] -g GRID_FILE [--id_col ID_COLUMN]
+  $ georastertools tiling --help
+  usage: georastertools tiling [-h] -g GRID_FILE [--id_col ID_COLUMN]
                             [--id ID [ID ...]] [-o OUTPUT] [-n OUTPUT_NAME]
                             [-d SUBDIR_NAME]
                             inputs [inputs ...]
@@ -60,14 +60,14 @@ The grid and the image only overlap on the cells 1 and 2.
 
 * example 1::
 
-    rastertools -v ti -g grid.geojson image.tif
+    georastertools -v ti -g grid.geojson image.tif
 
 This command will return 2 files in the current directory named *image_tile1.tif* et *image_tile2.tif*
 corresponding to the cells 1 and 2. The command will return an error for cells 3 and 4 because they do not overlap the raster image.
 
 * exemple 2::
 
-    rastertools -v ti -g grid.geojson image.tif --id 2 4 --name output_{1}.tif 
+    georastertools -v ti -g grid.geojson image.tif --id 2 4 --name output_{1}.tif
 
 This command will return 1 file in the current directory named *output_2.tif* and will return an error for cell 4 because this cell
 does not overlap the raster image.

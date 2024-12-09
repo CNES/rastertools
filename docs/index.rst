@@ -1,8 +1,8 @@
 ============
-Rastertools
+georastertools
 ============
 
-This project consists in a command line named **rastertools** that enables to run several processing on raster files, typically
+This project consists in a command line named **georastertools** that enables to run several processing on raster files, typically
 Sentinel2 raster images:
 
 - compute radiometric indices (e.g. ndvi).
@@ -15,7 +15,7 @@ Sentinel2 raster images:
 - apply a filter (median, local sum, local mean, adaptive gaussian)
 - compute the Sky View Factor and the Hillshades of input rasters that represent a Digital Surface/Elevation/Height Model.
 
-The aim of **rastertools** is also to make the use of the following raster products transparent:
+The aim of **georastertools** is also to make the use of the following raster products transparent:
 
 - Sentinel-2 L1C PEPS (available here: https://peps.cnes.fr/rocket/#/search)
 - Sentinel-2 L2A PEPS (available here: https://peps.cnes.fr/rocket/#/search)
@@ -23,14 +23,14 @@ The aim of **rastertools** is also to make the use of the following raster produ
 - Sentinel-2 L3A THEIA (available here: https://theia.cnes.fr/atdistrib/rocket/#/search?collection=SENTINEL2)
 - SPOT 6/7 Ortho GEOSUD (available here: http://ids.equipex-geosud.fr/web/guest/catalog)
 
-**rastertools** accept any of this raster product as input files. No need to unpack the archive to get
+**georastertools** accept any of this raster product as input files. No need to unpack the archive to get
 the raster files containing the different bands, to merge the bands, extract the region of interest and
-so on: **rastertools** does it.
+so on: **georastertools** does it.
 
-**rastertools** also accepts additional custom raster types. The new raster types shall be defined in a
-JSON file and provided as an argument of the rastertools CLI (cf. Usage)
+**georastertools** also accepts additional custom raster types. The new raster types shall be defined in a
+JSON file and provided as an argument of the georastertools CLI (cf. Usage)
 
-**rastertools** has a public API that enables to activate all the tools and extend their capabilities (e.g.
+**georastertools** has a public API that enables to activate all the tools and extend their capabilities (e.g.
 add a new radiometric indice).
 
 

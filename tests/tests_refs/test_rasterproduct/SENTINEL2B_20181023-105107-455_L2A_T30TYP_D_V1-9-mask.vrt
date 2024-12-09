@@ -132,7 +132,7 @@
         <DstRect xOff="0" yOff="0" xSize="860" ySize="881" />
       </SimpleSource>
       <PixelFunctionLanguage>Python</PixelFunctionLanguage>
-      <PixelFunctionType>eolab.rastertools.product.s2_maja_mask</PixelFunctionType>
+      <PixelFunctionType>eolab.georastertools.product.s2_maja_mask</PixelFunctionType>
     </VRTRasterBand>
   </MaskBand>
 </VRTDataset>

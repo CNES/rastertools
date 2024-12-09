@@ -4,7 +4,7 @@
 import geopandas as gpd
 from pathlib import Path
 
-from eolab.rastertools.processing import vector
+from eolab.georastertools.processing import vector
 
 from . import utils4test
 

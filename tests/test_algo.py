@@ -4,7 +4,7 @@
 import numpy as np
 import numpy.ma as ma
 
-from eolab.rastertools.processing import algo
+from eolab.georastertools.processing import algo
 
 __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"

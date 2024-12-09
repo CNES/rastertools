@@ -9,8 +9,8 @@ computes the shadows of the ground surface (buildings, trees, etc.).
 
 .. code-block:: console
 
-  $ rastertools hillshade --help
-  usage: rastertools hillshade [-h] --elevation ELEVATION --azimuth AZIMUTH
+  $ georastertools hillshade --help
+  usage: georastertools hillshade [-h] --elevation ELEVATION --azimuth AZIMUTH
                                [--radius RADIUS] --resolution RESOLUTION
                                [-o OUTPUT] [-ws WINDOW_SIZE]
                                [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
@@ -66,9 +66,9 @@ hours (8:00AM, noon, 6:00PM) of 21st June:
 
 .. code-block:: console
 
-  $ rastertools hillshade --elevation 27.2 --azimuth 82.64 --resolution 0.5 toulouse-mnh.tif
-  $ rastertools hillshade --elevation 69.83 --azimuth 180 --resolution 0.5 toulouse-mnh.tif
-  $ rastertools hillshade --elevation 25.82 --azimuth 278.58 --resolution 0.5 toulouse-mnh.tif
+  $ georastertools hillshade --elevation 27.2 --azimuth 82.64 --resolution 0.5 toulouse-mnh.tif
+  $ georastertools hillshade --elevation 69.83 --azimuth 180 --resolution 0.5 toulouse-mnh.tif
+  $ georastertools hillshade --elevation 25.82 --azimuth 278.58 --resolution 0.5 toulouse-mnh.tif
 
 The generated images are rendered with QGis:
 - first layer contains the hillshade (value 0 is masked)

@@ -4,8 +4,8 @@ import os
 
 import pytest
 from pathlib import Path
-from eolab.rastertools import Zonalstats
-from eolab.rastertools import RastertoolConfigurationException
+from eolab.georastertools import Zonalstats
+from eolab.georastertools import RastertoolConfigurationException
 
 from . import utils4test
 

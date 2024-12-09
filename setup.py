@@ -3,10 +3,14 @@ from setuptools import setup, find_packages
 
 if __name__ == "__main__":
     try:
-        setup(name='rastertools',
+        with open("README.rst", "r", encoding="utf-8") as fh:
+            long_description = fh.read()
+
+        setup(name='georastertools',
               version="0.1.0",
-              description=u"Collection of tools for raster data",
-              long_description="",
+              description="Collection of tools for raster data",
+              long_description=long_description,
+              long_description_content_type="text/x-rst",
               classifiers=[],
               keywords='',
               author=u"Olivier Queyrut",
@@ -36,7 +40,7 @@ if __name__ == "__main__":
               ],
               entry_points="""
                 [rasterio.rio_plugins]
-                rastertools=eolab.rastertools.main:rastertools
+                georastertools=eolab.georastertools.main:georastertools
                 """,
               python_requires='==3.8.13',
               use_scm_version={"version_scheme": "no-guess-dev"})

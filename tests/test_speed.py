@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from eolab.rastertools import Speed
-from eolab.rastertools.product import RasterType
+from eolab.georastertools import Speed
+from eolab.georastertools.product import RasterType
 
 from . import utils4test
 

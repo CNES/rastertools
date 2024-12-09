@@ -7,8 +7,8 @@ speed
 
 .. code-block:: console
 
-  $ rastertools speed --help
-  usage: rastertools speed [-h] [-b BANDS [BANDS ...]] [-a] [-o OUTPUT]
+  $ georastertools speed --help
+  usage: georastertools speed [-h] [-b BANDS [BANDS ...]] [-a] [-o OUTPUT]
                            inputs [inputs ...]
 
   Compute the speed of radiometric values for multiple raster images.
@@ -35,14 +35,14 @@ speed
 
 .. warning::
   At least two input rasters must be given. The rasters must match one of the configured raster types,
-  either a built-in raster type or a custom raster type defined with option -t of ``rastertools``.
+  either a built-in raster type or a custom raster type defined with option -t of ``georastertools``.
   See section "Raster types".
 
 Example:
 
 .. code-block:: console
 
-  $ rastertools speed ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D-ndvi.zip ./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif
+  $ georastertools speed ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D-ndvi.zip ./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif
 
 This command generates an image with one band that represents :math:`\\frac{ndvi_2 - ndvi_1}{date_2 - data_1}` where:
 

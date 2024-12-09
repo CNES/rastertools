@@ -1,2 +1,0 @@
-[rasterio.rio_plugins]
-rastertools = eolab.rastertools.main:rastertools

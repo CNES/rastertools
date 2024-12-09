@@ -5,8 +5,8 @@ filter
 
 .. code-block:: console
 
-  $ rastertools filter --help
-  usage: rastertools filter [-h] {median,sum,mean,adaptive_gaussian} ...
+  $ georastertools filter --help
+  usage: georastertools filter [-h] {median,sum,mean,adaptive_gaussian} ...
   
   Apply a filter to a set of images.
   
@@ -25,8 +25,8 @@ that configure the filter. Type option --help to get the definition of the argum
 
 .. code-block:: console
 
-  $ rastertools filter adaptive_gaussian --help
-  usage: rastertools filter adaptive_gaussian [-h] --kernel_size KERNEL_SIZE
+  $ georastertools filter adaptive_gaussian --help
+  usage: georastertools filter adaptive_gaussian [-h] --kernel_size KERNEL_SIZE
                                               --sigma SIGMA [-o OUTPUT]
                                               [-ws WINDOW_SIZE]
                                               [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
@@ -105,9 +105,9 @@ To apply three filters (median, mean and adaptive_gaussian) on a kernel of dimen
 
 .. code-block:: console
 
-  $ rastertools filter median --kernel_size 16 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-  $ rastertools filter mean --kernel_size 16 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-  $ rastertools filter adaptive_gaussian --kernel_size 16 --sigma 1 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+  $ georastertools filter median --kernel_size 16 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+  $ georastertools filter mean --kernel_size 16 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+  $ georastertools filter adaptive_gaussian --kernel_size 16 --sigma 1 "./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
 
 The commands will generate respectively:
 

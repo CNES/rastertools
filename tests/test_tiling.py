@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from eolab.rastertools import Tiling
+from eolab.georastertools import Tiling
 
 from . import utils4test
 

@@ -1,0 +1,45 @@
+name: CD Workflow
+
+on:
+  push:
+    branches:
+      - "main"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/georastertools
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python 3.8.13
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.8.13"
+
+      - name: Setup Miniconda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.8.13
+          auto-activate-base: false
+
+      - name: Build package
+        shell: bash -l {0}
+        run: |
+          conda create -n deploy_env python=3.8.13 libgdal=3.5.2 build -c conda-forge -y
+          conda activate deploy_env
+          python -m build -C--global-option=bdist_wheel -C--global-option=--build-number=0 --wheel
+
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          verbose: true
+          password: ${{ secrets.TEST_PYPI_PASSWORD }}
+          repository-url: https://test.pypi.org/legacy/
