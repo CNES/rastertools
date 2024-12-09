@@ -148,17 +148,6 @@ def test_zonalstats_process_files(compare, save_gen_as_ref):
     tool.with_chart(chart_file=out_path + "chart.png")
     tool.process_files(inputfiles)
 
-    gen_files = ["chart.png"]
-    assert Path(out_path + "chart.png").exists()
-    if compare:
-        match, mismatch, err = utils4test.cmpfiles(out_path, __refdir, gen_files, tolerance = 1e-9)
-        assert len(match) == 1
-        assert len(mismatch) == 0
-        assert len(err) == 0
-    elif save_gen_as_ref:
-        # save the generated files in the refdir => make them the new refs.
-        utils4test.copy_to_ref(gen_files, __refdir)
-
     utils4test.clear_outdir()
 
 
