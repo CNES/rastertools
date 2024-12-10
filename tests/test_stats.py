@@ -219,7 +219,8 @@ def test_compute_zonal_stats_per_category():
                                                         stats=stats_to_compute,
                                                         categories=categories,
                                                         category_index="Classe")
-    print(f"{statistics}")
+
+
     # statistics is a list of list of dict.
     # First list iterates over geometries
     # Second list iterates over bands.
@@ -257,6 +258,7 @@ def test_compute_zonal_stats_per_category():
                                                         categories=categories,
                                                         category_index="Classe",
                                                         category_labels=labels)
+
 
     # statistics is a list of list of dict.
     # First list iterates over geometries

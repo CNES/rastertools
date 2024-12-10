@@ -98,9 +98,15 @@ def _compute_stats(data, stats: List[str], categorical: bool = False, prefix_sta
         'median': np.median,
     }
 
+    # data = np.array(data, copy=True)
+    # data.flags.writeable = True
     # Mask out no-data values (if `data` isn't already masked)
     if not np.ma.isMaskedArray(data):
         mask = np.isnan(data)  # Create a mask for NaN values (no-data)
+        print(np.sum(mask))
+        print(data.size)
+        
+        print(data.size - np.sum(mask))
         data = np.ma.masked_array(data, mask=mask)
 
     # Calculate the requested statistics
@@ -226,42 +232,45 @@ def compute_zonal_stats_per_category(geoms: gpd.GeoDataFrame, image: str,
     statistics = []
     # Process geometries one by one
     nb_geoms = len(geoms)
-    print(nb_geoms)
 
     # Open raster using rioxarray
     with rioxarray.open_rasterio(image, masked=True) as src:
         # Loop over geometries (ROIs)
         for i in range(nb_geoms):
             roi_geom = geoms.iloc[[i]]  # Select the current geometry
-            roi_statistics = []
 
             # Clip the raster to the current geometry
             roi_raster = src.rio.clip(roi_geom.geometry, all_touched=True, drop=True)
 
             # Handle categories if provided
             if categories is not None:
+                roi_statistics = {}
                 category_geoms = filter_dissolve(roi_geom, categories, id=category_index)
 
                 prefix_stats = [str(cat[category_index]) for _, cat in category_geoms.iterrows()]
 
                 for prefix, (_, cat_geom) in zip(prefix_stats, category_geoms.iterrows()):
+                    print(prefix)
                     # Clip the raster to categorical geometry provided
                     cat_raster = roi_raster.rio.clip([cat_geom.geometry], all_touched=True, drop=True)
 
+                    print(bands)
                     # Compute stats for each band
                     for band in bands:
                         band_data = cat_raster.sel(band=band)
-                        roi_statistics.append(_compute_stats(band_data.values, stats, prefix))
+                        roi_statistics.update(_compute_stats(band_data.values, stats, prefix_stats = prefix))
             else:
                 # Compute stats for each band without categories
+                roi_statistics = []
                 band_stats = []
                 for band in bands:
                     band_data = roi_raster.sel(band=band)
-                    band_stats.append(_compute_stats(band_data.values, stats, prefix_stats[0]))
+                    band_stats.append(_compute_stats(band_data.values, stats, prefix_stats = prefix_stats[0]))
 
                 roi_statistics.append(band_stats)
 
-            statistics.append(roi_statistics)
+            statistics.append([roi_statistics])
+            print(statistics)
 
     return statistics
 

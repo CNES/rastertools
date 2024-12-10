@@ -5,6 +5,7 @@ This module defines a rastertool named Tiling that generates tiles a raster imag
 a reference grid.
 """
 import logging
+import math
 from typing import List
 from pathlib import Path
 
@@ -177,10 +178,31 @@ class Tiling(Rastertool):
                 _logger.info("Crop and export tile " + str(i) + "...")
 
                 try:
-                    print(raster.rio.crs)
-                    print(shape)
                     # Generate mask to crop the raster to the geometry
                     masked_raster = raster.rio.clip([shape], crs, from_disk=True, all_touched=True, drop=False)
+
+                    # Replacing the crop = True option
+                    # Get the raster resolution and bounding box of the shape
+                    resolution_x, resolution_y = raster.rio.resolution()
+                    bbox = shape.bounds
+
+                    # Compute the target number of rows and columns
+                    num_cols = math.ceil((bbox[2] - bbox[0]) / resolution_x)
+                    num_rows = math.ceil((bbox[3] - bbox[1]) / abs(resolution_y))
+
+                    # Adjust the bounds to align with the resolution
+                    aligned_bbox = (
+                        bbox[0],  # MinX
+                        bbox[1],  # MinY
+                        bbox[0] + num_cols * resolution_x,  # MaxX
+                        bbox[1] + num_rows * abs(resolution_y)  # MaxY
+                    )
+
+                    # Slice the raster using the adjusted bounding box
+                    masked_raster = masked_raster.sel(
+                        x=slice(aligned_bbox[0], aligned_bbox[2]),  # Adjusted X range
+                        y=slice(aligned_bbox[3], aligned_bbox[1])  # Adjusted Y range (reverse order for y-axis)
+                    )
 
                     # Get the original raster's transform and resolution
                     original_transform = raster.rio.transform()
