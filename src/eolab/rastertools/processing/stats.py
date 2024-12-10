@@ -16,7 +16,6 @@ import geopandas as gpd
 import matplotlib
 import matplotlib.pyplot as plt
 import rasterio
-from rasterio import features
 from tqdm import tqdm
 
 from eolab.rastertools.utils import get_metadata_name
@@ -27,9 +26,15 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
                         bands: List[int] = [1],
                         stats: List[str] = ["min", "max", "mean", "std"],
                         categorical: bool = False) -> List[List[Dict[str, float]]]:
-    """Compute the statistics of an input image for each feature in the shapefile
+    """
+    Compute zonal statistics for an input raster image over specified geometries.
+
+    This function calculates statistical summaries (e.g., min, max, mean, standard deviation)
+    for each feature in the provided geometries (GeoDataFrame) using the specified raster image.
+    If the raster is categorical, the function can compute counts of unique values.
 
     Args:
+<<<<<<< HEAD
         geoms (GeoDataFrame): Geometries where to compute stats
         image (str): Filename of the input image to process
         bands (list, optional, default=[1]): List of bands to process in the input image
@@ -195,29 +200,45 @@ def compute_zonal_stats_per_category(geoms: gpd.GeoDataFrame, image: str,
                                      stats: List[str] = ["min", "max", "mean", "std"],
                                      categories: gpd.GeoDataFrame = None,
                                      category_index: str = 'Classe'):
-    """Compute the statistics of an input image for each feature in the shapefile
+    """
+    Compute zonal statistics for an input raster image, categorized by specified subregions.
+
+    This function calculates statistical metrics for a raster image over a set of geometries
+    (e.g., polygons) provided in `geoms`. If a set of categories (subregions within each geometry)
+    is provided, statistics are computed separately for each category within each geometry.
 
     Args:
         geoms (GeoDataFrame):
-            Geometries where to compute stats
+            A GeoDataFrame containing the input geometries (e.g., polygons) to compute
+            statistics over.
         image (str):
-            Filename of the input image to process
-        bands ([int], optional, default=[1]):
-            List of bands to process in the input image
-        stats ([str], optional, default=["min", "max", "mean", "std"]):
-            List of stats to computed
-        categories (GeoDataFrame, optional, default=None):
-            The geometries defining the categories.
-        category_index (str, optional, default='Classe'):
-            Name of the column in category file (when it is a vector) that
-            contains the category index
-        category_labels (Dict[str, str], optional, default=None):
-            Dict that associates the category values and category names
+            The file path to the input raster image.
+        bands (List[int], optional):
+            A list of raster band indices to process. Defaults to [1] (the first band).
+        stats (List[str], optional):
+            A list of statistical metrics to compute. Supported values include:
+            - "min": Minimum value within the geometry.
+            - "max": Maximum value within the geometry.
+            - "mean": Mean value within the geometry.
+            - "std": Standard deviation within the geometry.
+            Defaults to ["min", "max", "mean", "std"].
+        categories (GeoDataFrame, optional):
+            A GeoDataFrame containing category geometries that define subregions of the
+            input geometries. Defaults to None.
+        category_index (str, optional):
+            The column in the `categories` GeoDataFrame that identifies category labels
+            for each geometry. Defaults to 'Classe'.
+        category_labels (Dict[str, str], optional):
+            A dictionary mapping category values (from `category_index`) to human-readable
+            labels. If provided, these labels replace category values in the output.
+            Defaults to None.
 
     Returns:
-        statistics ([[Dict[str, float]]]): a list of list of dictionnaries.
-        First list on ROI, second on bands. Dict associates the stat names and the stat values.
-
+        List[List[Dict[str, float]]]:
+            A nested list of dictionaries containing the computed statistics:
+            - Outer list corresponds to each input geometry in `geoms`.
+            - Inner list corresponds to each raster band being processed.
+            - Each dictionary maps statistic names to their respective values.
     """
     def _get_list_of_polygons(geom):
         """Get the list of polygons from the geometry"""
@@ -324,19 +345,63 @@ def extract_zonal_outliers(geoms: gpd.GeoDataFrame, image: str, outliers_image: 
 def plot_stats(chartfile: str, stats_per_date: Dict[datetime.datetime, gpd.GeoDataFrame],
                stats: List[str] = ["min", "max", "mean", "std"],
                index_name: str = 'ID', display: bool = False):
-    """Plot the statistics.
+    """
+    Plot temporal statistics for geometries across multiple dates.
+
+    This function visualizes the evolution of specified statistics (e.g., "min", "mean")
+    over time for different zones defined in the input GeoDataFrames. The output is
+    saved as a chart file, and optionally displayed.
 
     Args:
         chartfile (str):
-            Name of the chartfile to generate
+            Path to the file where the generated chart will be saved.
         stats_per_date (Dict[datetime.datetime, gpd.GeoDataFrame]):
-            A dict that associates a date and the statistics for this date
-        stats ([str], optional, default=["min", "max", "mean", "std"]):
-            List of stats to plot
-        index_name (str, optional, default='ID'):
-            List of bands to process in the input image
-        display (bool, optional, default=False):
-            Whether to display the generated plot
+            A dictionary mapping each date to a GeoDataFrame containing the statistics
+            for that date. Each GeoDataFrame should include the specified `index_name`
+            column and relevant statistics columns.
+        stats (List[str], optional):
+            A list of statistics to plot (e.g., "min", "max", "mean", "std"). Defaults
+            to ["min", "max", "mean", "std"].
+        index_name (str, optional):
+            Name of the column in the GeoDataFrames that uniquely identifies the zones
+            (e.g., region IDs). Defaults to 'ID'.
+        display (bool, optional):
+            If `True`, the generated plot is displayed after saving. Defaults to `False`.
+
+    Raises:
+        ValueError:
+            If the specified `index_name` is not present in the combined GeoDataFrame.
+
+    Notes:
+        - The `stats_per_date` dictionary must be ordered or sortable by date to ensure
+          proper time-series plotting.
+        - Each GeoDataFrame in `stats_per_date` should have columns named in the format
+          `<prefix>.<stat>` (e.g., "temperature.mean").
+
+    Example:
+        ```
+        import geopandas as gpd
+        import datetime
+        from plot_tools import plot_stats
+
+        # Example input
+        stats_per_date = {
+            datetime.datetime(2023, 1, 1): gpd.GeoDataFrame({...}),
+            datetime.datetime(2023, 2, 1): gpd.GeoDataFrame({...}),
+        }
+
+        plot_stats(
+            chartfile="output_chart.png",
+            stats_per_date=stats_per_date,
+            stats=["mean", "std"],
+            index_name="RegionID",
+            display=True
+        )
+        ```
+
+    Output:
+        - Saves a time-series plot of the specified statistics as `chartfile`.
+        - Optionally displays the plot if `display=True`.
     """
 
     # convert dates to datenumber format

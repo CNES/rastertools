@@ -1,0 +1,202 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Radioindice.process_file &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Radioindice.process_files" href="eolab.rastertools.Radioindice.process_files.html" />
+    <link rel="prev" title="Radioindice.postprocess_files" href="eolab.rastertools.Radioindice.postprocess_files.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../usage.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Filtering.html">Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Hillshade.html">Hillshade</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="eolab.rastertools.Radioindice.html">Radioindice</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.html#eolab.rastertools.Radioindice"><code class="docutils literal notranslate"><span class="pre">Radioindice</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.bi.html">Radioindice.bi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.bi2.html">Radioindice.bi2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.evi.html">Radioindice.evi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.indices.html">Radioindice.indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ipvi.html">Radioindice.ipvi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.keep_vrt.html">Radioindice.keep_vrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.merge.html">Radioindice.merge</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.mndwi.html">Radioindice.mndwi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.msavi.html">Radioindice.msavi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.msavi2.html">Radioindice.msavi2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ndbi.html">Radioindice.ndbi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ndpi.html">Radioindice.ndpi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ndti.html">Radioindice.ndti</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ndvi.html">Radioindice.ndvi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ndwi.html">Radioindice.ndwi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ndwi2.html">Radioindice.ndwi2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.outputdir.html">Radioindice.outputdir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.pad_mode.html">Radioindice.pad_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.pvi.html">Radioindice.pvi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.ri.html">Radioindice.ri</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.roi.html">Radioindice.roi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.rvi.html">Radioindice.rvi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.savi.html">Radioindice.savi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.tndvi.html">Radioindice.tndvi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.tsavi.html">Radioindice.tsavi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.vrt_dir.html">Radioindice.vrt_dir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.window_size.html">Radioindice.window_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.__init__.html">Radioindice.__init__</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.get_default_indices.html">Radioindice.get_default_indices</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.postprocess_files.html">Radioindice.postprocess_files</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Radioindice.process_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.process_files.html">Radioindice.process_files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.with_output.html">Radioindice.with_output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.with_roi.html">Radioindice.with_roi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.with_vrt_stored.html">Radioindice.with_vrt_stored</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Radioindice.with_windows.html">Radioindice.with_windows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Speed.html">Speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.SVF.html">SVF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Tiling.html">Tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Timeseries.html">Timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Zonalstats.html">Zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#raster-products">Raster products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#adding-custom-raster-types">Adding custom raster types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#design-rules-of-raster-tools">Design rules of raster tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="eolab.rastertools.Radioindice.html">Radioindice</a></li>
+      <li class="breadcrumb-item active">Radioindice.process_file</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eolab.rastertools.Radioindice.process_file.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="radioindice-process-file">
+<h1>Radioindice.process_file<a class="headerlink" href="#radioindice-process-file" title="Permalink to this heading"></a></h1>
+<dl class="py method">
+<dt class="sig sig-object py" id="eolab.rastertools.Radioindice.process_file">
+<span class="sig-prename descclassname"><span class="pre">Radioindice.</span></span><span class="sig-name descname"><span class="pre">process_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/eolab/rastertools/radioindice.html#Radioindice.process_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eolab.rastertools.Radioindice.process_file" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the indices for a single file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>inputfile</strong> (<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a>) – Input image to process</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of indice images (posix paths) that have been generated</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[<a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eolab.rastertools.Radioindice.postprocess_files.html" class="btn btn-neutral float-left" title="Radioindice.postprocess_files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eolab.rastertools.Radioindice.process_files.html" class="btn btn-neutral float-right" title="Radioindice.process_files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

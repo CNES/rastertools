@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>svf &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tiling" href="tiling.html" />
+    <link rel="prev" title="speed" href="speed.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../cli.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="filtering.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hillshade.html">hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radioindice.html">radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="speed.html">speed</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">svf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tiling.html">tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timeseries.html">timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zonalstats.html">zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#docker-singularity">Docker/Singularity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">Command Line Interface</a></li>
+      <li class="breadcrumb-item active">svf</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cli/svf.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="svf">
+<h1>svf<a class="headerlink" href="#svf" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">svf</span></code> computes the SVF of a Digital Height Model.</p>
+<p>SVF stands for Sky View Factor. It is a geophysical parameter that measures the portion of the sky
+visible from a certain point. The portion of the sky visible above the surface is especially relevant
+in energy balance studies and computation of diffuse solar insolation.</p>
+<p>Sky-view factor is defined as the proportion of visible sky (<span class="math notranslate nohighlight">\(\Omega\)</span>) above a certain
+observation point as seen from a two-dimensional representation.</p>
+<p>The light that falls from the sky onto a certain part of the surface is reduced by the obstacles
+that form the horizon. These obstacles can be described in all directions by the vertical
+elevation angle above the horizontal plane.</p>
+<p>A good SVF approximation can therefore be performed with the estimate of this angle
+in several directions. After the vertical elevation angle is determined in the chosen
+number of directions n, the SVF is determined as a sum of all portions of the sky within
+each direction: <span class="math notranslate nohighlight">\(\sum \frac {\cos \gamma_i}{n}\)</span>, where <span class="math notranslate nohighlight">\(\gamma_i\)</span> is the
+vertical angle of the horizon in the`direction i.</p>
+<p>The angle <span class="math notranslate nohighlight">\(\gamma\)</span> is extracted from the Digital Elevation Model:
+<span class="math notranslate nohighlight">\(\tan \frac{Height}{Distance}\)</span>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    <span class="n">_____</span>
+                  <span class="n">x</span><span class="o">|</span>     <span class="o">|</span>  <span class="o">^</span>
+              <span class="n">x</span>    <span class="o">|</span>     <span class="o">|</span>  <span class="o">|</span> <span class="n">Height</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">Digital</span> <span class="n">Elevation</span> <span class="n">Model</span><span class="p">)</span>
+         <span class="n">x</span>   <span class="n">__</span>    <span class="o">|</span>     <span class="o">|</span>  <span class="o">|</span>
+<span class="n">____p_______</span><span class="o">|</span>  <span class="o">|</span><span class="n">___</span><span class="o">|</span>     <span class="o">|</span><span class="n">__v____________</span>
+    <span class="o">&lt;--------------&gt;</span>
+        <span class="n">Distance</span>
+</pre></div>
+</div>
+<p>Where p is the current pixel where the SVF is computed.</p>
+<p>In a direction, the algorithm computes all angles and keeps the largest one. To avoid testing
+too many points, the “radius” parameter defines the max distance of the pixel to test.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>svf<span class="w"> </span>--help
+<span class="go">usage: rastertools svf [-h] --radius RADIUS --directions DIRECTIONS</span>
+<span class="go">                       --resolution RESOLUTION [--altitude ALTITUDE]</span>
+<span class="go">                       [-o OUTPUT] [-ws WINDOW_SIZE]</span>
+<span class="go">                       [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]</span>
+<span class="go">                       inputs [inputs ...]</span>
+
+<span class="go">Compute the Sky View Factor (SVF) of a Digital Height Model (DHM).</span>
+
+<span class="go">The Sky View Factor (SVF) is a measure of the visibility of the sky from a</span>
+<span class="go">point in a Digital Height Model (DHM). It is calculated by evaluating the</span>
+<span class="go">horizontal elevation angle from a given point in multiple directions (as</span>
+<span class="go">specified by the user), and is influenced by the topography and surrounding</span>
+<span class="go">terrain features.</span>
+
+<span class="go">Arguments:</span>
+
+<span class="go">    inputs TEXT</span>
+
+<span class="go">    Input file to process (i.e. geotiff corresponding to a Digital Height</span>
+<span class="go">    Model). You can provide a single file with extension &quot;.lst&quot; (e.g.</span>
+<span class="go">    &quot;svf.lst&quot;) that lists the input files to process (one input file</span>
+<span class="go">    per line in .lst)</span>
+
+<span class="go">Options:</span>
+<span class="go">    --radius INTEGER                Maximum distance (in pixels) around a point</span>
+<span class="go">                                    to evaluate horizontal elevation angle</span>
+<span class="go">                                    [required]</span>
+<span class="go">    --directions INTEGER            Number of directions on which to compute the</span>
+<span class="go">                                    horizon elevation angle  [required]</span>
+<span class="go">    --resolution FLOAT              Pixel resolution in meter  [required]</span>
+<span class="go">    --altitude INTEGER              Reference altitude to use for computing the</span>
+<span class="go">                                    SVF. If this option is not specified, SVF is</span>
+<span class="go">                                    computed for every point at the altitude of</span>
+<span class="go">                                    the point</span>
+<span class="go">    -o, --output TEXT               Output directory to store results (by</span>
+<span class="go">                                    default current directory)</span>
+<span class="go">    -ws, --window_size INTEGER      Size of tiles to distribute processing,</span>
+<span class="go">                                    default: 1024</span>
+<span class="go">    -p, --pad [none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap]</span>
+<span class="go">                                    Pad to use around the image, default : edge(see</span>
+<span class="go">                                    https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+<span class="go">                                    for more information)</span>
+<span class="go">    -h, --help                      Show this message and exit.</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This command line does not accept all input raster products as other raster tools (radioindice, zonalstats).
+It is mandatory to use a raster file (typically a geotif) in a format that can be read by rasterio: rasterio.open(xxx)).</p>
+</div>
+<p>Example:</p>
+<p>Let’s take as input a Digital Height Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):</p>
+<img alt="../_images/dsm.jpg" src="../_images/dsm.jpg" />
+<p>The first command line computes the Sky View Factor using 16 directions and a radius of 50 pixels (25 meters).
+The SVF is computed at the altitude of every point of the Digital Height Model, i.e. the SVF is computed on top
+of buildings (for the highest building, SVF is thus 1).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>svf<span class="w"> </span>--radius<span class="w"> </span><span class="m">50</span><span class="w"> </span>--directions<span class="w"> </span><span class="m">16</span><span class="w"> </span>--resolution<span class="w"> </span><span class="m">0</span>.5<span class="w"> </span>tests<span class="se">\t</span>ests_data<span class="se">\t</span>oulouse-mnh.tif
+</pre></div>
+</div>
+<p>This command generates the following SVF:</p>
+<img alt="../_images/dsm-svf.jpg" src="../_images/dsm-svf.jpg" />
+<p>It is also possible to compute the SVF at a specified height, for instance on ground (0m altitude for a Digital Height Model).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>svf<span class="w"> </span>--radius<span class="w"> </span><span class="m">50</span><span class="w"> </span>--directions<span class="w"> </span><span class="m">16</span><span class="w"> </span>--resolution<span class="w"> </span><span class="m">0</span>.5<span class="w"> </span>tests<span class="se">\t</span>ests_data<span class="se">\t</span>oulouse-mnh.tif
+</pre></div>
+</div>
+<p>The SVF is the following:</p>
+<img alt="../_images/dsm-svf0.jpg" src="../_images/dsm-svf0.jpg" />
+<p>As expected, the SVF at altitude 0m are equal to 0 for pixels inside buildings, and are the same as in the previous image
+for pixels outside the buildings.</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="speed.html" class="btn btn-neutral float-left" title="speed" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tiling.html" class="btn btn-neutral float-right" title="tiling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

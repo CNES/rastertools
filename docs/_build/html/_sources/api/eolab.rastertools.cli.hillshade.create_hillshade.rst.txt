@@ -1,0 +1,6 @@
+create\_hillshade
+=================
+
+.. currentmodule:: eolab.rastertools.cli.hillshade
+
+.. autofunction:: create_hillshade

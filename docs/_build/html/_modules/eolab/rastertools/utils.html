@@ -1,0 +1,235 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.utils &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines several utility methods for:</span>
+
+<span class="sd">- handling path</span>
+<span class="sd">- transforming data</span>
+<span class="sd">- computing sliding windows</span>
+<span class="sd">- ...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">gdal</span>
+
+
+<div class="viewcode-block" id="to_tuple"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.to_tuple">[docs]</a><span class="k">def</span> <span class="nf">to_tuple</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert val as a tuple of two val&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">val</span> <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">==</span> <span class="nb">tuple</span> <span class="k">else</span> <span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="highest_power_of_2"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.highest_power_of_2">[docs]</a><span class="k">def</span> <span class="nf">highest_power_of_2</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the highest power of 2 that is less than n</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="is_dir"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.is_dir">[docs]</a><span class="k">def</span> <span class="nf">is_dir</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if file is a dir or not</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">to_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="to_path"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.to_path">[docs]</a><span class="k">def</span> <span class="nf">to_path</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transform a file name to a Path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">file</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">file</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">default</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="get_basename"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.get_basename">[docs]</a><span class="k">def</span> <span class="nf">get_basename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the basename of a Path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">to_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">suffixes</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">basename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">[:</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">basename</span></div>
+
+
+<div class="viewcode-block" id="get_suffixes"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.get_suffixes">[docs]</a><span class="k">def</span> <span class="nf">get_suffixes</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the suffixes of a filename as a concatenated string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">to_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">suffixes</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="get_metadata_name"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.get_metadata_name">[docs]</a><span class="k">def</span> <span class="nf">get_metadata_name</span><span class="p">(</span><span class="n">band</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">metadata</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the metadata name for the statistics to generate&quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">prefix</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;b</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">band</span><span class="p">)</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">metadata</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">metadata</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">name</span></div>
+
+
+<div class="viewcode-block" id="slices_1d"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.slices_1d">[docs]</a><span class="k">def</span> <span class="nf">slices_1d</span><span class="p">(</span><span class="n">window_width</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield 1 dimension sliding windows according to the given parameters</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        window_width: window width</span>
+<span class="sd">        shift: shift to apply between two consecutive windows</span>
+<span class="sd">        stop: max value</span>
+<span class="sd">        start: min value (default 0)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        min, max (int, int): start and end index of the sliding windows.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nb_iter</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start</span> <span class="o">-</span> <span class="n">window_width</span><span class="p">)</span> <span class="o">/</span> <span class="n">shift</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">((</span><span class="n">start</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">shift</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">start</span> <span class="o">+</span> <span class="n">window_width</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">shift</span><span class="p">,</span> <span class="n">stop</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_iter</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="slices_2d"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.utils.slices_2d">[docs]</a><span class="k">def</span> <span class="nf">slices_2d</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">shift</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield 2 dimensions sliding windows according to the given parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        window_size: window width and height</span>
+<span class="sd">        shift: shift to apply between two consecutive windows</span>
+<span class="sd">        stop: max value</span>
+<span class="sd">        start: min value (default 0)</span>
+
+<span class="sd">    Returns: Firstly yield number of windows, then</span>
+<span class="sd">             window y_min, y_max, x_min, x_max for each windoww</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">to_tuple</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+    <span class="n">shift_c</span><span class="p">,</span> <span class="n">shift_r</span> <span class="o">=</span> <span class="n">to_tuple</span><span class="p">(</span><span class="n">shift</span><span class="p">)</span>
+    <span class="n">start_c</span><span class="p">,</span> <span class="n">start_r</span> <span class="o">=</span> <span class="n">to_tuple</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+    <span class="n">stop_c</span><span class="p">,</span> <span class="n">stop_r</span> <span class="o">=</span> <span class="n">to_tuple</span><span class="p">(</span><span class="n">stop</span><span class="p">)</span>
+
+    <span class="n">window_c</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">slices_1d</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">shift_c</span><span class="p">,</span> <span class="n">stop_c</span><span class="p">,</span> <span class="n">start_c</span><span class="p">))</span>
+    <span class="n">window_r</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">slices_1d</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">shift_r</span><span class="p">,</span> <span class="n">stop_r</span><span class="p">,</span> <span class="n">start_r</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">((</span><span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span><span class="p">,</span> <span class="n">c_min</span><span class="p">,</span> <span class="n">c_max</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">r_min</span><span class="p">,</span> <span class="n">r_max</span> <span class="ow">in</span> <span class="n">window_r</span>
+            <span class="k">for</span> <span class="n">c_min</span><span class="p">,</span> <span class="n">c_max</span> <span class="ow">in</span> <span class="n">window_c</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,6 @@
+filter\_options
+===============
+
+.. currentmodule:: eolab.rastertools.cli.filtering_dyn
+
+.. autofunction:: filter_options

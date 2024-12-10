@@ -17,12 +17,12 @@ Several options are provided:
 """
 from typing import List, Dict
 import datetime
-import logging
 import logging.config
 from pathlib import Path
 import json
 import numpy as np
 import geopandas as gpd
+import sys
 
 import rasterio
 import rioxarray
@@ -140,13 +140,6 @@ class Zonalstats(Rastertool):
 
     @property
     def generated_stats(self):
-
-        print("suppr")
-        # my_data = truc.compute()
-        # result = min(my_data)
-        #
-        # result = min(my_data)
-        # my_data = truc.compute()
         """The list of generated stats in the same order as the input files"""
         return self._generated_stats
 
@@ -284,9 +277,10 @@ class Zonalstats(Rastertool):
         self._output_format = output_format or 'ESRI Shapefile'
         # check if output_format exists
         if self._output_format not in Zonalstats.supported_output_formats:
-            raise RastertoolConfigurationException(
+            _logger.exception(RastertoolConfigurationException(
                 f"Unrecognized output format {output_format}. "
-                f"Possible values are {', '.join(Zonalstats.supported_output_formats)}")
+                f"Possible values are {', '.join(Zonalstats.supported_output_formats)}"))
+            sys.exit(2)
         return self
 
     def with_geometries(self, geometries: str, within: bool = False):
@@ -415,16 +409,16 @@ class Zonalstats(Rastertool):
             # open raster to get metadata
             raster = product.get_raster()
 
-            # Open with rasterio to extract metadata
-            with rasterio.open(raster) as rst:
-                bound = int(rst.count)
-                indexes = rst.indexes
-                descr = rst.descriptions
+            rst = rasterio.open(raster)
+            bound = int(rst.count)
+            indexes = rst.indexes
+            descr = rst.descriptions
 
-                geotransform = rst.get_transform()
-                width = np.abs(geotransform[1])
-                height = np.abs(geotransform[5])
-                area_square_meter = width * height
+            geotransform = rst.get_transform()
+            width = np.abs(geotransform[1])
+            height = np.abs(geotransform[5])
+            area_square_meter = width * height
+            rst.close()
 
             date_str = product.get_date_string('%Y%m%d-%H%M%S')
 

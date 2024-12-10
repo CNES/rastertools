@@ -1,0 +1,394 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.processing.sliding &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.processing.sliding</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.processing.sliding</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines a method to run a RasterProcessing on sliding windows.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">repeat</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">from</span> <span class="nn">rasterio.windows</span> <span class="kn">import</span> <span class="n">Window</span>
+<span class="kn">from</span> <span class="nn">tqdm.contrib.concurrent</span> <span class="kn">import</span> <span class="n">process_map</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">RasterProcessing</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="compute_sliding"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.sliding.compute_sliding.html#eolab.rastertools.processing.sliding.compute_sliding">[docs]</a><span class="k">def</span> <span class="nf">compute_sliding</span><span class="p">(</span><span class="n">input_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rasterprocessing</span><span class="p">:</span> <span class="n">RasterProcessing</span><span class="p">,</span>
+                    <span class="n">window_size</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">),</span> <span class="n">window_overlap</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply a sliding window raster processing operation on an input image and save the result.</span>
+
+<span class="sd">    This function processes a raster image in small sliding windows, allowing efficient</span>
+<span class="sd">    memory management for large datasets by processing chunks. The specified `rasterprocessing`</span>
+<span class="sd">    operation is applied to each window, with options for padding and overlapping windows.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_image (str): Path to the input raster image file to be processed.</span>
+<span class="sd">        output_image (str): Path to save the output raster image after processing.</span>
+<span class="sd">        rasterprocessing (RasterProcessing): A processing object defining the algorithm and</span>
+<span class="sd">            parameters to apply on each window of the input image.</span>
+<span class="sd">        window_size (tuple(int, int), optional): Size of each window for processing,</span>
+<span class="sd">            default is (1024, 1024).</span>
+<span class="sd">        window_overlap (int, optional): Number of pixels to overlap between consecutive windows,</span>
+<span class="sd">            default is 0.</span>
+<span class="sd">        pad_mode (str, optional, default=&quot;edge&quot;): Padding mode for the edges of the windows, default is &quot;edge&quot;.</span>
+<span class="sd">            Refer to `numpy.pad &lt;https://numpy.org/doc/stable/reference/generated/numpy.pad.html`_ documentation for valid modes.</span>
+<span class="sd">        bands (List[int], optional): List of specific bands to process. If None, all bands in</span>
+<span class="sd">            the input image will be processed.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If specified band indices are out of range for the input image.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">        This function supports concurrent processing and makes use of a thread pool for efficient</span>
+<span class="sd">        handling of multiple windows. Window padding at the image boundaries is applied as</span>
+<span class="sd">        specified, and sliding window indices are computed internally.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">GDAL_VRT_ENABLE_PYTHON</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="n">src</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">profile</span>
+
+        <span class="c1"># set block size</span>
+        <span class="n">blockxsize</span><span class="p">,</span> <span class="n">blockysize</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;</span> <span class="n">blockxsize</span><span class="p">:</span>
+            <span class="n">blockxsize</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">highest_power_of_2</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">height</span> <span class="o">&lt;</span> <span class="n">blockysize</span><span class="p">:</span>
+            <span class="n">blockysize</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">highest_power_of_2</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># dtype and creation options of output data</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">or</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">float32</span>
+        <span class="n">in_dtype</span> <span class="o">=</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">in_dtype</span> <span class="ow">or</span> <span class="n">dtype</span>
+        <span class="n">nbits</span> <span class="o">=</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">nbits</span>
+        <span class="n">compress</span> <span class="o">=</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">compress</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">compression</span> <span class="ow">or</span> <span class="s1">&#39;lzw&#39;</span>
+        <span class="n">nodata</span> <span class="o">=</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">nodata</span> <span class="ow">or</span> <span class="n">src</span><span class="o">.</span><span class="n">nodata</span>
+
+        <span class="c1"># check band index and handle all bands options (when bands is an empty list)</span>
+        <span class="k">if</span> <span class="n">bands</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">bands</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">indexes</span>
+        <span class="k">elif</span> <span class="nb">min</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid bands, all values are not in range [1, </span><span class="si">{</span><span class="n">src</span><span class="o">.</span><span class="n">count</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+        <span class="c1"># setup profile for output image</span>
+        <span class="n">profile</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GTiff&#39;</span><span class="p">,</span> <span class="n">blockxsize</span><span class="o">=</span><span class="n">blockxsize</span><span class="p">,</span> <span class="n">blockysize</span><span class="o">=</span><span class="n">blockysize</span><span class="p">,</span>
+                       <span class="n">tiled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">nbits</span><span class="o">=</span><span class="n">nbits</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="n">compress</span><span class="p">,</span>
+                       <span class="n">nodata</span><span class="o">=</span><span class="n">nodata</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_image</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile</span><span class="p">):</span>
+            <span class="c1"># file is created</span>
+            <span class="k">pass</span>
+
+        <span class="c1"># create the generator of sliding windows</span>
+        <span class="n">sliding_gen</span> <span class="o">=</span> <span class="n">_sliding_windows</span><span class="p">((</span><span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">),</span>
+                                       <span class="n">window_size</span><span class="p">,</span> <span class="n">window_overlap</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">per_band_algo</span><span class="p">:</span>
+            <span class="n">sliding_windows_bands</span> <span class="o">=</span> <span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="p">[</span><span class="n">b</span><span class="p">])</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">sliding_gen</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bands</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sliding_windows_bands</span> <span class="o">=</span> <span class="p">[(</span><span class="n">w</span><span class="p">,</span> <span class="n">bands</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">sliding_gen</span><span class="p">]</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+    <span class="n">write_lock</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+    <span class="c1"># compute using concurrent.futures.ThreadPoolExecutor and tqdm</span>
+    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">sliding_windows_bands</span><span class="p">),</span>
+        <span class="s2">&quot;disable&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;RASTERTOOLS_NOTQDM&quot;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">]</span>
+    <span class="p">}</span>
+    <span class="n">max_workers</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;RASTERTOOLS_MAXWORKERS&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">max_workers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;max_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_workers</span><span class="p">)</span>
+
+    <span class="n">process_map</span><span class="p">(</span><span class="n">_process_sliding</span><span class="p">,</span> <span class="n">repeat</span><span class="p">(</span><span class="n">rasterprocessing</span><span class="p">),</span>
+                <span class="n">repeat</span><span class="p">(</span><span class="n">input_image</span><span class="p">),</span> <span class="n">repeat</span><span class="p">(</span><span class="n">output_image</span><span class="p">),</span>
+                <span class="n">sliding_windows_bands</span><span class="p">,</span> <span class="n">repeat</span><span class="p">(</span><span class="n">window_overlap</span><span class="p">),</span>
+                <span class="n">repeat</span><span class="p">(</span><span class="n">pad_mode</span><span class="p">),</span> <span class="n">repeat</span><span class="p">(</span><span class="n">in_dtype</span><span class="p">),</span>
+                <span class="n">repeat</span><span class="p">(</span><span class="n">write_lock</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_process_sliding</span><span class="p">(</span><span class="n">rasterprocessing</span><span class="p">:</span> <span class="n">RasterProcessing</span><span class="p">,</span>
+                     <span class="n">input_image</span><span class="p">,</span> <span class="n">output_image</span><span class="p">,</span>
+                     <span class="n">sliding_windowbands</span><span class="p">,</span> <span class="n">window_overlap</span><span class="p">,</span>
+                     <span class="n">pad_mode</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">write_lock</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal method that computes the raster data for a specific window.</span>
+<span class="sd">    This method can be called safely by several processes thanks to the locks</span>
+<span class="sd">    that prevent from writing files simultaneously.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sliding_window</span><span class="p">,</span> <span class="n">bands</span> <span class="o">=</span> <span class="n">sliding_windowbands</span>
+    <span class="n">r_window</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">w_window</span> <span class="o">=</span> <span class="n">sliding_window</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">GDAL_VRT_ENABLE_PYTHON</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">_read_dataset</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">r_window</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">pad_mode</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+    <span class="c1"># The computation can be performed concurrently</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="c1"># Use of the lock to avoid writing in //</span>
+    <span class="k">with</span> <span class="n">write_lock</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">output_image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rasterprocessing</span><span class="o">.</span><span class="n">per_band_algo</span><span class="p">:</span>
+                <span class="c1"># here bands only contain a single item which is the band number</span>
+                <span class="n">dst</span><span class="o">.</span><span class="n">write_band</span><span class="p">(</span>
+                    <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">window_overlap</span><span class="p">:</span><span class="o">-</span><span class="n">window_overlap</span><span class="p">,</span>
+                           <span class="n">window_overlap</span><span class="p">:</span><span class="o">-</span><span class="n">window_overlap</span><span class="p">],</span>
+                    <span class="n">window</span><span class="o">=</span><span class="n">w_window</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="n">output</span><span class="p">[:,</span>
+                           <span class="n">window_overlap</span><span class="p">:</span><span class="o">-</span><span class="n">window_overlap</span><span class="p">,</span>
+                           <span class="n">window_overlap</span><span class="p">:</span><span class="o">-</span><span class="n">window_overlap</span><span class="p">],</span>
+                    <span class="n">window</span><span class="o">=</span><span class="n">w_window</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_read_dataset</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">window</span><span class="p">:</span> <span class="n">Window</span><span class="p">,</span> <span class="n">pad</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a src dataset</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src:</span>
+<span class="sd">            Source dataset as given by rasterio.open(...)</span>
+<span class="sd">        bands ([int]):</span>
+<span class="sd">            Bands to read or None if all bands shall be read</span>
+<span class="sd">        window (:obj:`rasterio.windows.Window`):</span>
+<span class="sd">            Window of data to read</span>
+<span class="sd">        pad (tuple of tuple of int):</span>
+<span class="sd">            Pad to apply to the read data: (padx, pady). padx</span>
+<span class="sd">            and pady are also a tuple. The first (resp. second) value is the</span>
+<span class="sd">            pad to apply at the beginning (resp. end) of the window.</span>
+<span class="sd">        pad_mode:</span>
+<span class="sd">            Method to pad data</span>
+<span class="sd">            (See https://numpy.org/doc/stable/reference/generated/numpy.pad.html)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        The numpy masked array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get all bands values as a np.ndarray of 2 or 3 dimensions depending</span>
+    <span class="c1"># on band argument (if None, all bands are read simultaneously and the</span>
+    <span class="c1"># dataset contains all bands and is thus a 3-dims array)</span>
+    <span class="k">if</span> <span class="n">bands</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># pad the dataset if necessary</span>
+    <span class="n">pad_width</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+    <span class="n">padx</span><span class="p">,</span> <span class="n">pady</span> <span class="o">=</span> <span class="n">pad</span>
+    <span class="k">if</span> <span class="n">padx</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">pady</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">pad_width</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">pady</span><span class="p">,</span> <span class="n">padx</span><span class="p">])</span>
+        <span class="n">pad_dataset</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">pad_mode</span><span class="p">)</span>
+
+        <span class="c1"># reapply a padded mask if a mask exists</span>
+        <span class="k">if</span> <span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">dataset</span><span class="p">):</span>
+            <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">pad_width</span><span class="o">=</span><span class="n">pad_width</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">pad_mode</span><span class="p">)</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">pad_dataset</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">pad_dataset</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataset</span>
+
+
+<span class="k">def</span> <span class="nf">_sliding_windows</span><span class="p">(</span><span class="n">image_size</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">overlap</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a generator of windows of a given size with an overlap.</span>
+
+<span class="sd">    (*) = Image boundaries</span>
+<span class="sd">    (-) = Windows boundaries</span>
+
+<span class="sd">    1st window starts at position (-overlap, -overlap) in the</span>
+<span class="sd">    coordinates reference of the image.</span>
+<span class="sd">    Last window ends at position (width + overlap, height + overlap)</span>
+<span class="sd">    in the coordinates reference of the image</span>
+
+<span class="sd">    ```</span>
+<span class="sd">    (-o,-o)</span>
+<span class="sd">       |-----------|      ...      ---------|</span>
+<span class="sd">       | (0,0)     |                        |</span>
+<span class="sd">       |   ********|**********************  |</span>
+<span class="sd">       |   *       |                     *  |</span>
+<span class="sd">       |-----------|               ---------|</span>
+<span class="sd">           *                             *</span>
+<span class="sd">           *                             *</span>
+<span class="sd">           *                             *</span>
+<span class="sd">       |   *       |                     *  |</span>
+<span class="sd">       |   *       |                     *  |</span>
+<span class="sd">       |   ********|**********************  |</span>
+<span class="sd">       |           |                   (w,h)|</span>
+<span class="sd">       |-----------|     ...       ---------|</span>
+<span class="sd">                                           (w+o,h+o)</span>
+<span class="sd">    ```</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        image_size (tuple or int):</span>
+<span class="sd">            Total size of the image that is windowed</span>
+<span class="sd">        window_size (tuple or int):</span>
+<span class="sd">            Window size</span>
+<span class="sd">        overlap (tuple or int):</span>
+<span class="sd">            Number of pixels that overlap previous (or next) window</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A generator of tuples. Each tuple contains: the window to read,</span>
+<span class="sd">        the pad to apply when the window is on the edge of the image, the</span>
+<span class="sd">        corresponding window of &quot;useful data&quot; (the window without the</span>
+<span class="sd">        overlapping pixels). Pad is given as a tuple (padx, pady). padx</span>
+<span class="sd">        and pady are also a tuple. The first (resp. second) value is the</span>
+<span class="sd">        pad to apply at the beginning (resp. end) of the window.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">w_width</span><span class="p">,</span> <span class="n">w_height</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_tuple</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_tuple</span><span class="p">(</span><span class="n">image_size</span><span class="p">)</span>
+    <span class="n">c_overlap</span><span class="p">,</span> <span class="n">r_overlap</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_tuple</span><span class="p">(</span><span class="n">overlap</span><span class="p">)</span>
+
+    <span class="c1"># compute 2d slices from input parameters</span>
+    <span class="n">slices</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">slices_2d</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span>
+                             <span class="c1"># shift is reduced by 2 * overlap</span>
+                             <span class="p">(</span><span class="n">w_width</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">c_overlap</span><span class="p">,</span> <span class="n">w_height</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">r_overlap</span><span class="p">),</span>
+                             <span class="c1"># stop is increased by overlap</span>
+                             <span class="p">(</span><span class="n">width</span> <span class="o">+</span> <span class="n">c_overlap</span><span class="p">,</span> <span class="n">height</span> <span class="o">+</span> <span class="n">r_overlap</span><span class="p">),</span>
+                             <span class="c1"># start is decreased by overlap</span>
+                             <span class="p">(</span><span class="o">-</span><span class="n">c_overlap</span><span class="p">,</span> <span class="o">-</span><span class="n">r_overlap</span><span class="p">))</span>
+
+    <span class="c1"># iterate the slices and compute windows and padding</span>
+    <span class="k">for</span> <span class="n">row_start</span><span class="p">,</span> <span class="n">row_stop</span><span class="p">,</span> <span class="n">col_start</span><span class="p">,</span> <span class="n">col_stop</span> <span class="ow">in</span> <span class="n">slices</span><span class="p">:</span>
+        <span class="c1"># compute padding when the window is partially outside the image</span>
+        <span class="n">padx</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">col_start</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">col_stop</span> <span class="o">-</span> <span class="n">width</span><span class="p">))</span>
+        <span class="n">pady</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">row_start</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">row_stop</span> <span class="o">-</span> <span class="n">height</span><span class="p">))</span>
+
+        <span class="c1"># read window should not be outside the actual dataset window</span>
+        <span class="n">r_window</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">from_slices</span><span class="p">((</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">row_start</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">row_stop</span><span class="p">)),</span>
+                                      <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">col_start</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">col_stop</span><span class="p">)))</span>
+        <span class="c1"># write window corresponds to the window without overlap</span>
+        <span class="n">w_window</span> <span class="o">=</span> <span class="n">Window</span><span class="o">.</span><span class="n">from_slices</span><span class="p">((</span><span class="n">row_start</span> <span class="o">+</span> <span class="n">r_overlap</span><span class="p">,</span> <span class="n">row_stop</span> <span class="o">-</span> <span class="n">r_overlap</span><span class="p">),</span>
+                                      <span class="p">(</span><span class="n">col_start</span> <span class="o">+</span> <span class="n">c_overlap</span><span class="p">,</span> <span class="n">col_stop</span> <span class="o">-</span> <span class="n">c_overlap</span><span class="p">))</span>
+
+        <span class="k">yield</span><span class="p">(</span><span class="n">r_window</span><span class="p">,</span> <span class="p">(</span><span class="n">padx</span><span class="p">,</span> <span class="n">pady</span><span class="p">),</span> <span class="n">w_window</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

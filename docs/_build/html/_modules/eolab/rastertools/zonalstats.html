@@ -1,0 +1,738 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.zonalstats &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.zonalstats</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.zonalstats</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines a rastertool named zonalstats that compute several statistics</span>
+<span class="sd">(mean, median, std dev, etc) on one or several bands of a raster image. The statistics</span>
+<span class="sd">can be computed on the whole image or by zones defined by a vector file (e.g. shapefile,</span>
+<span class="sd">geojson).</span>
+
+<span class="sd">Several options are provided:</span>
+
+<span class="sd">* compute outliers: enable to generate an image that emphasizes the outliers pixels</span>
+<span class="sd">  (i.e. pixels with values greater that mean + n x stddev where n can be parametrized).</span>
+<span class="sd">* generate a chart: if several raster images are computed and if we can extract a date from the</span>
+<span class="sd">  filenames (because the raster is of a known type), generate one chart</span>
+<span class="sd">  per statistics (x=time, y=stats)</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">rasterio</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">Rastertool</span><span class="p">,</span> <span class="n">RastertoolConfigurationException</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">compute_zonal_stats</span><span class="p">,</span> <span class="n">compute_zonal_stats_per_category</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">extract_zonal_outliers</span><span class="p">,</span> <span class="n">plot_stats</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">vector</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">RasterProduct</span>
+
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Zonalstats"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.html#eolab.rastertools.zonalstats.Zonalstats">[docs]</a><span class="k">class</span> <span class="nc">Zonalstats</span><span class="p">(</span><span class="n">Rastertool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raster tool that computes zonal statistics of a raster product.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">supported_output_formats</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;ESRI Shapefile&#39;</span><span class="p">:</span> <span class="s1">&#39;shp&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GeoJSON&#39;</span><span class="p">:</span> <span class="s1">&#39;geojson&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;CSV&#39;</span><span class="p">:</span> <span class="s1">&#39;csv&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GPKG&#39;</span><span class="p">:</span> <span class="s1">&#39;gpkg&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;GML&#39;</span><span class="p">:</span> <span class="s1">&#39;gml&#39;</span>
+    <span class="p">}</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of all possible output format are provided by fiona.supported_drivers.keys()&quot;&quot;&quot;</span>
+
+    <span class="n">valid_stats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">,</span> <span class="s1">&#39;valid&#39;</span><span class="p">,</span> <span class="s1">&#39;nodata&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;min&#39;</span><span class="p">,</span> <span class="s1">&#39;max&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="s1">&#39;median&#39;</span><span class="p">,</span> <span class="s2">&quot;mad&quot;</span><span class="p">,</span> <span class="s1">&#39;range&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;majority&#39;</span><span class="p">,</span> <span class="s1">&#39;minority&#39;</span><span class="p">,</span> <span class="s1">&#39;unique&#39;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List of stats that can be computed. In addition to this list, &quot;percentile_xx&quot; is</span>
+<span class="sd">    also a valid stat where xx is the percentile value, e.g. percentile_70&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Zonalstats.__init__"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.__init__.html#eolab.rastertools.zonalstats.Zonalstats.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stats</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">categorical</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">valid_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">area</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stats ([str]):</span>
+<span class="sd">                List of stats to compute. Zonalstats.valid_stats defined the list of valid stats</span>
+<span class="sd">                except percentile which can be defined as string concatenating percentile\\_ with</span>
+<span class="sd">                the percentile value (from 0 to 100).</span>
+<span class="sd">            categorical (bool, optional, default=False):</span>
+<span class="sd">                If true and input raster is &quot;categorical&quot;, add the counts of every unique</span>
+<span class="sd">                raster values to the stats</span>
+<span class="sd">            valid_threshold (float, optional, default=0.0):</span>
+<span class="sd">                Minimum percentage of valid pixels in a shape to compute its statistics ([0.0, 1.0])</span>
+<span class="sd">            area (bool, optional, default=False):</span>
+<span class="sd">                If true, statistics are multiplied by the pixel area of the raster input</span>
+<span class="sd">            prefix (str, optional, default=None]):</span>
+<span class="sd">                Add a prefix to the stats keys, one prefix per band. The argument is a string</span>
+<span class="sd">                with all prefixes separated by a space.</span>
+<span class="sd">            bands ([int], optional, default=[1]):</span>
+<span class="sd">                List of bands in the input image to process.</span>
+<span class="sd">                Set None if all bands shall be processed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="o">=</span> <span class="n">stats</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_categorical</span> <span class="o">=</span> <span class="n">categorical</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">valid_threshold</span> <span class="ow">or</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Valid threshold must be in range [0.0, 1.0].&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">&gt;</span> <span class="mf">1e-5</span> <span class="ow">and</span> <span class="s2">&quot;valid&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot apply a valid threshold when the computation &quot;</span>
+                <span class="s2">&quot;of the valid stat has not been requested.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_valid_threshold</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_area</span> <span class="o">=</span> <span class="n">area</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span> <span class="o">=</span> <span class="n">prefix</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">prefix</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__check_stats</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span> <span class="o">=</span> <span class="n">bands</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">=</span> <span class="s2">&quot;ESRI Shapefile&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_within</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chart_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_index</span> <span class="o">=</span> <span class="s1">&#39;ID&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_chart</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category_file</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category_file_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category_labels</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats_dates</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">generated_stats_per_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;After processing one or several files, this method enables to retrieve a dictionary</span>
+<span class="sd">        that contains the statistics for each inputfile&#39;s date:</span>
+
+<span class="sd">        - keys are timestamps</span>
+<span class="sd">        - values are the statistics at the corresponding timestam</span>
+
+<span class="sd">        Warning:</span>
+<span class="sd">            When the timestamp of the input raster cannot be retrieved, the dictionary does not</span>
+<span class="sd">            contain the generated statistics for this input raster. In this case, prefer calling</span>
+<span class="sd">            generated_stats to get the stats as a list (one item per input file).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats_dates</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="n">date</span><span class="p">:</span> <span class="n">stats</span>
+                   <span class="k">for</span> <span class="p">(</span><span class="n">date</span><span class="p">,</span> <span class="n">stats</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_stats_dates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generated_stats</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">generated_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of generated stats in the same order as the input files&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">generated_stats_dates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of dates when they can be extracted from the input files&#39; names&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats_dates</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of stats to compute&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">categorical</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether to compute the counts of every unique pixel values&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_categorical</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">valid_threshold</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Minimum percentage of valid pixels in a shape to compute its statistics&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_threshold</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">area</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether to compute the statistics multiplied by the pixel area&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_area</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prefix of the features stats (one per band)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prefix</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bands</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of bands to process&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">output_format</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Output format for the features stats&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">geometries</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The geometries where to compute zonal statistics&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">within</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether to compute stats for geometries within the raster (if False, stats for</span>
+<span class="sd">           all geometries intersecting the raster are computed)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_within</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sigma</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of sigmas for identifying outliers&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">chart_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Name of the chart file to generate&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_chart_file</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">geometry_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The column name identifying the name of the geometry&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_index</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">display_chart</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether to display the chart&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_display_chart</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">category_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filename containing the categories when computing stats per</span>
+<span class="sd">           categories in the geometries&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category_file</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">category_file_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Type of the category file, either &#39;raster&#39; or &#39;vector&#39;&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category_file_type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">category_index</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Column name identifying categories in categroy_file (only if file format</span>
+<span class="sd">           is geometries)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category_index</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">category_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dict with classes index as keys and names to display as values&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_category_labels</span>
+
+    <span class="k">def</span> <span class="nf">__check_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check that the requested stats are valid.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stats_to_compute ([str]):</span>
+<span class="sd">                List of stats to compute</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span>
+            <span class="c1"># check percentile format</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;percentile_&quot;</span><span class="p">):</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;percentile_&quot;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+                <span class="c1"># percentile must be in range [0, 100]</span>
+                <span class="k">if</span> <span class="n">q</span> <span class="o">&gt;</span> <span class="mf">100.0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span><span class="s1">&#39;percentiles must be &lt;= 100&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">q</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span><span class="s1">&#39;percentiles must be &gt;= 0&#39;</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Zonalstats</span><span class="o">.</span><span class="n">valid_stats</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Invalid stat </span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">: must be &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;percentile_xxx or one of </span><span class="si">{</span><span class="n">Zonalstats</span><span class="o">.</span><span class="n">valid_stats</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Zonalstats.with_output"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.with_output.html#eolab.rastertools.zonalstats.Zonalstats.with_output">[docs]</a>    <span class="k">def</span> <span class="nf">with_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">output_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ESRI Shapefile&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            outputdir (str, optional, default=&quot;.&quot;):</span>
+<span class="sd">                Output dir where to store results. If none, results are not dumped to a file.</span>
+<span class="sd">            output_format (str, optional, default=&quot;ESRI Shapefile&quot;):</span>
+<span class="sd">                Format of the output &#39;ESRI Shapefile&#39;, &#39;GeoJSON&#39;, &#39;CSV&#39;, &#39;GPKG&#39;, &#39;GML&#39;</span>
+<span class="sd">                (see supported_output_formats). If None, it is set to ESRI Shapefile</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Zonalstats`: the current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">with_output</span><span class="p">(</span><span class="n">outputdir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="o">=</span> <span class="n">output_format</span> <span class="ow">or</span> <span class="s1">&#39;ESRI Shapefile&#39;</span>
+        <span class="c1"># check if output_format exists</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_output_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Zonalstats</span><span class="o">.</span><span class="n">supported_output_formats</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">RastertoolConfigurationException</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unrecognized output format </span><span class="si">{</span><span class="n">output_format</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Possible values are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">Zonalstats</span><span class="o">.</span><span class="n">supported_output_formats</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Zonalstats.with_geometries"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.with_geometries.html#eolab.rastertools.zonalstats.Zonalstats.with_geometries">[docs]</a>    <span class="k">def</span> <span class="nf">with_geometries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">geometries</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">within</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the geometries where to compute stats.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            geometries (str):</span>
+<span class="sd">                Name of the file containing the geometries where to compute zonal stats. If not set,</span>
+<span class="sd">                stats are computed on the whole raster image</span>
+<span class="sd">            within (bool, optional, default=False):</span>
+<span class="sd">                Whether to compute stats only for geometries within the raster. If False,</span>
+<span class="sd">                statistics are computed for geometries that intersect the raster shape.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Zonalstats`: the current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geometries</span> <span class="o">=</span> <span class="n">geometries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_within</span> <span class="o">=</span> <span class="n">within</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Zonalstats.with_outliers"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.with_outliers.html#eolab.rastertools.zonalstats.Zonalstats.with_outliers">[docs]</a>    <span class="k">def</span> <span class="nf">with_outliers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the computation of outliers</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sigma (float):</span>
+<span class="sd">                Distance to the mean value to consider a pixel as an outlier (expressed</span>
+<span class="sd">                in sigma, e.g. the value 2 means that pixels values greater than</span>
+<span class="sd">                mean value + 2 * std are outliers)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Zonalstats`: the current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Manage sigma computation option that requires mean + std dev computation</span>
+        <span class="k">if</span> <span class="s2">&quot;mean&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;std&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;std&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="n">sigma</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Zonalstats.with_chart"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.with_chart.html#eolab.rastertools.zonalstats.Zonalstats.with_chart">[docs]</a>    <span class="k">def</span> <span class="nf">with_chart</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">chart_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">geometry_index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;ID&#39;</span><span class="p">,</span> <span class="n">display</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the charting capability</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            chart_file (str, optional, default=None):</span>
+<span class="sd">                If not None, generate a chart with the statistics and saves it to str</span>
+<span class="sd">            geometry_index (str, optional, default=&#39;ID&#39;):</span>
+<span class="sd">                Name of the index in the geometry file</span>
+<span class="sd">            display (bool, optional, default=False):</span>
+<span class="sd">                If true, display the chart with the statistics</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Zonalstats`: the current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_chart_file</span> <span class="o">=</span> <span class="n">chart_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_geometry_index</span> <span class="o">=</span> <span class="n">geometry_index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_display_chart</span> <span class="o">=</span> <span class="n">display</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Zonalstats.with_per_category"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.with_per_category.html#eolab.rastertools.zonalstats.Zonalstats.with_per_category">[docs]</a>    <span class="k">def</span> <span class="nf">with_per_category</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">category_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">category_index</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Classe&#39;</span><span class="p">,</span>
+                          <span class="n">category_labels_json</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the zonal stats computation per categories</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            category_file (str):</span>
+<span class="sd">                Name of the file containing the categories</span>
+<span class="sd">            category_index (str, optional, default=&#39;Classe&#39;):</span>
+<span class="sd">                Name of column containing the category value (if category_file is a vector)</span>
+<span class="sd">            category_labels_json (str, optional, default=None):</span>
+<span class="sd">                Name of json file containing the dict that associates category values</span>
+<span class="sd">                to category names</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Zonalstats`: the current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category_file</span> <span class="o">=</span> <span class="n">category_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_category_index</span> <span class="o">=</span> <span class="n">category_index</span>
+        <span class="c1"># get the category file type</span>
+        <span class="k">if</span> <span class="n">category_file</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_suffixes</span><span class="p">(</span><span class="n">category_file</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">suffix</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="ow">in</span> <span class="n">Zonalstats</span><span class="o">.</span><span class="n">supported_output_formats</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_category_file_type</span> <span class="o">=</span> <span class="s2">&quot;vector&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># not a vector, maybe a raster? try to open it with rasterio</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">category_file</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">category_file</span><span class="si">}</span><span class="s2"> cannot be read: check format and existence&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_category_file_type</span> <span class="o">=</span> <span class="s2">&quot;raster&quot;</span>
+        <span class="c1"># get the dict of category labels</span>
+        <span class="k">if</span> <span class="n">category_labels_json</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">category_labels_json</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_category_labels</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">RastertoolConfigurationException</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;File </span><span class="si">{</span><span class="n">category_labels_json</span><span class="si">}</span><span class="s2"> does not contain a valid dict.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">err</span>
+
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Zonalstats.process_file"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.process_file.html#eolab.rastertools.zonalstats.Zonalstats.process_file">[docs]</a>    <span class="k">def</span> <span class="nf">process_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the stats for a single input file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfile (str):</span>
+<span class="sd">                Input image to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: List of generated statistical images (posix paths) that have been generated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file </span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># STEP 1: Prepare the input image so that it can be processed</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Prepare the input for computation&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">RasterProduct</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">vrt_outputdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vrt_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">product</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">rastertype</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_file</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unrecognized raster type of input file,&quot;</span>
+                              <span class="s2">&quot; cannot extract date for plotting&quot;</span><span class="p">)</span>
+
+            <span class="c1"># open raster to get metadata</span>
+            <span class="n">raster</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">get_raster</span><span class="p">()</span>
+
+            <span class="n">rst</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
+            <span class="n">bound</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">rst</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+            <span class="n">indexes</span> <span class="o">=</span> <span class="n">rst</span><span class="o">.</span><span class="n">indexes</span>
+            <span class="n">descr</span> <span class="o">=</span> <span class="n">rst</span><span class="o">.</span><span class="n">descriptions</span>
+
+            <span class="n">geotransform</span> <span class="o">=</span> <span class="n">rst</span><span class="o">.</span><span class="n">get_transform</span><span class="p">()</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">geotransform</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">geotransform</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span>
+            <span class="n">area_square_meter</span> <span class="o">=</span> <span class="n">width</span> <span class="o">*</span> <span class="n">height</span>
+            <span class="n">rst</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="n">date_str</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">get_date_string</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">-%H%M%S&#39;</span><span class="p">)</span>
+
+            <span class="c1"># check band index and handle all bands options (when bands is None)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">bands</span> <span class="o">=</span> <span class="n">indexes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands</span>
+            <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">bound</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid bands, all values are not in range [1, </span><span class="si">{</span><span class="n">bound</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+
+            <span class="c1"># check the prefix</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Number of prefix does not equal the number of bands.&quot;</span><span class="p">)</span>
+
+            <span class="c1"># STEP 2: Prepare the geometries where to compute zonal stats</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">:</span>
+                <span class="c1"># reproject &amp; filter input geometries to fit the raster extent</span>
+                <span class="n">geometries</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span>
+                    <span class="n">vector</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">geometries</span><span class="p">,</span> <span class="n">raster</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">within</span><span class="p">),</span> <span class="n">raster</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># if no geometry is defined, get the geometry from raster shape</span>
+                <span class="n">geometries</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">get_raster_shape</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span>
+
+            <span class="c1"># STEP 3: Compute the statistics</span>
+            <span class="n">geom_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_stats</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">geometries</span><span class="p">,</span>
+                                            <span class="n">descr</span><span class="p">,</span> <span class="n">date_str</span><span class="p">,</span> <span class="n">area_square_meter</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geom_stats</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">date_str</span><span class="p">:</span>
+                <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">-%H%M%S&#39;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_generated_stats_dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
+
+            <span class="c1"># STEP 4: Generate outputs</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputdir</span><span class="p">:</span>
+                <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+                <span class="n">ext</span> <span class="o">=</span> <span class="n">Zonalstats</span><span class="o">.</span><span class="n">supported_output_formats</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">output_format</span><span class="p">]</span>
+                <span class="n">outputname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="si">}</span><span class="s2">-stats.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">outputfile</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">outputname</span><span class="p">)</span>
+                <span class="n">geom_stats</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">outputfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">driver</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_format</span><span class="p">)</span>
+                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outputfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+                <span class="c1"># if sigma is not None, generate the outliers image</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">:</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Extract outliers&quot;</span><span class="p">)</span>
+                    <span class="n">outliersfile</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="si">}</span><span class="s2">-stats-outliers.tif&quot;</span><span class="p">)</span>
+                    <span class="n">extract_zonal_outliers</span><span class="p">(</span><span class="n">geom_stats</span><span class="p">,</span> <span class="n">raster</span><span class="p">,</span> <span class="n">outliersfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+                                           <span class="n">prefix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">),</span>
+                                           <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">)</span>
+                    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outliersfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+            <span class="k">return</span> <span class="n">outputs</span></div>
+
+<div class="viewcode-block" id="Zonalstats.postprocess_files"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.postprocess_files.html#eolab.rastertools.zonalstats.Zonalstats.postprocess_files">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">outputfiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate the chart if requested after computing stats for each input file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfiles ([str]): Input images to process</span>
+<span class="sd">            outputfiles ([str]): List of generated files after executing the</span>
+<span class="sd">                rastertool on the input files</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: A list containing the chart file if requested</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">additional_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chart_file</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generated_stats_per_date</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Generating chart&quot;</span><span class="p">)</span>
+            <span class="n">plot_stats</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chart_file</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">generated_stats_per_date</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry_index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_chart</span><span class="p">)</span>
+            <span class="n">additional_outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chart_file</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">additional_outputs</span></div>
+
+<div class="viewcode-block" id="Zonalstats.compute_stats"><a class="viewcode-back" href="../../../api/eolab.rastertools.Zonalstats.compute_stats.html#eolab.rastertools.zonalstats.Zonalstats.compute_stats">[docs]</a>    <span class="k">def</span> <span class="nf">compute_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raster</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+                      <span class="n">geometries</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+                      <span class="n">descr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                      <span class="n">area_square_meter</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the statistics of the input data. [Minimum, Maximum, Mean, Standard deviation]</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            raster (str):</span>
+<span class="sd">                Input image to process</span>
+<span class="sd">            bands ([int]):</span>
+<span class="sd">                List of bands in the input image to process. Empty list means all bands</span>
+<span class="sd">            geometries (GeoDataFrame):</span>
+<span class="sd">                Geometries where to add statistics (geometries must be in the same</span>
+<span class="sd">                projection as the raster)</span>
+<span class="sd">            descr ([str]):</span>
+<span class="sd">                Band descriptions</span>
+<span class="sd">            date (str):</span>
+<span class="sd">                Timestamp of the input raster</span>
+<span class="sd">            area_square_meter (int):</span>
+<span class="sd">                Area represented by a pixel</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        list[list[dict]]</span>
+<span class="sd">        The dictionnary associates the name of the statistics to its value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Compute statistics&quot;</span><span class="p">)</span>
+        <span class="c1"># Compute zonal statistics</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">category_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># prepare the categories data</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">category_file_type</span> <span class="o">==</span> <span class="s2">&quot;vector&quot;</span><span class="p">:</span>
+                <span class="c1"># clip categories to the raster bounds and reproject in the raster crs</span>
+                <span class="n">class_geom</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span>
+                    <span class="n">vector</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category_file</span><span class="p">,</span> <span class="n">raster</span><span class="p">),</span>
+                    <span class="n">raster</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># filetype is raster</span>
+                <span class="c1"># vectorize the raster and reproject in the raster crs</span>
+                <span class="n">class_geom</span> <span class="o">=</span> <span class="n">vector</span><span class="o">.</span><span class="n">reproject</span><span class="p">(</span>
+                    <span class="n">vector</span><span class="o">.</span><span class="n">vectorize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category_file</span><span class="p">,</span> <span class="n">raster</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">category_index</span><span class="p">),</span>
+                    <span class="n">raster</span><span class="p">)</span>
+
+            <span class="c1"># compute the statistics per category</span>
+            <span class="n">statistics</span> <span class="o">=</span> <span class="n">compute_zonal_stats_per_category</span><span class="p">(</span>
+                <span class="n">geometries</span><span class="p">,</span> <span class="n">raster</span><span class="p">,</span>
+                <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span>
+                <span class="n">stats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
+                <span class="n">categories</span><span class="o">=</span><span class="n">class_geom</span><span class="p">,</span>
+                <span class="n">category_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category_index</span><span class="p">,</span>
+                <span class="n">category_labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">category_labels</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">statistics</span> <span class="o">=</span> <span class="n">compute_zonal_stats</span><span class="p">(</span>
+                <span class="n">geometries</span><span class="p">,</span> <span class="n">raster</span><span class="p">,</span>
+                <span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span>
+                <span class="n">stats</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="p">,</span>
+                <span class="n">categorical</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical</span><span class="p">)</span>
+
+        <span class="c1"># apply area</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">area</span><span class="p">:</span>
+            <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">area_square_meter</span> <span class="o">*</span> <span class="n">val</span><span class="p">})</span>
+             <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">statistics</span>
+             <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">s</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">val</span><span class="p">)]</span>
+
+        <span class="c1"># convert statistics to GeoDataFrame</span>
+        <span class="n">geom_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stats_to_geoms</span><span class="p">(</span><span class="n">statistics</span><span class="p">,</span> <span class="n">geometries</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">descr</span><span class="p">,</span> <span class="n">date</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">geom_stats</span></div>
+
+    <span class="k">def</span> <span class="nf">__stats_to_geoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">statistics_data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>
+                         <span class="n">geometries</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+                         <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">descr</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">date</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Appends statistics to the geodataframe.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            statistics_data:</span>
+<span class="sd">                A list of list of dictionnaries. Dict associates the stat names and the stat values.</span>
+<span class="sd">            geometries (GeoDataFrame):</span>
+<span class="sd">                Geometries where to add statistics</span>
+<span class="sd">            bands ([int]):</span>
+<span class="sd">                List of bands in the input image to process. Empty list means all bands</span>
+<span class="sd">            descr ([str]):</span>
+<span class="sd">                Bands descriptions to add to global metadata</span>
+<span class="sd">            date (str):</span>
+<span class="sd">                Date of raster to add to global metadata</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GeoDataFrame: The updated geometries with statistics saved in metadata of</span>
+<span class="sd">            the following form: b{band_number}.{metadata_name} where metadata_name is</span>
+<span class="sd">            successively the band name, the date and the statistics names (min, mean, max, median, std)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prefix</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">band</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bands</span><span class="p">):</span>
+            <span class="c1"># add general metadata to geometries</span>
+            <span class="k">if</span> <span class="n">descr</span> <span class="ow">and</span> <span class="n">descr</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+                <span class="n">geometries</span><span class="p">[</span><span class="n">utils</span><span class="o">.</span><span class="n">get_metadata_name</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">prefix</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;name&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">descr</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">date</span><span class="p">:</span>
+                <span class="n">geometries</span><span class="p">[</span><span class="n">utils</span><span class="o">.</span><span class="n">get_metadata_name</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">prefix</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;date&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">date</span>
+
+            <span class="c1"># get all statistics names since additional statistics coming from categorical</span>
+            <span class="c1"># option may have been computed</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">categorical_stats</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="p">[</span><span class="n">categorical_stats</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">statistics_data</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">category_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># remove stats from the categorical stats</span>
+                <span class="c1"># and add the categorical stats to the stats</span>
+                <span class="c1"># remark: this operation seems strange but it ensures that stats are</span>
+                <span class="c1"># in the correct order</span>
+                <span class="n">categorical_stats</span> <span class="o">-=</span> <span class="nb">set</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">categorical_stats</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># per_category mode do not compute overall stats.</span>
+                <span class="c1"># So stats is not exended but replaced</span>
+                <span class="n">stats</span> <span class="o">=</span> <span class="n">categorical_stats</span>
+
+            <span class="k">for</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="p">:</span>
+                <span class="n">cond</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_threshold</span> <span class="o">&lt;</span> <span class="mf">1e-5</span> <span class="ow">or</span> <span class="n">stat</span> <span class="o">==</span> <span class="s2">&quot;valid&quot;</span>
+                <span class="n">metadataname</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_metadata_name</span><span class="p">(</span><span class="n">band</span><span class="p">,</span> <span class="n">prefix</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">stat</span><span class="p">)</span>
+                <span class="n">geometries</span><span class="p">[</span><span class="n">metadataname</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">stat</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="p">(</span><span class="n">cond</span> <span class="ow">or</span> <span class="n">s</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;valid&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_threshold</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">statistics_data</span>
+                <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">geometries</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

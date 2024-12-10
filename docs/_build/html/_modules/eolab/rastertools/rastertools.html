@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.rastertools &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.rastertools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.rastertools</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines the base class for every Rastertool, namely :obj:`eolab.rastertools.Rastertool`.</span>
+
+<span class="sd">It also defines a specific Exception class that shall be raised when invalid rastertool&#39;s</span>
+<span class="sd">configuration parameters are setup.</span>
+
+<span class="sd">Finally, it defines additional decorator classes that factorize some rastertool configuration</span>
+<span class="sd">features. For example, the class :obj:`eolab.rastertools.Windowable` enables to configure a</span>
+<span class="sd">rastertool with windowable capabilities (i.e. capability to split the raster input file in small</span>
+<span class="sd">parts in order to distribute the processing over several cpus).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RastertoolConfigurationException"><a class="viewcode-back" href="../../../api/eolab.rastertools.RastertoolConfigurationException.html#eolab.rastertools.rastertools.RastertoolConfigurationException">[docs]</a><span class="k">class</span> <span class="nc">RastertoolConfigurationException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class defines an exception that is raised when the configuration of the raster tool</span>
+<span class="sd">    is invalid (wrong input parameter)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Rastertool"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.html#eolab.rastertools.rastertools.Rastertool">[docs]</a><span class="k">class</span> <span class="nc">Rastertool</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for every raster tool which contains the common configuration:</span>
+
+<span class="sd">    - the output dir where to store the results (by default, current dir)</span>
+<span class="sd">    - whether to save to disk the intermediate VRT images that can be created when</span>
+<span class="sd">      handling the input raster products (that can be an archive of several band files for</span>
+<span class="sd">      example). This parameter is mainly for debug purpose and is False by default.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Rastertool.__init__"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.__init__.html#eolab.rastertools.rastertools.Rastertool.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keep_vrt</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outputdir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Path of the output directory where are stored the results&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">keep_vrt</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether intermediate VRT images shall be kept&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keep_vrt</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vrt_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dir where to store intermediate VRT images&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">outputdir</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">keep_vrt</span> <span class="k">else</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Rastertool.with_output"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.with_output.html#eolab.rastertools.rastertools.Rastertool.with_output">[docs]</a>    <span class="k">def</span> <span class="nf">with_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            outputdir (str, optional, default=&quot;.&quot;):</span>
+<span class="sd">                Output dir where to store results. If none, it is set to current dir</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Rastertool`: The current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">outputdir</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(</span><span class="n">outputdir</span><span class="p">):</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span>
+                <span class="n">RastertoolConfigurationException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output directory </span><span class="se">\&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">outputdir</span><span class="p">)</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> does not exist.&quot;</span><span class="p">))</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outputdir</span> <span class="o">=</span> <span class="n">outputdir</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Rastertool.with_vrt_stored"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.with_vrt_stored.html#eolab.rastertools.rastertools.Rastertool.with_vrt_stored">[docs]</a>    <span class="k">def</span> <span class="nf">with_vrt_stored</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keep_vrt</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure if the intermediate VRT images that are generated when handling</span>
+<span class="sd">        the input files (which can be complex raster product composed of several band files)</span>
+<span class="sd">        shall be stored to disk or not - for debug purpose for instance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            keep_vrt (bool):</span>
+<span class="sd">                Whether intermediate VRT images shall be stored or not</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Rastertool`: The current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_keep_vrt</span> <span class="o">=</span> <span class="n">keep_vrt</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Rastertool.process_files"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.process_files.html#eolab.rastertools.rastertools.Rastertool.process_files">[docs]</a>    <span class="k">def</span> <span class="nf">process_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the rastertool to a set of input files. By default, this implementation</span>
+<span class="sd">        recursively calls &quot;process_file&quot; on each input file and then calls &quot;postprocess_files&quot;.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            It is not meant to be overriden by subclasses. Prefer overriding process_file</span>
+<span class="sd">            and postproces_files instead.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfiles ([str]): Input images to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ([str]) The list of the generated files</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_outputs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">inputfiles</span><span class="p">:</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">outputs</span><span class="p">:</span>
+                <span class="n">all_outputs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+        <span class="c1"># add a postprocessing call</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_files</span><span class="p">(</span><span class="n">inputfiles</span><span class="p">,</span> <span class="n">all_outputs</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">outputs</span><span class="p">:</span>
+            <span class="n">all_outputs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">all_outputs</span></div>
+
+<div class="viewcode-block" id="Rastertool.process_file"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.process_file.html#eolab.rastertools.rastertools.Rastertool.process_file">[docs]</a>    <span class="k">def</span> <span class="nf">process_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the rastertool to a single input file.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This implementation does nothing. Override this method in the subclass</span>
+<span class="sd">            to achieve special processing of an inputfile.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfile (str):</span>
+<span class="sd">                Input image to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: List of generated files (by default empty list)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># nothing to do by default, just return input file as output</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Rastertool.postprocess_files"><a class="viewcode-back" href="../../../api/eolab.rastertools.Rastertool.postprocess_files.html#eolab.rastertools.rastertools.Rastertool.postprocess_files">[docs]</a>    <span class="k">def</span> <span class="nf">postprocess_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">outputfiles</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a postprocess when all input files have been processed. This step may consist</span>
+<span class="sd">        in transforming the outputs or mixing them to generate additional ones.</span>
+
+<span class="sd">        Note:</span>
+<span class="sd">            This implementation does nothing. Override this method in the subclass</span>
+<span class="sd">            to achieve special processing that needs the whole list of inputfiles</span>
+<span class="sd">            and/or the output files generated when processing every single file (to mix</span>
+<span class="sd">            them for instance).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfiles ([str]): Input images to process</span>
+<span class="sd">            outputfiles ([str]): List of generated files after executing the</span>
+<span class="sd">                rastertool on the input files</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">            [str]: Additional output files (by default empty list)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># nothing to do by default</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Windowable"><a class="viewcode-back" href="../../../api/eolab.rastertools.Windowable.html#eolab.rastertools.rastertools.Windowable">[docs]</a><span class="k">class</span> <span class="nc">Windowable</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator of a :obj:`eolab.rastertools.Rastertool` that adds configuration</span>
+<span class="sd">    parameters to set the windowable capability of the tool:</span>
+
+<span class="sd">    - the window size</span>
+<span class="sd">    - the mode for padding the window when at the edge of the image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">window_size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Size of the windows to split the image in small parts&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_window_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pad_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mode used to `pad &lt;https://numpy.org/doc/stable/reference/generated/numpy.pad.html&gt;`_ the image when the window is on the edge of the image</span>
+<span class="sd">        The mode can be self defined or among [constant (default), edge, linear_ramp, maximum, mean, median, minimum, reflect, symmetric, wrap, empty].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_mode</span>
+
+<div class="viewcode-block" id="Windowable.with_windows"><a class="viewcode-back" href="../../../api/eolab.rastertools.Windowable.with_windows.html#eolab.rastertools.rastertools.Windowable.with_windows">[docs]</a>    <span class="k">def</span> <span class="nf">with_windows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">pad_mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;edge&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the window generation for processing image</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            window_size (int, optional, default=1024):</span>
+<span class="sd">                Size of windows for splitting the processed image in small parts</span>
+<span class="sd">                so that processing can be distributed on several cpus.</span>
+<span class="sd">            pad_mode (str, optional, default=&quot;edge&quot;):</span>
+<span class="sd">                Mode for padding data around the windows that are on the edge of the image.</span>
+<span class="sd">                See https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Rastertool`: The current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_window_size</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_tuple</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pad_mode</span> <span class="o">=</span> <span class="n">pad_mode</span>
+        <span class="k">return</span> <span class="bp">self</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

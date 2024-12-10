@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>zonalstats &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API Reference" href="../usage.html" />
+    <link rel="prev" title="timeseries" href="timeseries.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../cli.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="filtering.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hillshade.html">hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radioindice.html">radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="speed.html">speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svf.html">svf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tiling.html">tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timeseries.html">timeseries</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#docker-singularity">Docker/Singularity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">Command Line Interface</a></li>
+      <li class="breadcrumb-item active">zonalstats</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cli/zonalstats.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="zonalstats">
+<h1>zonalstats<a class="headerlink" href="#zonalstats" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">zonalstats</span></code> (or <code class="docutils literal notranslate"><span class="pre">zs</span></code>) computes zonal statistics of an input raster. The zones are defined by
+a vector file (shapefile, geojson, etc.). If no vector file is provided, the statistics are
+computed on the whole image.</p>
+<p>Statistics inside a geometry can be computed for different categories also defined by a vector
+file. For instance, is is possible to compute the average height of buildings and vegetation of
+cities using:</p>
+<ul class="simple">
+<li><p>a Digital Height Model (input raster file)</p></li>
+<li><p>a shapefile with the boundaries of cities (-g argument)</p></li>
+<li><p>a shapefile with the buildings / vegetation classification (–category_file)</p></li>
+</ul>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>zonalstats<span class="w"> </span>--help
+<span class="go">usage: rastertools zonalstats [-h] [-o OUTPUT] [-f OUTPUT_FORMAT]</span>
+<span class="go">                              [-g GEOMETRIES] [-w] [--stats STATS [STATS ...]]</span>
+<span class="go">                              [--categorical]</span>
+<span class="go">                              [--valid_threshold VALID_THRESHOLD] [--area]</span>
+<span class="go">                              [--prefix PREFIX] [-b BANDS [BANDS ...]] [-a]</span>
+<span class="go">                              [--sigma SIGMA] [-c CHARTFILE] [-d]</span>
+<span class="go">                              [-gi GEOM_INDEX] [--category_file CATEGORY_FILE]</span>
+<span class="go">                              [--category_index CATEGORY_INDEX]</span>
+<span class="go">                              [--category_names CATEGORY_NAMES]</span>
+<span class="go">                              inputs [inputs ...]</span>
+
+<span class="go">Compute zonal statistics of a raster image.</span>
+
+<span class="go">Available statistics are: min, max, range, mean, std, percentile_x (x in [0,</span>
+<span class="go">100]), median, mad, count, valid, nodata, sum, majority, minority, unique.</span>
+
+<span class="go">By default, only the first band is computed unless specified otherwise.</span>
+
+<span class="go">Arguments:</span>
+
+<span class="go">  inputs TEXT</span>
+
+<span class="go">  Raster files to process. You can provide a single filewith extension</span>
+<span class="go">  &quot;.lst&quot; (e.g. &quot;zonalstats.lst&quot;) that lists the input files to process</span>
+<span class="go">  (one input file per line in .lst)</span>
+
+<span class="go">Options:</span>
+<span class="go">  -o, --output TEXT           Output directory to store results (by default</span>
+<span class="go">                              current directory)</span>
+<span class="go">  -f, --format TEXT           Output format of the results when input</span>
+<span class="go">                              geometries are provided (by default ESRI</span>
+<span class="go">                              Shapefile). Possible values are ESRI Shapefile,</span>
+<span class="go">                              GeoJSON, CSV, GPKG, GML</span>
+<span class="go">  -g, --geometry TEXT         List of geometries where to compute statistics</span>
+<span class="go">                              (vector like a shapefile or geojson)</span>
+<span class="go">  -w, --within                When activated, statistics are computed for the</span>
+<span class="go">                              geometries that are within the raster shape. The</span>
+<span class="go">                              default behaviour otherwise is to compute</span>
+<span class="go">                              statistics for all geometries that intersect the</span>
+<span class="go">                              raster shape.</span>
+<span class="go">  --stats TEXT                List of stats to compute. Possible stats are:</span>
+<span class="go">                              min max range mean std percentile_x (x in [0,</span>
+<span class="go">                              100]) median mad count valid nodata sum majority</span>
+<span class="go">                              minority unique</span>
+<span class="go">  --categorical               If the input raster is categorical (i.e. raster</span>
+<span class="go">                              values represent discrete classes) compute the</span>
+<span class="go">                              counts of every unique pixel values.</span>
+<span class="go">  --valid_threshold FLOAT     Minimum percentage of valid pixels in a shape to</span>
+<span class="go">                              compute its statistics.</span>
+<span class="go">  --area                      Whether to multiply all stats by the area of a</span>
+<span class="go">                              cell of the input raster.</span>
+<span class="go">  --prefix TEXT               Add a prefix to the keys (default: None). One</span>
+<span class="go">                              prefix per band (e.g. &#39;band1 band2&#39;)</span>
+<span class="go">  -b, --bands INTEGER         List of bands to process</span>
+<span class="go">  -a, --all                   Process all bands</span>
+<span class="go">  --sigma TEXT                Distance to the mean value (in sigma) in order</span>
+<span class="go">                              to produce a raster that highlights outliers.</span>
+<span class="go">  -c, --chart TEXT            Generate a chart per stat and per geometry</span>
+<span class="go">                              (x=timestamp of the input products / y=stat</span>
+<span class="go">                              value) and store it in the file defined by this</span>
+<span class="go">                              argument</span>
+<span class="go">  -d, --display               Display the chart</span>
+<span class="go">  -gi, --geometry-index TEXT  Name of the geometry index used for the chart</span>
+<span class="go">                              (default=&#39;ID&#39;)</span>
+<span class="go">  --category_file TEXT        File (raster or geometries) containing discrete</span>
+<span class="go">                              classes classifying the ROI.</span>
+<span class="go">  --category_index TEXT       Column name identifying categories in</span>
+<span class="go">                              categroy_file (only if file format is</span>
+<span class="go">                              geometries)</span>
+<span class="go">  --category_names TEXT       JSON files containing a dict with classes index</span>
+<span class="go">                              as keys and names to display classes as values.</span>
+<span class="go">  -h, --help                  Show this message and exit.</span>
+</pre></div>
+</div>
+<p>When -g option is set with a valid geometries file, <code class="docutils literal notranslate"><span class="pre">zonalstats</span></code> generate a new vector file with the following metadata:</p>
+<ul class="simple">
+<li><p>[prefix].name : name of the band (if available in the input raster)</p></li>
+<li><p>[prefix].date : date of the input raster (if the raster has one of the configured raster types, either a built-in raster
+type or an additional custom raster type)</p></li>
+<li><p>[prefix].[stat] : values of the statistics</p></li>
+<li><p>[prefix].[pixel] : count of pixels having value = [pixel] when the categorical option is activated</p></li>
+<li><p>[prefix].[category][stat] : values of the statistics for the category [category] when the category_names option is activated.</p></li>
+</ul>
+<p>With :</p>
+<ul class="simple">
+<li><p>[prefix] : prefix defined in the command line. If not set in the command line: b[band_number]</p></li>
+<li><p>[stat] : name of the statistics, e.g. mean, std</p></li>
+</ul>
+<p>If no vector file is set in the command line, the statistics are stored in a new vector file that contains a single entry
+whose geometry is the raster shape (without the zones of nodata).</p>
+<p>Examples:</p>
+<p>The following examples use an input raster file generated by radioindice. This is an NDVI of a SENTINEL2 L2A THEIA image that
+covers most of the cities we are interested in.</p>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-geoms.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-geoms.jpg" />
+<p>The first command generates statistics of ndvi values for several cities</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>zs<span class="w"> </span>-f<span class="w"> </span>GeoJSON<span class="w"> </span>-g<span class="w"> </span>COMMUNE_32.geojson<span class="w"> </span>--stats<span class="w"> </span>min<span class="w"> </span>max<span class="w"> </span>mean<span class="w"> </span>std<span class="w"> </span>SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif
+</pre></div>
+</div>
+<p>This generates a new vector file that contains for each entity the stats values.</p>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-stats.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-stats.jpg" />
+<p>Notice that some cities are partially covered by the input raster and their statistics are thus probably not fully relevant.
+To disable the computation for these cities, use option –within.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>zs<span class="w"> </span>-f<span class="w"> </span>GeoJSON<span class="w"> </span>-g<span class="w"> </span>COMMUNE_32.geojson<span class="w"> </span>--within<span class="w"> </span>--stats<span class="w"> </span>min<span class="w"> </span>max<span class="w"> </span>mean<span class="w"> </span>std<span class="w"> </span>SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif
+</pre></div>
+</div>
+<p>The new vector file is now:</p>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-stats2.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-stats2.jpg" />
+<p>Let’s use another raster file that corresponds to a land cover map named OSO. In this map, every pixel has
+a value that represents its class (for instance: 1=dense urban area).</p>
+<p>The following command line enables to count the pixels of every classes:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>zs<span class="w"> </span>-f<span class="w"> </span>GeoJSON<span class="w"> </span>--categorical<span class="w"> </span>OCS_2017_CESBIO.tif
+</pre></div>
+</div>
+<p>The generated vector file contains one geometry (a green square that corresponds to the shape of the
+input raster) with the number of pixels for each category:</p>
+<img alt="../_images/oso-stats.jpg" src="../_images/oso-stats.jpg" />
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="timeseries.html" class="btn btn-neutral float-left" title="timeseries" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../usage.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

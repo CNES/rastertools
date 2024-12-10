@@ -1,0 +1,200 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RasterFilter &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RasterFilter.algo" href="eolab.rastertools.processing.rasterproc.RasterFilter.algo.html" />
+    <link rel="prev" title="RadioindiceProcessing.with_documentation" href="eolab.rastertools.processing.rasterproc.RadioindiceProcessing.with_documentation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../private_api.html">Private API</a></li>
+          <li class="breadcrumb-item"><a href="eolab.rastertools.processing.html">eolab.rastertools.processing</a></li>
+          <li class="breadcrumb-item"><a href="eolab.rastertools.processing.rasterproc.html">eolab.rastertools.processing.rasterproc</a></li>
+      <li class="breadcrumb-item active">RasterFilter</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eolab.rastertools.processing.rasterproc.RasterFilter.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rasterfilter">
+<h1>RasterFilter<a class="headerlink" href="#rasterfilter" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="eolab.rastertools.processing.rasterproc.RasterFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eolab.rastertools.processing.rasterproc.</span></span><span class="sig-name descname"><span class="pre">RasterFilter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo:</span> <span class="pre">~typing.Callable</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodata:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">-2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype:</span> <span class="pre">~numpy.dtype</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'numpy.float32'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_band_algo:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eolab/rastertools/processing/rasterproc.html#RasterFilter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eolab.rastertools.processing.rasterproc.RasterFilter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterProcessing.html#eolab.rastertools.processing.rasterproc.RasterProcessing" title="eolab.rastertools.processing.rasterproc.RasterProcessing"><code class="xref py py-class docutils literal notranslate"><span class="pre">RasterProcessing</span></code></a></p>
+<p>Class that defines a raster processing for applying a filter on a kernel (square of
+configurable size).</p>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.algo.html#eolab.rastertools.processing.rasterproc.RasterFilter.algo" title="eolab.rastertools.processing.rasterproc.RasterFilter.algo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.algo</span></code></a></p></td>
+<td><p>Process an algo that is called on a multidimensional array of data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.aliases.html#eolab.rastertools.processing.rasterproc.RasterFilter.aliases" title="eolab.rastertools.processing.rasterproc.RasterFilter.aliases"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.aliases</span></code></a></p></td>
+<td><p>Aliases of the processing</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.arguments.html#eolab.rastertools.processing.rasterproc.RasterFilter.arguments" title="eolab.rastertools.processing.rasterproc.RasterFilter.arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.arguments</span></code></a></p></td>
+<td><p>Definition of Arguments that parametrize the processing algorithm (see with_arguments for the description of the data structure)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.compress.html#eolab.rastertools.processing.rasterproc.RasterFilter.compress" title="eolab.rastertools.processing.rasterproc.RasterFilter.compress"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.compress</span></code></a></p></td>
+<td><p>Set the compression to use</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.description.html#eolab.rastertools.processing.rasterproc.RasterFilter.description" title="eolab.rastertools.processing.rasterproc.RasterFilter.description"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.description</span></code></a></p></td>
+<td><p>Long description of the processing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.dtype.html#eolab.rastertools.processing.rasterproc.RasterFilter.dtype" title="eolab.rastertools.processing.rasterproc.RasterFilter.dtype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.dtype</span></code></a></p></td>
+<td><p>Type of the generated data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.help.html#eolab.rastertools.processing.rasterproc.RasterFilter.help" title="eolab.rastertools.processing.rasterproc.RasterFilter.help"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.help</span></code></a></p></td>
+<td><p>Help message of the processing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.in_dtype.html#eolab.rastertools.processing.rasterproc.RasterFilter.in_dtype" title="eolab.rastertools.processing.rasterproc.RasterFilter.in_dtype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.in_dtype</span></code></a></p></td>
+<td><p>Type of the processed data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.name.html#eolab.rastertools.processing.rasterproc.RasterFilter.name" title="eolab.rastertools.processing.rasterproc.RasterFilter.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.name</span></code></a></p></td>
+<td><p>Name of the processing</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.nbits.html#eolab.rastertools.processing.rasterproc.RasterFilter.nbits" title="eolab.rastertools.processing.rasterproc.RasterFilter.nbits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.nbits</span></code></a></p></td>
+<td><p>Bits size of the generated data</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.nodata.html#eolab.rastertools.processing.rasterproc.RasterFilter.nodata" title="eolab.rastertools.processing.rasterproc.RasterFilter.nodata"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.nodata</span></code></a></p></td>
+<td><p>No data value of the generated data</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.per_band_algo.html#eolab.rastertools.processing.rasterproc.RasterFilter.per_band_algo" title="eolab.rastertools.processing.rasterproc.RasterFilter.per_band_algo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.per_band_algo</span></code></a></p></td>
+<td><p>Whether the algo is applied on a dataset that contains only one band (per_band_algo=True) or on a dataset with all bands (per_band_algo=False)</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.__init__.html#eolab.rastertools.processing.rasterproc.RasterFilter.__init__" title="eolab.rastertools.processing.rasterproc.RasterFilter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.__init__</span></code></a>(name[, algo, nodata, ...])</p></td>
+<td><p>Constructor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.compute.html#eolab.rastertools.processing.rasterproc.RasterFilter.compute" title="eolab.rastertools.processing.rasterproc.RasterFilter.compute"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.compute</span></code></a>(input_data)</p></td>
+<td><p>Compute the output from the different bands of the input data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.configure.html#eolab.rastertools.processing.rasterproc.RasterFilter.configure" title="eolab.rastertools.processing.rasterproc.RasterFilter.configure"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.configure</span></code></a>(argsdict)</p></td>
+<td><p>Configure the processing algo with its specific arguments' values</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.with_arguments.html#eolab.rastertools.processing.rasterproc.RasterFilter.with_arguments" title="eolab.rastertools.processing.rasterproc.RasterFilter.with_arguments"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.with_arguments</span></code></a>(arguments)</p></td>
+<td><p>Add new arguments that parametrize the processing algorithm.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.processing.rasterproc.RasterFilter.with_documentation.html#eolab.rastertools.processing.rasterproc.RasterFilter.with_documentation" title="eolab.rastertools.processing.rasterproc.RasterFilter.with_documentation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterFilter.with_documentation</span></code></a>([aliases, ...])</p></td>
+<td><p>Set up the documentation for the processing</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eolab.rastertools.processing.rasterproc.RadioindiceProcessing.with_documentation.html" class="btn btn-neutral float-left" title="RadioindiceProcessing.with_documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eolab.rastertools.processing.rasterproc.RasterFilter.algo.html" class="btn btn-neutral float-right" title="RasterFilter.algo" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

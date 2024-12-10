@@ -146,12 +146,6 @@ def compute_speed(date0: datetime, date1: datetime,
             src0 = src0.isel(band=slice(0, len(bands))).astype(dtype)
             src1 = src1.isel(band=slice(0, len(bands))).astype(dtype)
 
-            print('....'*20)
-            print(numpy.nanmin(src0.values))
-            print(numpy.nanmin(src0.values))
-
-            print(numpy.nanmin(src1.values))
-            print(numpy.nanmin(src1.values))
             result = algo.speed(src0, src1, interval).astype(dtype)
 
             ##Create the file and compute

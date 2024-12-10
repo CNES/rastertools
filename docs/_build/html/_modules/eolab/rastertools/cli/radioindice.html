@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.cli.radioindice &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">eolab.rastertools.cli</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.cli.radioindice</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.cli.radioindice</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">CLI definition for the radioindice tool</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">RastertoolConfigurationException</span><span class="p">,</span> <span class="n">Radioindice</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.utils_cli</span> <span class="kn">import</span> <span class="n">apply_process</span><span class="p">,</span> <span class="n">win_opt</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">BandChannel</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">RadioindiceProcessing</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">CONTEXT_SETTINGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">help_option_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-h&#39;</span><span class="p">,</span> <span class="s1">&#39;--help&#39;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="indices_opt"><a class="viewcode-back" href="../../../../api/eolab.rastertools.cli.radioindice.indices_opt.html#eolab.rastertools.cli.radioindice.indices_opt">[docs]</a><span class="k">def</span> <span class="nf">indices_opt</span><span class="p">(</span><span class="n">function</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create options for all the possible indices</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dict_indices</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;--ndvi&#39;</span> <span class="p">:</span> <span class="s2">&quot;ndvi&quot;</span><span class="p">,</span> <span class="s1">&#39;--tndvi&#39;</span> <span class="p">:</span> <span class="s2">&quot;tndvi&quot;</span><span class="p">,</span> <span class="s1">&#39;--rvi&#39;</span> <span class="p">:</span> <span class="s2">&quot;rvi&quot;</span><span class="p">,</span> <span class="s1">&#39;--pvi&#39;</span> <span class="p">:</span> <span class="s2">&quot;pvi&quot;</span><span class="p">,</span> <span class="s1">&#39;--savi&#39;</span> <span class="p">:</span> <span class="s2">&quot;savi&quot;</span><span class="p">,</span> <span class="s1">&#39;--tsavi&#39;</span> <span class="p">:</span> <span class="s2">&quot;tsavi&quot;</span><span class="p">,</span>
+                    <span class="s1">&#39;--msavi&#39;</span> <span class="p">:</span> <span class="s2">&quot;msavi&quot;</span><span class="p">,</span> <span class="s1">&#39;--msavi2&#39;</span> <span class="p">:</span> <span class="s2">&quot;msavi2&quot;</span><span class="p">,</span> <span class="s1">&#39;--ipvi&#39;</span> <span class="p">:</span> <span class="s2">&quot;ipvi&quot;</span><span class="p">,</span>
+                    <span class="s1">&#39;--evi&#39;</span> <span class="p">:</span> <span class="s2">&quot;evi&quot;</span><span class="p">,</span> <span class="s1">&#39;--ndwi&#39;</span> <span class="p">:</span> <span class="s2">&quot;ndwi&quot;</span><span class="p">,</span> <span class="s1">&#39;--ndwi2&#39;</span> <span class="p">:</span> <span class="s2">&quot;ndwi2&quot;</span><span class="p">,</span> <span class="s1">&#39;--mndwi&#39;</span> <span class="p">:</span> <span class="s2">&quot;mndwi&quot;</span><span class="p">,</span>
+                    <span class="s1">&#39;--ndpi&#39;</span> <span class="p">:</span> <span class="s2">&quot;ndpi&quot;</span><span class="p">,</span> <span class="s1">&#39;--ndti&#39;</span> <span class="p">:</span> <span class="s2">&quot;ndti&quot;</span><span class="p">,</span> <span class="s1">&#39;--ndbi&#39;</span> <span class="p">:</span> <span class="s2">&quot;ndbi&quot;</span><span class="p">,</span> <span class="s1">&#39;--ri&#39;</span> <span class="p">:</span> <span class="s2">&quot;ri&quot;</span><span class="p">,</span> <span class="s1">&#39;--bi&#39;</span> <span class="p">:</span> <span class="s2">&quot;bi&quot;</span><span class="p">,</span> <span class="s1">&#39;--bi2&#39;</span> <span class="p">:</span> <span class="s2">&quot;bi2&quot;</span><span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">idc</span> <span class="ow">in</span> <span class="n">dict_indices</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">function</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="n">idc</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Compute &quot;</span> <span class="o">+</span> <span class="n">dict_indices</span><span class="p">[</span><span class="n">idc</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; indice&quot;</span><span class="p">)(</span><span class="n">function</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">function</span></div>
+
+
+<span class="c1">#Radioindice command</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="s2">&quot;radioindice&quot;</span><span class="p">,</span><span class="n">context_settings</span><span class="o">=</span><span class="n">CONTEXT_SETTINGS</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">argument</span><span class="p">(</span><span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">nargs</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">required</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="s1">&#39;--output&#39;</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Output directory to store results (by default current directory)&quot;</span><span class="p">)</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--merge&#39;</span><span class="p">,</span> <span class="n">is_flag</span> <span class="o">=</span>  <span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Merge all indices in the same image (i.e. one band per indice)&quot;</span><span class="p">)</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--roi&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span> <span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Region of interest in the input image (vector)&quot;</span><span class="p">)</span>
+
+<span class="nd">@win_opt</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-i&#39;</span><span class="p">,</span> <span class="s1">&#39;--indices&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">multiple</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="n">help</span><span class="o">=</span><span class="s2">&quot; List of indices to compute. Possible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,&quot;</span>
+                        <span class="s2">&quot; ndti, ndvi, ndwi, ndwi2, pvi, ri, rvi, savi, tndvi, tsavi&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@indices_opt</span>
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-nd&#39;</span><span class="p">,</span> <span class="s1">&#39;--normalized_difference&#39;</span><span class="p">,</span><span class="s1">&#39;nd&#39;</span><span class="p">,</span><span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+    <span class="n">multiple</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;band1 band2&quot;</span><span class="p">,</span>
+              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Compute the normalized difference of two bands defined&quot;</span>
+                        <span class="s2">&quot; as parameter of this option, e.g. </span><span class="se">\&quot;</span><span class="s2">-nd red nir</span><span class="se">\&quot;</span><span class="s2"> will compute (red-nir)/(red+nir). &quot;</span>
+                        <span class="s2">&quot;See eolab.rastertools.product.rastertype.BandChannel for the list of bands names. &quot;</span>
+                        <span class="s2">&quot;Several nd options can be set to compute several normalized differences.&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+<span class="k">def</span> <span class="nf">radioindice</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">inputs</span> <span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">output</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indices</span> <span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">merge</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">roi</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">window_size</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nd</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the requested radio indices on raster data.</span>
+
+<span class="sd">    This command computes various vegetation and environmental indices on satellite or raster data based on the</span>
+<span class="sd">    provided input images and options. The tool can compute specific indices, merge the results into one image,</span>
+<span class="sd">    compute normalized differences between bands, and apply processing using a region of interest (ROI) and specified</span>
+<span class="sd">    tile/window size.</span>
+
+<span class="sd">    Arguments:</span>
+
+<span class="sd">        inputs TEXT</span>
+
+<span class="sd">        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).</span>
+<span class="sd">    You can provide a single file with extension \&quot;.lst\&quot; (e.g. \&quot;radioindice.lst\&quot;) that lists</span>
+<span class="sd">    the input files to process (one input file per line in .lst).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indices_opt</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">value</span><span class="p">]</span>
+    <span class="n">indices_to_compute</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># append indices defined with --&lt;name_of_indice&gt;</span>
+    <span class="n">indices_to_compute</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">indice</span> <span class="k">for</span> <span class="n">indice</span> <span class="ow">in</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">get_default_indices</span><span class="p">()</span>
+                               <span class="k">if</span> <span class="n">indice</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">indices_opt</span><span class="p">])</span>
+
+    <span class="c1"># append indices defined with --indices</span>
+    <span class="k">if</span> <span class="n">indices</span><span class="p">:</span>
+        <span class="n">indices_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">indice</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">indice</span> <span class="k">for</span> <span class="n">indice</span> <span class="ow">in</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">get_default_indices</span><span class="p">()}</span>
+        <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ind</span> <span class="ow">in</span> <span class="n">indices_dict</span><span class="p">:</span>
+                <span class="n">indices_to_compute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indices_dict</span><span class="p">[</span><span class="n">ind</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">RastertoolConfigurationException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid indice name: </span><span class="si">{</span><span class="n">ind</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">nd</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">nd_bands</span> <span class="ow">in</span> <span class="n">nd</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nd_bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">__members__</span> <span class="ow">and</span> <span class="n">nd_bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">__members__</span><span class="p">:</span>
+                <span class="n">channel1</span> <span class="o">=</span> <span class="n">BandChannel</span><span class="p">[</span><span class="n">nd_bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="n">channel2</span> <span class="o">=</span> <span class="n">BandChannel</span><span class="p">[</span><span class="n">nd_bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+                <span class="n">new_indice</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;nd[</span><span class="si">{</span><span class="n">nd_bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">nd_bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">channel2</span><span class="p">,</span> <span class="n">channel1</span><span class="p">])</span>
+                <span class="n">indices_to_compute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_indice</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">RastertoolConfigurationException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid band(s) in normalized difference: </span><span class="si">{</span><span class="n">nd_bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> and/or </span><span class="si">{</span><span class="n">nd_bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># handle special case: no indice setup</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices_to_compute</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">indices_to_compute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Radioindice</span><span class="o">.</span><span class="n">ndvi</span><span class="p">)</span>
+        <span class="n">indices_to_compute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Radioindice</span><span class="o">.</span><span class="n">ndwi</span><span class="p">)</span>
+        <span class="n">indices_to_compute</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Radioindice</span><span class="o">.</span><span class="n">ndwi2</span><span class="p">)</span>
+
+    <span class="c1"># create the rastertool object</span>
+    <span class="n">tool</span> <span class="o">=</span> <span class="n">Radioindice</span><span class="p">(</span><span class="n">indices_to_compute</span><span class="p">)</span>
+
+    <span class="c1"># set up config with args values</span>
+    <span class="n">tool</span><span class="o">.</span><span class="n">with_output</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">merge</span><span class="p">)</span>
+    <span class="n">tool</span><span class="o">.</span><span class="n">with_roi</span><span class="p">(</span><span class="n">roi</span><span class="p">)</span>
+    <span class="n">tool</span><span class="o">.</span><span class="n">with_windows</span><span class="p">(</span><span class="n">window_size</span><span class="p">)</span>
+
+    <span class="n">apply_process</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">tool</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

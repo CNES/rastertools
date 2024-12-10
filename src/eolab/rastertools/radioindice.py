@@ -456,7 +456,6 @@ class Radioindice(Rastertool, Windowable):
         # return the list of generated files
         return outputs
 
-
 def compute_indices(input_image: str, image_channels: List[BandChannel],
                     indice_image: str, indices: List[RadioindiceProcessing],
                     window_size: tuple = (1024, 1024)):
@@ -480,7 +479,7 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
             Size of windows for splitting the processed image in small parts
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-        print(input_image)
+
         with rioxarray.open_rasterio(input_image, masked=True, chunks=True, cache=False, lock = False) as src_array:
 
             # dtype of output data
@@ -532,3 +531,4 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
 
                     # Write metadata to the band
                     dataset.update_tags(band_idx, **stats)
+

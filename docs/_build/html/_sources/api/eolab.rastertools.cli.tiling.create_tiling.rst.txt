@@ -1,0 +1,6 @@
+create\_tiling
+==============
+
+.. currentmodule:: eolab.rastertools.cli.tiling
+
+.. autofunction:: create_tiling

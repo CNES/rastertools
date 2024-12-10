@@ -1,0 +1,219 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hillshade &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="radioindice" href="radioindice.html" />
+    <link rel="prev" title="filter" href="filtering.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../cli.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="filtering.html">filter</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radioindice.html">radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="speed.html">speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svf.html">svf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tiling.html">tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timeseries.html">timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zonalstats.html">zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#docker-singularity">Docker/Singularity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">Command Line Interface</a></li>
+      <li class="breadcrumb-item active">hillshade</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cli/hillshade.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hillshade">
+<h1>hillshade<a class="headerlink" href="#hillshade" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">hillshade</span></code> (or <code class="docutils literal notranslate"><span class="pre">hs</span></code>) subcommand computes the hillshades of a Digital Height Model.
+The tool takes the sun position (elevation and azimuth) as input and
+computes the shadows of the ground surface (buildings, trees, etc.).</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>hillshade<span class="w"> </span>--help
+<span class="go">usage: rastertools hillshade [-h] --elevation ELEVATION --azimuth AZIMUTH</span>
+<span class="go">                             [--radius RADIUS] --resolution RESOLUTION</span>
+<span class="go">                             [-o OUTPUT] [-ws WINDOW_SIZE]</span>
+<span class="go">                             [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]</span>
+<span class="go">                             inputs [inputs ...]</span>
+
+<span class="go">Execute the hillshade subcommand on a Digital Height Model (DHM) using the</span>
+<span class="go">given solar parameters (elevation, azimuth), resolution, and optional</span>
+<span class="go">parameters for processing the raster.</span>
+
+<span class="go">Arguments:</span>
+
+<span class="go">    inputs TEXT</span>
+
+<span class="go">    Input file to process (i.e. geotiff corresponding to a Digital Height</span>
+<span class="go">    Model). You can provide a single file with extension &quot;.lst&quot; (e.g.</span>
+<span class="go">    &quot;hillshade.lst&quot;) that lists the input files to process (one input file</span>
+<span class="go">    per line in .lst)</span>
+
+<span class="go">Options:</span>
+<span class="go">    --elevation FLOAT               Elevation of the sun in degrees, [0°, 90°]</span>
+<span class="go">                                    where 90°=zenith and 0°=horizon  [required]</span>
+<span class="go">    --azimuth FLOAT                 Azimuth of the sun in degrees, [0°, 360°]</span>
+<span class="go">                                    where 0°=north, 90°=east, 180°=south and</span>
+<span class="go">                                    270°=west  [required]</span>
+<span class="go">    --radius INTEGER                Maximum distance (in pixels) around a point</span>
+<span class="go">                                    to evaluate horizontal elevation angle. If</span>
+<span class="go">                                    not set, it is automatically computed from</span>
+<span class="go">                                    the range of altitudes in the digital model.</span>
+<span class="go">    --resolution FLOAT              Pixel resolution in meter  [required]</span>
+<span class="go">    -o, --output TEXT               Output directory to store results (by</span>
+<span class="go">                                    default current directory)</span>
+<span class="go">    -ws, --window_size INTEGER      Size of tiles to distribute processing,</span>
+<span class="go">                                    default: 1024</span>
+<span class="go">    -p, --pad [none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap]</span>
+<span class="go">                                    Pad to use around the image, default : edge (see</span>
+<span class="go">                                    https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+<span class="go">                                    for more information)</span>
+<span class="go">    -h, --help                      Show this message and exit.</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This command line does not accept all input raster products as other raster tools (radioindice, zonalstats).
+It is mandatory to use a raster file (typically a geotif) in a format that can be read by rasterio: rasterio.open(xxx)).</p>
+</div>
+<p>Example:</p>
+<p>Let’s take as input a Digital Height Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):</p>
+<img alt="../_images/dsm.jpg" src="../_images/dsm.jpg" />
+<p>The following commands will compute the hillshades of this Digital Height Model at 3 differents solar
+hours (8:00AM, noon, 6:00PM) of 21st June:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>hillshade<span class="w"> </span>--elevation<span class="w"> </span><span class="m">27</span>.2<span class="w"> </span>--azimuth<span class="w"> </span><span class="m">82</span>.64<span class="w"> </span>--resolution<span class="w"> </span><span class="m">0</span>.5<span class="w"> </span>toulouse-mnh.tif
+<span class="gp">$ </span>rastertools<span class="w"> </span>hillshade<span class="w"> </span>--elevation<span class="w"> </span><span class="m">69</span>.83<span class="w"> </span>--azimuth<span class="w"> </span><span class="m">180</span><span class="w"> </span>--resolution<span class="w"> </span><span class="m">0</span>.5<span class="w"> </span>toulouse-mnh.tif
+<span class="gp">$ </span>rastertools<span class="w"> </span>hillshade<span class="w"> </span>--elevation<span class="w"> </span><span class="m">25</span>.82<span class="w"> </span>--azimuth<span class="w"> </span><span class="m">278</span>.58<span class="w"> </span>--resolution<span class="w"> </span><span class="m">0</span>.5<span class="w"> </span>toulouse-mnh.tif
+</pre></div>
+</div>
+<p>The generated images are rendered with QGis:
+- first layer contains the hillshade (value 0 is masked)
+- second layer contains the Digital Height Model rendered in grayscale (white to black)</p>
+<p>Here are the captures:</p>
+<ul class="simple">
+<li><p>8 AM</p></li>
+</ul>
+<img alt="../_images/dsm-hillshade1.jpg" src="../_images/dsm-hillshade1.jpg" />
+<ul class="simple">
+<li><p>Noon</p></li>
+</ul>
+<img alt="../_images/dsm-hillshade2.jpg" src="../_images/dsm-hillshade2.jpg" />
+<ul class="simple">
+<li><p>6 PM</p></li>
+</ul>
+<img alt="../_images/dsm-hillshade3.jpg" src="../_images/dsm-hillshade3.jpg" />
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="filtering.html" class="btn btn-neutral float-left" title="filter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="radioindice.html" class="btn btn-neutral float-right" title="radioindice" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

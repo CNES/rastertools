@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.product.vrt &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../product.html">eolab.rastertools.product</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.product.vrt</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.product.vrt</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities to handle vrt image format</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ET</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">gdal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Olivier Queyrut&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, CNES&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache v2.0&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_file2vrt</span><span class="p">(</span><span class="n">xml_element</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a simple source to the vrt.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xml_element:</span>
+<span class="sd">            Parent XML element that will contains the function definition</span>
+<span class="sd">        file:</span>
+<span class="sd">            Raster file that contains the bands used as masks</span>
+<span class="sd">        bands (int):</span>
+<span class="sd">            Bands of the raster image to use as masks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fh</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fh</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">bands</span><span class="p">:</span>
+            <span class="n">rasterband</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rasterband</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">data_type_name</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GetDataTypeName</span><span class="p">(</span><span class="n">rasterband</span><span class="o">.</span><span class="n">DataType</span><span class="p">)</span>
+                <span class="n">block_size_x</span><span class="p">,</span> <span class="n">block_size_y</span> <span class="o">=</span> <span class="n">rasterband</span><span class="o">.</span><span class="n">GetBlockSize</span><span class="p">()</span>
+
+                <span class="c1"># add a source</span>
+                <span class="n">simplesource</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">xml_element</span><span class="p">,</span> <span class="s2">&quot;SimpleSource&quot;</span><span class="p">)</span>
+
+                <span class="n">sourcefilename</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">simplesource</span><span class="p">,</span> <span class="s2">&quot;SourceFilename&quot;</span><span class="p">)</span>
+                <span class="n">sourcefilename</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;relativeToVRT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+                <span class="n">sourcefilename</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+
+                <span class="n">sourceband</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">simplesource</span><span class="p">,</span> <span class="s2">&quot;SourceBand&quot;</span><span class="p">)</span>
+                <span class="n">sourceband</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">band</span><span class="p">)</span>
+
+                <span class="c1"># set the source properties with metadata from input raster</span>
+                <span class="n">sourceprops</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">simplesource</span><span class="p">,</span> <span class="s2">&quot;SourceProperties&quot;</span><span class="p">)</span>
+                <span class="n">sourceprops</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;RasterXSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">RasterXSize</span><span class="p">)</span>
+                <span class="n">sourceprops</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;RasterYSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">RasterYSize</span><span class="p">)</span>
+                <span class="n">sourceprops</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;DataType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_type_name</span>
+                <span class="n">sourceprops</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;BlockXSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">block_size_x</span><span class="p">)</span>
+                <span class="n">sourceprops</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;BlockYSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">block_size_y</span><span class="p">)</span>
+
+                <span class="c1"># set the source shape with the shape of the input raster</span>
+                <span class="n">srcrect</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">simplesource</span><span class="p">,</span> <span class="s2">&quot;SrcRect&quot;</span><span class="p">)</span>
+                <span class="n">srcrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;xOff&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+                <span class="n">srcrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;yOff&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+                <span class="n">srcrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;xSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">RasterXSize</span><span class="p">)</span>
+                <span class="n">srcrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;ySize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">RasterYSize</span><span class="p">)</span>
+
+                <span class="c1"># set the dest shape the same way</span>
+                <span class="n">dstrect</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">simplesource</span><span class="p">,</span> <span class="s2">&quot;DstRect&quot;</span><span class="p">)</span>
+                <span class="n">dstrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;xOff&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+                <span class="n">dstrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;yOff&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;0&quot;</span>
+                <span class="n">dstrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;xSize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">RasterXSize</span><span class="p">)</span>
+                <span class="n">dstrect</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;ySize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fh</span><span class="o">.</span><span class="n">RasterYSize</span><span class="p">)</span>
+
+    <span class="c1"># free gdal resource</span>
+    <span class="k">del</span> <span class="n">fh</span>
+
+
+<span class="k">def</span> <span class="nf">_func2vrt</span><span class="p">(</span><span class="n">xml_element</span><span class="p">,</span> <span class="n">funcname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">funcdef</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a pixel function to the vrt.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        xml_element:</span>
+<span class="sd">            Parent XML element that will contains the function definition</span>
+<span class="sd">        funcname (str):</span>
+<span class="sd">            Fully qualified name of the function (e.g. indices.vrt.s2_maja_mask)</span>
+<span class="sd">        funcdef (str, optional, default=None):</span>
+<span class="sd">            Function definition (without its signature). If None, the function funcname</span>
+<span class="sd">            must be available in the scope</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Name of the pixel function</span>
+    <span class="n">pixelfunctiontype</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">xml_element</span><span class="p">,</span> <span class="s2">&quot;PixelFunctionType&quot;</span><span class="p">)</span>
+    <span class="n">pixelfunctiontype</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">funcname</span>
+
+    <span class="c1"># Language of the pixel function</span>
+    <span class="n">pixelfunctionlang</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">xml_element</span><span class="p">,</span> <span class="s2">&quot;PixelFunctionLanguage&quot;</span><span class="p">)</span>
+    <span class="n">pixelfunctionlang</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;Python&quot;</span>
+
+    <span class="c1"># Definition of the pixel function</span>
+    <span class="k">if</span> <span class="n">funcdef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;PixelFunctionCode&gt;&lt;![CDATA[</span><span class="se">\n\</span>
+<span class="s1">            import numpy as np</span><span class="se">\n\</span>
+<span class="s1">            def </span><span class="si">{</span><span class="n">funcname</span><span class="si">}</span><span class="s1">(in_ar, out_ar, xoff, yoff, xsize, ysize,</span><span class="se">\</span>
+<span class="s1">                           raster_xsize, raster_ysize, buf_radius, gt, **kwargs):</span><span class="se">\</span>
+<span class="s1">                </span><span class="si">{</span><span class="n">funcdef</span><span class="si">}</span><span class="se">\n\</span>
+<span class="s1">            ]]&gt;&lt;/PixelFunctionCode&gt;&#39;</span>
+        <span class="n">pixelfunctioncode</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
+        <span class="n">xml_element</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pixelfunctioncode</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="add_masks_to_vrt"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.vrt.add_masks_to_vrt.html#eolab.rastertools.product.vrt.add_masks_to_vrt">[docs]</a><span class="k">def</span> <span class="nf">add_masks_to_vrt</span><span class="p">(</span><span class="n">src_vrt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">maskfile</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                     <span class="n">funcname</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">funcdef</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adds a mask bands to the vrt.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src_vrt (pathlib.Path or str):</span>
+<span class="sd">            Vrt input image</span>
+<span class="sd">        maskfile (pathlib.Path or str):</span>
+<span class="sd">            Input image that contains the bands to use as masks</span>
+<span class="sd">        bands ([int]):</span>
+<span class="sd">            Bands in the the input image to use as masks</span>
+<span class="sd">        funcname (str, optional, default=None):</span>
+<span class="sd">            Fully qualified name of the pixel function (e.g. indices.vrt.s2_maja_mask)</span>
+<span class="sd">            used to compute the mask from the maskfile dataset.</span>
+<span class="sd">        funcdef (str, optional, default=None):</span>
+<span class="sd">            Function definition (without its signature). If None, the function funcname</span>
+<span class="sd">            must be available in the scope</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (str): XML content (vrt format) with the added mask band.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">svrt</span> <span class="o">=</span> <span class="n">src_vrt</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src_vrt</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">src_vrt</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">maskfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">maskfile</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">maskfile</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">svrt</span><span class="p">)</span> <span class="k">as</span> <span class="n">vrtContent</span><span class="p">:</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">vrtContent</span><span class="p">)</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+        <span class="n">vrtmaskband</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;MaskBand&#39;</span><span class="p">)</span>
+        <span class="n">vrtrasterband</span> <span class="o">=</span> <span class="n">ET</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">vrtmaskband</span><span class="p">,</span> <span class="s2">&quot;VRTRasterBand&quot;</span><span class="p">)</span>
+        <span class="n">vrtrasterband</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;dataType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Byte&quot;</span>
+        <span class="n">vrtrasterband</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s2">&quot;subClass&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;VRTDerivedRasterBand&quot;</span>
+        <span class="k">if</span> <span class="n">funcname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_func2vrt</span><span class="p">(</span><span class="n">vrtrasterband</span><span class="p">,</span> <span class="n">funcname</span><span class="p">,</span> <span class="n">funcdef</span><span class="p">)</span>
+        <span class="n">_file2vrt</span><span class="p">(</span><span class="n">vrtrasterband</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">bands</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">ET</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">root</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_band_descriptions"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.vrt.set_band_descriptions.html#eolab.rastertools.product.vrt.set_band_descriptions">[docs]</a><span class="k">def</span> <span class="nf">set_band_descriptions</span><span class="p">(</span><span class="n">src_vrt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">descriptions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set the descriptions of the bands in a VRT image.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        src_vrt (pathlib.Path or str):</span>
+<span class="sd">            VRT input image</span>
+<span class="sd">        descriptions ([str]):</span>
+<span class="sd">            Descriptions of the bands</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">src_vrt</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">src_vrt</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">src_vrt</span><span class="p">,</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GA_Update</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">desc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">descriptions</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">rb</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">GetRasterBand</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="c1"># if the band exists at the given position, set the description</span>
+        <span class="k">if</span> <span class="n">rb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">rb</span><span class="o">.</span><span class="n">SetDescription</span><span class="p">(</span><span class="n">desc</span><span class="p">)</span>
+    <span class="c1"># free gdal resource</span>
+    <span class="k">del</span> <span class="n">ds</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

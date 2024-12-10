@@ -1,0 +1,6 @@
+handle\_result
+==============
+
+.. currentmodule:: eolab.rastertools.cli.filtering_dyn
+
+.. autofunction:: handle_result

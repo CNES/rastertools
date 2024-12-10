@@ -1,0 +1,6 @@
+create\_speed
+=============
+
+.. currentmodule:: eolab.rastertools.cli.speed
+
+.. autofunction:: create_speed

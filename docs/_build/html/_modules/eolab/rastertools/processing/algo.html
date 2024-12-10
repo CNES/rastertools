@@ -1,0 +1,922 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.processing.algo &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.processing.algo</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.processing.algo</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Algorithms on raster data</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span><span class="p">,</span> <span class="n">signal</span>
+
+
+<div class="viewcode-block" id="normalized_difference"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.normalized_difference.html#eolab.rastertools.processing.algo.normalized_difference">[docs]</a><span class="k">def</span> <span class="nf">normalized_difference</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Normalized Difference Vegetation Index</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        NDVI = \\frac{NIR - RED}{NIR + RED}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed TNDVI.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="tndvi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.tndvi.html#eolab.rastertools.processing.algo.tndvi">[docs]</a><span class="k">def</span> <span class="nf">tndvi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Transformed Normalized Difference Vegetation Index</span>
+<span class="sd">    The coefficient is positive in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        TNDVI = \\sqrt{NDVI + 0.5}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed TNDVI.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Deering D.W., Rouse J.W., Haas R.H., and Schell J.A., 1975. Measuring forage production</span>
+<span class="sd">        of grazing units from Landsat MSS data. Pages 1169-1178 In: Cook J.J. (Ed.), Proceedings</span>
+<span class="sd">        of the Tenth International Symposium on Remote Sensing of Environment (Ann Arbor, 1975),</span>
+<span class="sd">        Vol. 2, Ann Arbor, Michigan, USA. &lt;https://www.scirp.org/reference/referencespapers?referenceid=1046714&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">normalized_difference</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span>
+    <span class="n">ratio</span><span class="p">[</span><span class="n">ratio</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ratio</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rvi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.rvi.html#eolab.rastertools.processing.algo.rvi">[docs]</a><span class="k">def</span> <span class="nf">rvi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Ratio Vegetation Index</span>
+<span class="sd">    The coefficient is positive in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        PVI = \\frac{NIR}{RED}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed RVI.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Jordan C.F., 1969. Derivation of leaf area index from quality of light on the forest</span>
+<span class="sd">        floor. Ecology 50:663-666 &lt;https://esajournals.onlinelibrary.wiley.com/doi/10.2307/1936256&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="pvi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.pvi.html#eolab.rastertools.processing.algo.pvi">[docs]</a><span class="k">def</span> <span class="nf">pvi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Perpendicular Vegetation Index</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        PVI = 0.74 (NIR - 0.90893 RED - 7.46216)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed PVI.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Richardson A.J., Wiegand C.L., 1977. Distinguishing vegetation from soil background</span>
+<span class="sd">        information. Photogramm Eng Rem S 43-1541-1552 &lt;https://www.asprs.org/wp-content/uploads/pers/1977journal/dec/1977_dec_1541-1552.pdf&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.90893</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">7.46216</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.74</span></div>
+
+
+<div class="viewcode-block" id="savi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.savi.html#eolab.rastertools.processing.algo.savi">[docs]</a><span class="k">def</span> <span class="nf">savi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Soil Adjusted Vegetation Index</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        SAVI = \\frac{(NIR - RED) (1 + 0.5)}{NIR + RED + 0.5}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed SAVI.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Huete A.R., 1988. A soil-adjusted vegetation index (SAVI). Remote Sens Environ 25:295-309 &lt;https://www.sciencedirect.com/science/article/abs/pii/003442578890106X&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="tsavi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.tsavi.html#eolab.rastertools.processing.algo.tsavi">[docs]</a><span class="k">def</span> <span class="nf">tsavi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Transformed Soil Adjusted Vegetation Index</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        TSAVI = \\frac{0.7 (NIR - 0.7 RED - 0.9)}{0.7 NIR + RED + 0.08 (1 + 0.7^2)}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed TSAVI.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Baret F., Guyot G., Major D., 1989. TSAVI: a vegetation index which minimizes soil</span>
+<span class="sd">        brightness effects on LAI or APAR estimation. 12th Canadian Symposium on Remote</span>
+<span class="sd">        Sensing and IGARSS 1990, Vancouver, Canada, 07/10-14. &lt;https://www.researchgate.net/publication/3679422_TSAVI_A_vegetation_index_which_minimizes_soil_brightness_effects_on_LAI_and_APAR_estimation&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.08</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">)</span>
+    <span class="n">numerator</span> <span class="o">=</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.9</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span></div>
+
+
+<span class="k">def</span> <span class="nf">_wdvi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Weighted Difference Vegetation Index of the input data.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        WDVI = NIR - 0.4 RED</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed WDVI.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="msavi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.msavi.html#eolab.rastertools.processing.algo.msavi">[docs]</a><span class="k">def</span> <span class="nf">msavi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Modified Soil Adjusted Vegetation Index of the input data.</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    grdtbrbr The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        MSAVI = \\frac{(NIR - RED) (1 + L)} {NIR + RED + L} \\\\</span>
+
+<span class="sd">    With : :math:`L = 1 - 2 * 0.4 * NDVI * WDVI`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_data : np.ndarray</span>
+<span class="sd">        A 3D numpy array of shape (number of bands, number of lines, number of columns) where number of bands &gt; 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        A 2D numpy array of shape (number of lines, number of columns) containing the computed MSAVI values.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    -------</span>
+<span class="sd">        `Qi J., Chehbouni A., Huete A.R., Kerr Y.H., 1994. Modified Soil Adjusted Vegetation</span>
+<span class="sd">        Index (MSAVI). Remote Sens Environ 48:119-126 &lt;https://www.researchgate.net/publication/223906415_A_Modified_Soil_Adjusted_Vegetation_Index&gt;`_</span>
+
+<span class="sd">        `Qi J., Kerr Y., Chehbouni A., 1994. External factor consideration in vegetation index</span>
+<span class="sd">        development. Proc. of Physical Measurements and Signatures in Remote Sensing,</span>
+<span class="sd">        ISPRS, 723-730. &lt;https://www.academia.edu/20596726/External_factor_consideration_in_vegetation_index_development&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">ndvi</span> <span class="o">=</span> <span class="n">normalized_difference</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span>
+    <span class="n">wdvi</span> <span class="o">=</span> <span class="n">_wdvi</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span>
+    <span class="n">dl</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">0.4</span> <span class="o">*</span> <span class="n">ndvi</span> <span class="o">*</span> <span class="n">wdvi</span>
+    <span class="n">denominator</span> <span class="o">=</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">dl</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">dl</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">denominator</span></div>
+
+
+<div class="viewcode-block" id="msavi2"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.msavi2.html#eolab.rastertools.processing.algo.msavi2">[docs]</a><span class="k">def</span> <span class="nf">msavi2</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Modified Soil Adjusted Vegetation Index of the input data.</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        MSAVI2 = (2 * NIR + 1)^2 - 8 (NIR - RED)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed MSAVI.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">dsqrt</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">8</span> <span class="o">*</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dsqrt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ipvi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.ipvi.html#eolab.rastertools.processing.algo.ipvi">[docs]</a><span class="k">def</span> <span class="nf">ipvi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Infrared Percentage Vegetation Index of the input data.</span>
+<span class="sd">    The coefficient ranges from 0 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red).</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        IPVI = \\frac{NIR}{NIR + RED}</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of size (number of lines, number of columns) containing the computed IPVI.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Crippen, R. E. 1990. Calculating the Vegetation Index Faster, Remote Sensing of</span>
+<span class="sd">        Environment, vol 34., pp. 71-73. &lt;https://www.sciencedirect.com/science/article/abs/pii/003442579090085Z&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="evi"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.evi.html#eolab.rastertools.processing.algo.evi">[docs]</a><span class="k">def</span> <span class="nf">evi</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Enhanced vegetation index of the input data.</span>
+<span class="sd">    The coefficient ranges from -1 to 1 in each pixel.</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, NIR (Near Infra-Red), Blue.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 2.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed EVI.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        EVI = \\frac{G (NIR - RED)} {NIR + C1 * RED - C2 * BLUE + L}</span>
+
+<span class="sd">    With :</span>
+<span class="sd">        - $L$ : Canopy background adjustment term, it reduces the influence of soil brightness.</span>
+<span class="sd">        - $C1$, $C2$ : Coefficients that correct the influence of aerosol.</span>
+<span class="sd">        - $G$ : A gain factor. The greater is G, the more the EVI is sensitive to vegetation changes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span> <span class="c1">#Ignore divisions by zero</span>
+    <span class="k">return</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="p">((</span><span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mf">7.5</span> <span class="o">*</span> <span class="n">bands</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="redness_index"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.redness_index.html#eolab.rastertools.processing.algo.redness_index">[docs]</a><span class="k">def</span> <span class="nf">redness_index</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Redness Index of the input data.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        RI = \\frac{RED^2} {GREEN^3}</span>
+
+<span class="sd">    The function considers the bands of the input data in the following order :</span>
+<span class="sd">    Red, Green.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of size (number of lines, number of columns) containing the computed Redness Index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">divide</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="brightness_index"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.brightness_index.html#eolab.rastertools.processing.algo.brightness_index">[docs]</a><span class="k">def</span> <span class="nf">brightness_index</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Brightness Index of the input data.</span>
+
+<span class="sd">    The function considers the first 2 bands of the input data to be Red and Green.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        BI = \\sqrt{ \\frac{RED^2 + GREEN^2} {2} }</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed Brightness Index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">bi</span> <span class="o">=</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">bi</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="brightness_index2"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.brightness_index2.html#eolab.rastertools.processing.algo.brightness_index2">[docs]</a><span class="k">def</span> <span class="nf">brightness_index2</span><span class="p">(</span><span class="n">bands</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the Brightness Index of the input data.</span>
+
+<span class="sd">    The function considers the first 3 bands of the input data to be Red, Green, Blue.</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        BI = \\sqrt{ \\frac{RED^2 + BLUE^2 + GREEN^2} {2} }</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray) : Numpy array of 3 dimensions (number of bands, number of lines, number of columns)</span>
+<span class="sd">                    with number of bands &gt; 2.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size (number of lines, number of columns) containing the computed Brightness Index.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+    <span class="n">bi2</span> <span class="o">=</span> <span class="p">(</span><span class="n">bands</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">bands</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">3</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">bi2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="speed"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.speed.html#eolab.rastertools.processing.algo.speed">[docs]</a><span class="k">def</span> <span class="nf">speed</span><span class="p">(</span><span class="n">data0</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">data1</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">interval</span> <span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the speed of the input data based on the difference between two time points.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        data0 (numpy.ndarray): Numpy array containing the band value(s) at the first date.</span>
+<span class="sd">                               Shape must be (number_of_lines, number_of_columns).</span>
+
+<span class="sd">        data1 (numpy.ndarray): Numpy array containing the band value(s) at the second date.</span>
+<span class="sd">                               Shape must match `data0`.</span>
+
+<span class="sd">        interval (float): Time interval (in the same units as the timestamps of the input data)</span>
+<span class="sd">                          between the first and second dates.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: Numpy array of shape (number_of_lines, number_of_columns)</span>
+<span class="sd">                       containing the computed speed of the sequence. The values represent</span>
+<span class="sd">                       the change in band values per unit time.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `data0` and `data1` do not have the same shape, or if `interval` is zero.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">data1</span> <span class="o">-</span> <span class="n">data0</span><span class="p">)</span> <span class="o">/</span> <span class="n">interval</span></div>
+
+
+<div class="viewcode-block" id="interpolated_timeseries"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.interpolated_timeseries.html#eolab.rastertools.processing.algo.interpolated_timeseries">[docs]</a><span class="k">def</span> <span class="nf">interpolated_timeseries</span><span class="p">(</span><span class="n">dates</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">,</span> <span class="n">series</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">,</span> <span class="n">output_dates</span> <span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">nodata</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Interpolate a timeseries of data. Dates and series must be sorted in ascending order.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dates (numpy.ma.masked_array): A masked array of timestamps (dates) corresponding to</span>
+<span class="sd">                                        the input series. Should be in ascending order.</span>
+
+<span class="sd">        series (numpy.ma.masked_array): A list of 3D masked arrays, each with shape</span>
+<span class="sd">                                         (bands, height, width), containing the raster data</span>
+<span class="sd">                                         for each timestamp in `dates`.</span>
+
+<span class="sd">        output_dates (numpy.array): A 1D array of timestamps for which to generate the interpolated</span>
+<span class="sd">                                     rasters.</span>
+
+<span class="sd">        nodata (float): Value to use for pixels where input data is NaN or missing.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: A 4D numpy array of shape (time, bands, height, width), containing</span>
+<span class="sd">                       the interpolated raster data for each output date. If there are no valid</span>
+<span class="sd">                       data points for a specific pixel, the corresponding pixel will be filled with `nodata`.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `series` is empty, or if `dates` and `series` dimensions do not match.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Create stack, an array of dimension time x band x height x width from a list of band x height x width arrays</span>
+    <span class="n">stack</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+    <span class="n">stack_shape</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">shape</span>
+    <span class="c1"># flatten the stacked data: shape is pixel x time</span>
+    <span class="n">pixel_series</span> <span class="o">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">transpose</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="n">stack_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">stack_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">stack_shape</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">serie</span> <span class="ow">in</span> <span class="n">pixel_series</span><span class="p">:</span>
+        <span class="n">compressed</span> <span class="o">=</span> <span class="n">serie</span><span class="o">.</span><span class="n">compressed</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">serie</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
+                <span class="n">output_dates</span><span class="p">,</span>
+                <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">serie</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span><span class="o">.</span><span class="n">compressed</span><span class="p">(),</span>
+                <span class="n">compressed</span><span class="p">,</span>
+                <span class="n">compressed</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">compressed</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_val</span> <span class="o">=</span> <span class="n">serie</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="k">if</span> <span class="n">serie</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">nodata</span>
+            <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">default_val</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_dates</span><span class="p">))</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">stack_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">stack_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">stack_shape</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span></div>
+
+
+<span class="k">def</span> <span class="nf">_local_sum</span><span class="p">(</span><span class="n">data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the local sums of the input data using a sliding window defined by the kernel size.</span>
+<span class="sd">    Each element in the output is the sum of the pixels within the specified kernel size window.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)</span>
+<span class="sd">                                 containing the Digital Height Model (DHM).</span>
+<span class="sd">                                 The function only accepts arrays with one band.</span>
+
+<span class="sd">        kernel_size (int): The size of the sliding window used to compute the local sum.</span>
+
+<span class="sd">    If kernel_size = 1 : The output array equals to the input</span>
+<span class="sd">    Otherwise : Sums the pixels belonging to a sliding window of size radius * radius (with radius = (kernel_width + 1) // 2)</span>
+<span class="sd">                The top-left pixel of the window is the current pixel</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size of input_data containing the computed local sums. Computed data have a size minored by the kernel_size</span>
+<span class="sd">        and are centered in the output shape.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kernel_width</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># special case: size = 1 ==&gt; returns data</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
+            <span class="n">ii_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span>
+        <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">):</span>
+            <span class="n">ii_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ii_dtype</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span>
+
+        <span class="c1"># create the integral image</span>
+        <span class="n">line_cumsum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nancumsum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ii_dtype</span><span class="p">)</span>
+        <span class="n">ii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nancumsum</span><span class="p">(</span><span class="n">line_cumsum</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># if input data is a masked array, ii is a masked array</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ii</span><span class="p">,</span> <span class="s1">&#39;mask&#39;</span><span class="p">):</span>
+            <span class="c1"># get the data of the masked array</span>
+            <span class="n">ii</span> <span class="o">=</span> <span class="n">ii</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="c1"># compute local sum at each pixel from integral image</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">ii</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">posd</span> <span class="o">=</span> <span class="p">(</span><span class="n">kernel_width</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">posf</span> <span class="o">=</span> <span class="n">kernel_width</span> <span class="o">-</span> <span class="n">posd</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">[:,</span> <span class="n">posd</span><span class="p">:</span><span class="o">-</span><span class="n">posf</span><span class="p">,</span> <span class="n">posd</span><span class="p">:</span><span class="o">-</span><span class="n">posf</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">]</span> \
+                <span class="o">+</span> <span class="n">ii</span><span class="p">[:,</span> <span class="n">kernel_width</span><span class="p">:,</span> <span class="n">kernel_width</span><span class="p">:]</span> \
+                <span class="o">-</span> <span class="n">ii</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">,</span> <span class="n">kernel_width</span><span class="p">:]</span> \
+                <span class="o">-</span> <span class="n">ii</span><span class="p">[:,</span> <span class="n">kernel_width</span><span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">[</span><span class="n">posd</span><span class="p">:</span><span class="o">-</span><span class="n">posf</span><span class="p">,</span> <span class="n">posd</span><span class="p">:</span><span class="o">-</span><span class="n">posf</span><span class="p">]</span> <span class="o">=</span> <span class="n">ii</span><span class="p">[:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">]</span> \
+                <span class="o">+</span> <span class="n">ii</span><span class="p">[</span><span class="n">kernel_width</span><span class="p">:,</span> <span class="n">kernel_width</span><span class="p">:]</span> \
+                <span class="o">-</span> <span class="n">ii</span><span class="p">[:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">,</span> <span class="n">kernel_width</span><span class="p">:]</span> \
+                <span class="o">-</span> <span class="n">ii</span><span class="p">[</span><span class="n">kernel_width</span><span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="n">kernel_width</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="median"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.median.html#eolab.rastertools.processing.algo.median">[docs]</a><span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">input_data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_size</span> <span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies a Median Filter to the input data using `scipy.ndimage.median_filter &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html&gt;`_.</span>
+<span class="sd">    The filter computes the median of the values contained within a sliding window determined by the kernel size.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)</span>
+<span class="sd">                                 containing the Digital Height Model (DHM). The function only accepts arrays with one band.</span>
+
+<span class="sd">        kernel_size (int): The size of the sliding window (kernel) used to compute the median.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A numpy array of the same shape as `input_data`, containing the filtered data with the median values computed in the specified kernel.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1,</span>
+<span class="sd">                    or if `kernel_size` is not a positive odd integer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;adaptive_gaussian only accepts 3 dims numpy arrays&quot;</span><span class="p">)</span>
+
+    <span class="c1">#kernel_size = kwargs.get(&#39;kernel_size&#39;, 8)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">ndimage</span><span class="o">.</span><span class="n">median_filter</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="local_sum"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.local_sum.html#eolab.rastertools.processing.algo.local_sum">[docs]</a><span class="k">def</span> <span class="nf">local_sum</span><span class="p">(</span><span class="n">input_data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_size</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the local sums of the input data using a sliding window defined by the kernel size.</span>
+<span class="sd">    Each element in the output is the sum of the pixels within the specified kernel size window.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)</span>
+<span class="sd">                                 containing the Digital Height Model (DHM).</span>
+<span class="sd">                                 The function only accepts arrays with one band.</span>
+
+<span class="sd">        kernel_size (int): The size of the sliding window used to compute the local sum.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A numpy array of the same size as `input_data` containing the computed local sums.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">#kernel_size = kwargs.get(&#39;kernel_size&#39;, 8)</span>
+    <span class="c1"># compute local sum of band pixels</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">_local_sum</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">output</span></div>
+
+
+<div class="viewcode-block" id="local_mean"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.local_mean.html#eolab.rastertools.processing.algo.local_mean">[docs]</a><span class="k">def</span> <span class="nf">local_mean</span><span class="p">(</span><span class="n">input_data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_size</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the local means of the input data using a sliding window defined by the kernel size.</span>
+<span class="sd">    Each element in the output is the mean of the pixels within the specified kernel size window.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)</span>
+<span class="sd">                                 containing the Digital Height Model (DHM).</span>
+<span class="sd">                                 The function only accepts arrays with one band.</span>
+
+<span class="sd">        kernel_size (int): The size of the sliding window used to compute the local mean.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A numpy array of the same size as `input_data` containing the computed local means.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#kernel_size = kwargs.get(&#39;kernel_size&#39;, 8)</span>
+    <span class="c1"># compute local sum of band pixels</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">_local_sum</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
+    <span class="c1"># compute local sum of band mask: number of valid pixels</span>
+    <span class="c1"># in the kernel</span>
+    <span class="k">if</span> <span class="n">ma</span><span class="o">.</span><span class="n">is_masked</span><span class="p">(</span><span class="n">input_data</span><span class="p">):</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">_local_sum</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">input_data</span><span class="o">.</span><span class="n">mask</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="n">kernel_size</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="c1"># compute mean for the band</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">valid</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">output</span><span class="p">),</span> <span class="n">where</span><span class="o">=</span><span class="n">valid</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="adaptive_gaussian"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.adaptive_gaussian.html#eolab.rastertools.processing.algo.adaptive_gaussian">[docs]</a><span class="k">def</span> <span class="nf">adaptive_gaussian</span><span class="p">(</span><span class="n">input_data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">kernel_size</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">sigma</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies an Adaptive Gaussian Filter to the input data that smoothes the input while preserving edges.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)</span>
+<span class="sd">                                 containing the Digital Height Model (DHM).</span>
+<span class="sd">                                 The function only accepts arrays with one band.</span>
+
+<span class="sd">        kernel_size (int): The size of the kernel used for the adaptive filtering. Default is 8.</span>
+
+<span class="sd">        sigma (int): The standard deviation of the Gaussian distribution, which controls the level of smoothing.</span>
+<span class="sd">                     Default is 1.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A numpy array of the same shape as `input_data`, containing the filtered data.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;adaptive_gaussian only accepts 3 dims numpy arrays&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;adaptive_gaussian only accepts numpy arrays with first dim of size 1&quot;</span><span class="p">)</span>
+
+    <span class="n">dtype</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">dtype</span>
+
+    <span class="n">w_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">w_2</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:,</span> <span class="p">:])</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">w_1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">w_2</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">w_sum</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">convolve2d</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span> <span class="n">boundary</span><span class="o">=</span><span class="s1">&#39;symm&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+    <span class="n">w_sum</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">input_data</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">kernel_size</span><span class="p">):</span>
+        <span class="n">prod</span> <span class="o">=</span> <span class="n">w</span> <span class="o">*</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">convolve2d</span><span class="p">(</span><span class="n">prod</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span> <span class="n">boundary</span><span class="o">=</span><span class="s1">&#39;symm&#39;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;same&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">conv</span> <span class="o">/</span> <span class="n">w_sum</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<div class="viewcode-block" id="svf"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.svf.html#eolab.rastertools.processing.algo.svf">[docs]</a><span class="k">def</span> <span class="nf">svf</span><span class="p">(</span><span class="n">input_data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">radius</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">directions</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span> <span class="n">resolution</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">altitude</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Height Model (DHM).</span>
+
+<span class="sd">    More information about the Sky View Factor can be found `here &lt;https://www.researchgate.net/publication/257315893_Application_of_sky-view_factor_for_the_visualization_of_historic_landscape_features_in_lidar-derived_relief_models&gt;`_.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns) containing the Digital Height Model (DHM).</span>
+<span class="sd">                                  The function only accepts arrays with one band (the first dimension must be 1).</span>
+
+<span class="sd">        radius (int): The maximum distance (in pixels) around each point to evaluate the horizontal elevation angle. Default is 8.</span>
+
+<span class="sd">        direction (int): The number of discrete directions to compute the vertical angle. Default is 12.</span>
+
+<span class="sd">        resolution (float): The spatial resolution of the input data in meters. Default is 0.5.</span>
+
+<span class="sd">        altitude (Optional[np.ndarray]): A reference altitude to use for computing the SVF. If not specified, SVF is computed using the elevation of each point.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A numpy array of the same size as `input_data`, containing the Sky View Factor for each point,</span>
+<span class="sd">                    where values range from 0 (no visible sky) to 1 (full sky visibility).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If `input_data` does not have 3 dimensions or if the first dimension is not of size 1.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;svf only accepts 3 dims numpy arrays&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;svf only accepts numpy arrays with first dim of size 1&quot;</span><span class="p">)</span>
+
+    <span class="n">nb_directions</span> <span class="o">=</span> <span class="n">directions</span>
+
+    <span class="c1"># initialize output</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># prevent nodata problem</span>
+    <span class="c1"># change the NaN in the input array to 0</span>
+    <span class="n">input_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># compute directions</span>
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">[</span><span class="n">_bresenham_line</span><span class="p">(</span><span class="mi">360</span> <span class="o">*</span> <span class="n">i</span> <span class="o">/</span> <span class="n">nb_directions</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_directions</span><span class="p">)]</span>
+
+    <span class="c1"># get altitude of current point to consider for computing elevation angle</span>
+    <span class="k">if</span> <span class="n">altitude</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">input_band</span><span class="p">[</span><span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">altitude</span>
+
+    <span class="c1"># iterate over axes to identify the largest elevation in the radius</span>
+    <span class="k">for</span> <span class="n">axe</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
+        <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x_tr</span><span class="p">,</span> <span class="n">y_tr</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">axe</span><span class="p">:</span>
+            <span class="n">new_ratios</span> <span class="o">=</span> <span class="n">input_band</span><span class="p">[</span><span class="n">radius</span> <span class="o">+</span> <span class="n">x_tr</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">+</span> <span class="n">x_tr</span><span class="p">,</span>
+                                    <span class="n">radius</span> <span class="o">+</span> <span class="n">y_tr</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">+</span> <span class="n">y_tr</span><span class="p">]</span> <span class="o">-</span> <span class="n">view</span>
+            <span class="c1"># tangente de l&#39;angle</span>
+            <span class="n">new_ratios</span> <span class="o">/=</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">resolution</span><span class="p">)</span>
+            <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ratios</span><span class="p">,</span> <span class="n">new_ratios</span><span class="p">)</span>
+
+        <span class="c1"># SVF = (cosinus de l&#39;angle avec la relation : cos² = sqrt(1 / (1+tan²))</span>
+        <span class="n">ratios</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">ratios</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>  <span class="c1"># = np.sin(np.arctan(ratios / self.pixel_size))</span>
+        <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ratios</span>
+
+    <span class="n">out</span> <span class="o">/=</span> <span class="n">nb_directions</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+
+<span class="k">def</span> <span class="nf">_bresenham_line</span><span class="p">(</span><span class="n">theta</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">radius</span> <span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of the `Bresenham&#39;s line algorithm &lt;https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm&gt;`_</span>
+
+<span class="sd">    This function generates points along a line from the origin (0, 0) based on the given angle (theta)</span>
+<span class="sd">    and length (radius).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        theta (int): The angle of the line in degrees (0 degrees points to the right, 90 degrees points up).</span>
+<span class="sd">        radius (int): The length of the line in units. If radius is less than or equal to zero, an empty list will be returned.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: A list of tuples representing the coordinates of the line points in the format</span>
+<span class="sd">              (x, y, r), where (x, y) are the coordinates of the point and r is the distance</span>
+<span class="sd">              from the origin to that point. The origin point (0, 0) is not included.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">theta</span><span class="p">))</span>
+    <span class="n">sx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">dx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">sy</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">dy</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dx</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">dy</span><span class="p">):</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">theta</span><span class="p">)))</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">radius</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">+=</span> <span class="n">sx</span>
+            <span class="n">err</span> <span class="o">+=</span> <span class="n">delta</span>
+            <span class="k">if</span> <span class="n">err</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">+=</span> <span class="n">sy</span>
+                <span class="n">err</span> <span class="o">-=</span> <span class="mf">1.0</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">90</span> <span class="o">-</span> <span class="n">theta</span><span class="p">)))</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="n">radius</span><span class="p">:</span>
+            <span class="n">y</span> <span class="o">+=</span> <span class="n">sy</span>
+            <span class="n">err</span> <span class="o">+=</span> <span class="n">delta</span>
+            <span class="k">if</span> <span class="n">err</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">+=</span> <span class="n">sx</span>
+                <span class="n">err</span> <span class="o">-=</span> <span class="mf">1.0</span>
+            <span class="n">r</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">pts</span>
+
+
+<div class="viewcode-block" id="hillshade"><a class="viewcode-back" href="../../../../api/eolab.rastertools.processing.algo.hillshade.html#eolab.rastertools.processing.algo.hillshade">[docs]</a><span class="k">def</span> <span class="nf">hillshade</span><span class="p">(</span><span class="n">input_data</span> <span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">elevation</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">azimuth</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">radius</span> <span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span> <span class="n">resolution</span> <span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span> <span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes a mask of cast shadows in a Digital Height Model (DHM).</span>
+
+<span class="sd">    This function calculates the shadows based on the specified elevation and azimuth angles,</span>
+<span class="sd">    and returns a mask indicating where shadows are cast.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns) containing the Digital Height Model (DHM).</span>
+<span class="sd">                                  The function only accepts arrays with one band.</span>
+
+<span class="sd">        elevation (float): The angle (in degrees) between the horizon and the line of sight from an observer to the satellite.</span>
+
+<span class="sd">        azimuth (float): The angle (in degrees) between true north and the projection of the satellite&#39;s position onto the horizontal plane,</span>
+<span class="sd">                         measured in a clockwise direction.</span>
+
+<span class="sd">        radius (int): The radius around each pixel to consider when calculating shadows.</span>
+
+<span class="sd">        resolution (float): The spatial resolution of the input data, used for scaling calculations.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        np.ndarray: A boolean numpy array of the same size as `input_data`, indicating the mask of cast shadows,</span>
+<span class="sd">                    where True represents shadowed areas and False represents illuminated areas.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the input_data does not have 3 dimensions or if the first dimension is not of size 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;hillshade only accepts 3 dims numpy arrays&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;hillshade only accepts numpy arrays with first dim of size 1&quot;</span><span class="p">)</span>
+
+    <span class="c1"># initialize output</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">input_data</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+
+    <span class="c1"># prevent nodata problem</span>
+    <span class="n">input_band</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">input_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># compute direction</span>
+    <span class="n">axe</span> <span class="o">=</span> <span class="n">_bresenham_line</span><span class="p">(</span><span class="mi">180</span> <span class="o">-</span> <span class="n">azimuth</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
+
+    <span class="c1"># identify the largest elevation in the radius</span>
+    <span class="n">view</span> <span class="o">=</span> <span class="n">input_band</span><span class="p">[</span><span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">]</span>
+    <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">x_tr</span><span class="p">,</span> <span class="n">y_tr</span><span class="p">,</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">axe</span><span class="p">:</span>
+        <span class="n">new_ratios</span> <span class="o">=</span> <span class="n">input_band</span><span class="p">[</span><span class="n">radius</span> <span class="o">+</span> <span class="n">x_tr</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">+</span> <span class="n">x_tr</span><span class="p">,</span>
+                                <span class="n">radius</span> <span class="o">+</span> <span class="n">y_tr</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span> <span class="o">+</span> <span class="n">y_tr</span><span class="p">]</span> <span class="o">-</span> <span class="n">view</span>
+        <span class="c1"># tangente de l&#39;angle</span>
+        <span class="n">new_ratios</span> <span class="o">/=</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">resolution</span><span class="p">)</span>
+        <span class="n">ratios</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">ratios</span><span class="p">,</span> <span class="n">new_ratios</span><span class="p">)</span>
+
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">(</span><span class="n">ratios</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">radius</span><span class="p">]</span> <span class="o">=</span> <span class="n">angles</span> <span class="o">&gt;</span> <span class="n">elevation</span>
+
+    <span class="k">return</span> <span class="n">out</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

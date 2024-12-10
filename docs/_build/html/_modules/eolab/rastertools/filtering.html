@@ -1,0 +1,349 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.filtering &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.filtering</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.filtering</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines a rastertool named Filtering that can apply different kind</span>
+<span class="sd">of filters on raster images.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">Rastertool</span><span class="p">,</span> <span class="n">Windowable</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">algo</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">RasterFilter</span><span class="p">,</span> <span class="n">compute_sliding</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">RasterProduct</span>
+
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Filtering"><a class="viewcode-back" href="../../../api/eolab.rastertools.Filtering.html#eolab.rastertools.filtering.Filtering">[docs]</a><span class="k">class</span> <span class="nc">Filtering</span><span class="p">(</span><span class="n">Rastertool</span><span class="p">,</span> <span class="n">Windowable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raster tool that applies a filter on a raster image.</span>
+
+<span class="sd">    Predefined filters are available:</span>
+
+<span class="sd">    - Median filter</span>
+<span class="sd">    - Local sum</span>
+<span class="sd">    - Local mean</span>
+<span class="sd">    - Adaptive gaussian filter.</span>
+
+<span class="sd">    A filter is applied on a kernel of a configurable size. To set the kernel size, you need</span>
+<span class="sd">    to call:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        tool = Filtering(Filtering.median_filter, kernel_size=16)</span>
+
+<span class="sd">    Custom additional filters can be easily added by instanciating a RasterFilter (see</span>
+<span class="sd">    :obj:`eolab.rastertools.processing.RasterFilter`).</span>
+
+<span class="sd">    The parameters that customize the filter algo can be passed by following this procedure:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        def myalgo(input_data, **kwargs):</span>
+<span class="sd">            # kwargs contain the values of the algo parameters</span>
+<span class="sd">            kernel_size = kwargs.get(&#39;kernel_size&#39;, 8)</span>
+<span class="sd">            myparam = kwargs.get(&#39;myparam&#39;, 1)</span>
+<span class="sd">            # ... do someting ...</span>
+
+<span class="sd">        my_filter = RasterFilter(</span>
+<span class="sd">            &quot;myfilter&quot;, algo=myalgo</span>
+<span class="sd">        ).with_documentation(</span>
+<span class="sd">            help=&quot;Apply my filter&quot;,</span>
+<span class="sd">            description=&quot;Apply my filter&quot;</span>
+<span class="sd">        ).with_arguments({</span>
+<span class="sd">            &quot;myparam&quot;: {</span>
+<span class="sd">                # configure the command line interface for this param, this can be skipped</span>
+<span class="sd">                &quot;default&quot;: 8,</span>
+<span class="sd">                &quot;required&quot;: True,</span>
+<span class="sd">                &quot;type&quot;: int,</span>
+<span class="sd">                &quot;help&quot;: &quot;my configuration param for myalgo&quot;</span>
+<span class="sd">            }</span>
+<span class="sd">        })</span>
+
+<span class="sd">        # create the raster tool</span>
+<span class="sd">        tool = Filtering(my_filter, kernel_size=16)</span>
+<span class="sd">        my_filter.with_output(&quot;.&quot;)</span>
+<span class="sd">        my_filter.with_window(1024, &quot;edge&quot;)</span>
+<span class="sd">        # set the configuration parameter of the algo</span>
+<span class="sd">        my_filter.with_filter_configuration({&quot;myparam&quot;: 1024})</span>
+<span class="sd">        # run the tool</span>
+<span class="sd">        tool.process_file(&quot;./mytif.tif&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">median_filter</span> <span class="o">=</span> <span class="n">RasterFilter</span><span class="p">(</span>
+        <span class="s2">&quot;median&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">median</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">with_documentation</span><span class="p">(</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Apply median filter&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply a median filter (see scipy median_filter for more information)&quot;</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Applies a Median Filter to the input data using </span>
+<span class="sd">    `scipy.ndimage.median_filter &lt;https://docs.scipy.org/doc/scipy/reference/generated/scipy.ndimage.median_filter.html&gt;`_.</span>
+<span class="sd">    The filter computes the median contained in the sliding window determined by kernel_size.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array containing the input data filtered by the median filter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">local_sum</span> <span class="o">=</span> <span class="n">RasterFilter</span><span class="p">(</span>
+        <span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">local_sum</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">with_documentation</span><span class="p">(</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Apply local sum filter&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply a local sum filter using integral image method&quot;</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the local sums of the input data.</span>
+<span class="sd">    Each element is the sum of the pixels contained in the sliding window determined by kernel_size.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size of input_data containing the computed local sums</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">local_mean</span> <span class="o">=</span> <span class="n">RasterFilter</span><span class="p">(</span>
+        <span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">local_mean</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">with_documentation</span><span class="p">(</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Apply local mean filter&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply a local mean filter using integral image method&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Computes the local means of the input data.</span>
+<span class="sd">    Each element is the mean of the pixels contained in the sliding window determined by kernel_size.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array of the size of input_data containing the computed local means</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">adaptive_gaussian</span> <span class="o">=</span> <span class="n">RasterFilter</span><span class="p">(</span>
+        <span class="s2">&quot;adaptive_gaussian&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">adaptive_gaussian</span><span class="p">,</span> <span class="n">per_band_algo</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">with_documentation</span><span class="p">(</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Apply adaptive gaussian filter&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Apply an adaptive (Local gaussian of 3x3) recursive filter on the input image&quot;</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">with_arguments</span><span class="p">({</span>
+        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s2">&quot;help&quot;</span><span class="p">:</span> <span class="s2">&quot;Standard deviation of the Gaussian distribution (sigma)&quot;</span>
+        <span class="p">},</span>
+    <span class="p">})</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;RasterFilter that applies an adaptive gaussian filter to the kernel. The parameter sigma defines the standard deviation </span>
+<span class="sd">    of the Gaussian distribution.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Numpy array containing the input data filtered by the Gaussian filter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Filtering.get_default_filters"><a class="viewcode-back" href="../../../api/eolab.rastertools.Filtering.get_default_filters.html#eolab.rastertools.filtering.Filtering.get_default_filters">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_default_filters</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the list of predefined raster filters</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [:obj:`eolab.rastertools.processing.RasterFilter`] List of the predefined</span>
+<span class="sd">            raster filters ([Median, Local sum, Local mean, Adaptive gaussian])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">Filtering</span><span class="o">.</span><span class="n">median_filter</span><span class="p">,</span> <span class="n">Filtering</span><span class="o">.</span><span class="n">local_sum</span><span class="p">,</span>
+            <span class="n">Filtering</span><span class="o">.</span><span class="n">local_mean</span><span class="p">,</span> <span class="n">Filtering</span><span class="o">.</span><span class="n">adaptive_gaussian</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Filtering.__init__"><a class="viewcode-back" href="../../../api/eolab.rastertools.Filtering.__init__.html#eolab.rastertools.filtering.Filtering.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raster_filter</span><span class="p">:</span> <span class="n">RasterFilter</span><span class="p">,</span> <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            raster_filter (:obj:`eolab.rastertools.processing.RasterFilter`):</span>
+<span class="sd">                The instance of RasterFilter to apply</span>
+<span class="sd">            kernel_size (int):</span>
+<span class="sd">                Size of the kernel on which the filter is applied</span>
+<span class="sd">            bands ([int], optional, default=[1]):</span>
+<span class="sd">                List of bands in the input image to process.</span>
+<span class="sd">                Set None if all bands shall be processed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="c1"># initialize default windowing configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">with_windows</span><span class="p">()</span>
+        <span class="c1"># the raster filter processing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raster_filter</span> <span class="o">=</span> <span class="n">raster_filter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raster_filter</span><span class="o">.</span><span class="n">configure</span><span class="p">({</span><span class="s2">&quot;kernel_size&quot;</span><span class="p">:</span> <span class="n">kernel_size</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span> <span class="o">=</span> <span class="n">bands</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bands</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of bands to process&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bands</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">raster_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RasterFilter</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Name of the filter to apply to the raster&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raster_filter</span>
+
+<div class="viewcode-block" id="Filtering.with_filter_configuration"><a class="viewcode-back" href="../../../api/eolab.rastertools.Filtering.with_filter_configuration.html#eolab.rastertools.filtering.Filtering.with_filter_configuration">[docs]</a>    <span class="k">def</span> <span class="nf">with_filter_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argsdict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the filter with its specific arguments&#39; values</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            argsdict (dict):</span>
+<span class="sd">                Dictionary of filter&#39;s arguments names and values. Shall contain at least</span>
+<span class="sd">                the kernel size (key=&quot;kernel&quot;)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Filtering`: The current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">raster_filter</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">argsdict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Filtering.process_file"><a class="viewcode-back" href="../../../api/eolab.rastertools.Filtering.process_file.html#eolab.rastertools.filtering.Filtering.process_file">[docs]</a>    <span class="k">def</span> <span class="nf">process_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the filter to the input file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfile (str):</span>
+<span class="sd">                Input image to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ([str]) A list of one element containing the path of the generated filtered image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file </span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">overlap</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raster_filter</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">if</span> <span class="n">overlap</span> <span class="o">&gt;=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The kernel size (option --kernel_size, &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;value=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raster_filter</span><span class="o">.</span><span class="n">kernel_size</span><span class="si">}</span><span class="s2">) &quot;</span>
+                             <span class="s2">&quot;must be strictly less than the window size minus 1 &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;(option --window_size, value=</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># STEP 1: Prepare the input image so that it can be processed</span>
+        <span class="k">with</span> <span class="n">RasterProduct</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">vrt_outputdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vrt_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">product</span><span class="p">:</span>
+
+            <span class="c1"># STEP 2: apply filter</span>
+            <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+            <span class="n">output_image</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raster_filter</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+
+            <span class="n">compute_sliding</span><span class="p">(</span>
+                <span class="n">product</span><span class="o">.</span><span class="n">get_raster</span><span class="p">(),</span> <span class="n">output_image</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">raster_filter</span><span class="p">,</span>
+                <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">,</span>
+                <span class="n">window_overlap</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">raster_filter</span><span class="o">.</span><span class="n">kernel_size</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="n">pad_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span><span class="p">,</span>
+                <span class="n">bands</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bands</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">[</span><span class="n">output_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()]</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

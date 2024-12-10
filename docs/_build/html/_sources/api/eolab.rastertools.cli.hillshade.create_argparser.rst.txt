@@ -1,0 +1,6 @@
+create\_argparser
+=================
+
+.. currentmodule:: eolab.rastertools.cli.hillshade
+
+.. autofunction:: create_argparser

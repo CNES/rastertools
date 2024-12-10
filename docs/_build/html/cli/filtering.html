@@ -1,0 +1,255 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>filter &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="hillshade" href="hillshade.html" />
+    <link rel="prev" title="Command Line Interface" href="../cli.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../cli.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hillshade.html">hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radioindice.html">radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="speed.html">speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svf.html">svf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tiling.html">tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="timeseries.html">timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zonalstats.html">zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#docker-singularity">Docker/Singularity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">Command Line Interface</a></li>
+      <li class="breadcrumb-item active">filter</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cli/filtering.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="filter">
+<h1>filter<a class="headerlink" href="#filter" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">filter</span></code> (or <code class="docutils literal notranslate"><span class="pre">fi</span></code>) subcommand applies a convolutive filter on a a raster image.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>filter<span class="w"> </span>--help
+<span class="go">usage: rastertools filter [-h] {median,sum,mean,adaptive_gaussian} ...</span>
+
+<span class="go">Apply a filter to a set of images.</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+
+<span class="go">Filters:</span>
+<span class="go">  {median,sum,mean,adaptive_gaussian}</span>
+<span class="go">    median              Apply median filter</span>
+<span class="go">    sum                 Apply local sum filter</span>
+<span class="go">    mean                Apply local mean filter</span>
+<span class="go">    adaptive_gaussian   Apply adaptive gaussian filter</span>
+</pre></div>
+</div>
+<p>For different filters are available. They are applied as sub-command that each define the arguments
+that configure the filter. Type option –help to get the definition of the arguments:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>filter<span class="w"> </span>adaptive_gaussian<span class="w"> </span>--help
+<span class="go">usage: rastertools filter adaptive_gaussian [-h] --kernel_size KERNEL_SIZE</span>
+<span class="go">                                            --sigma SIGMA [-o OUTPUT]</span>
+<span class="go">                                            [-ws WINDOW_SIZE]</span>
+<span class="go">                                            [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]</span>
+<span class="go">                                            [-b BANDS [BANDS ...]] [-a]</span>
+<span class="go">                                            inputs [inputs ...]</span>
+
+<span class="go">Execute the requested filter on the input files with the specified</span>
+<span class="go">parameters. The `inputs` argument can either be a single file or a `.lst`</span>
+<span class="go">file containing a list of input files.</span>
+
+<span class="go">Arguments:</span>
+
+<span class="go">    inputs TEXT</span>
+
+<span class="go">    Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). You can</span>
+<span class="go">    provide a single file with extension &quot;.lst&quot; (e.g. &quot;filtering.lst&quot;) that</span>
+<span class="go">    lists the input files to process (one input file per line in .lst).</span>
+
+<span class="go">Options:</span>
+<span class="go">    --sigma INTEGER                 Standard deviation of the Gaussian</span>
+<span class="go">                                    distribution  [required]</span>
+<span class="go">    -a, --all                       Process all bands</span>
+<span class="go">    -b, --bands INTEGER             List of bands to process</span>
+<span class="go">    -p, --pad [none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap]</span>
+<span class="go">                                    Pad to use around the image, default : edge(see</span>
+<span class="go">                                    https://numpy.org/doc/stable/reference/generated/numpy.pad.html</span>
+<span class="go">                                    for more information)</span>
+<span class="go">    -ws, --window_size INTEGER      Size of tiles to distribute processing,</span>
+<span class="go">                                    default: 1024</span>
+<span class="go">    -o, --output TEXT               Output directory to store results (by</span>
+<span class="go">                                    default current directory)</span>
+<span class="go">    --kernel_size INTEGER           Kernel size of the filter function, e.g. 3</span>
+<span class="go">                                    means a square of 3x3 pixels on which the</span>
+<span class="go">                                    filter function is computed (default: 8)</span>
+<span class="go">    -h, --help                      Show this message and exit.</span>
+
+<span class="go">Apply an adaptive (Local gaussian of 3x3) recursive filter on the input image</span>
+
+<span class="go">positional arguments:</span>
+<span class="go">  inputs                Input file to process (e.g. Sentinel2 L2A MAJA from</span>
+<span class="go">                        THEIA). You can provide a single file with extension</span>
+<span class="go">                        &quot;.lst&quot; (e.g. &quot;filtering.lst&quot;) that lists the input</span>
+<span class="go">                        files to process (one input file per line in .lst)</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+<span class="go">  --kernel_size KERNEL_SIZE</span>
+<span class="go">                        Kernel size of the filter function, e.g. 3 means a</span>
+<span class="go">                        square of 3x3 pixels on which the filter function is</span>
+<span class="go">                        computed (default: 8)</span>
+<span class="go">  --sigma SIGMA         Standard deviation of the Gaussian distribution</span>
+<span class="go">                        (sigma)</span>
+<span class="go">  -o OUTPUT, --output OUTPUT</span>
+<span class="go">                        Output dir where to store results (by default current</span>
+<span class="go">                        dir)</span>
+<span class="go">  -ws WINDOW_SIZE, --window_size WINDOW_SIZE</span>
+<span class="go">                        Size of tiles to distribute processing, default: 1024</span>
+<span class="go">  -p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}, --pad {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}</span>
+<span class="go">                        Pad to use around the image, default : edge (see https</span>
+<span class="go">                        ://numpy.org/doc/stable/reference/generated/numpy.pad.</span>
+<span class="go">                        html for more information)</span>
+<span class="go">  -b BANDS [BANDS ...], --bands BANDS [BANDS ...]</span>
+<span class="go">                        List of bands to compute</span>
+<span class="go">  -a, --all             Compute all bands</span>
+
+<span class="go">By default only first band is computed.</span>
+</pre></div>
+</div>
+<p>Examples:</p>
+<p>The following examples use an input raster file generated by radioindice. This is an NDVI of a SENTINEL2 L2A THEIA image cropped to a (small)
+region of interest.</p>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.jpg" />
+<p>To apply three filters (median, mean and adaptive_gaussian) on a kernel of dimension 16x16, run these commands:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>filter<span class="w"> </span>median<span class="w"> </span>--kernel_size<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="s2">&quot;./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif&quot;</span>
+<span class="gp">$ </span>rastertools<span class="w"> </span>filter<span class="w"> </span>mean<span class="w"> </span>--kernel_size<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="s2">&quot;./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif&quot;</span>
+<span class="gp">$ </span>rastertools<span class="w"> </span>filter<span class="w"> </span>adaptive_gaussian<span class="w"> </span>--kernel_size<span class="w"> </span><span class="m">16</span><span class="w"> </span>--sigma<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="s2">&quot;./SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif&quot;</span>
+</pre></div>
+</div>
+<p>The commands will generate respectively:</p>
+<ul class="simple">
+<li><p>SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-median.tif</p></li>
+</ul>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-median.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-median.jpg" />
+<ul class="simple">
+<li><p>SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-mean.tif</p></li>
+</ul>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-mean.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-mean.jpg" />
+<ul class="simple">
+<li><p>SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive_gaussian.tif</p></li>
+</ul>
+<img alt="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive_gaussian.jpg" src="../_images/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive_gaussian.jpg" />
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../cli.html" class="btn btn-neutral float-left" title="Command Line Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="hillshade.html" class="btn btn-neutral float-right" title="hillshade" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

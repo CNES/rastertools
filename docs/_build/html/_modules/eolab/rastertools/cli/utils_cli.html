@@ -1,0 +1,225 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.cli.utils_cli &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">eolab.rastertools.cli</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.cli.utils_cli</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.cli.utils_cli</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">RastertoolConfigurationException</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">click</span>
+
+<span class="c1">#TO DO</span>
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">all_opt</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--all&#39;</span><span class="p">,</span><span class="s1">&#39;all_bands&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">bool</span><span class="p">,</span> <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Process all bands&quot;</span><span class="p">)</span>
+
+<span class="n">band_opt</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-b&#39;</span><span class="p">,</span><span class="s1">&#39;--bands&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">multiple</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;List of bands to process&quot;</span><span class="p">)</span>
+
+<span class="n">win_opt</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-ws&#39;</span><span class="p">,</span> <span class="s1">&#39;--window_size&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Size of tiles to distribute processing, default: 1024&quot;</span><span class="p">)</span>
+
+<span class="n">pad_opt</span> <span class="o">=</span> <span class="n">click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="s1">&#39;--pad&#39;</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;edge&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Choice</span><span class="p">([</span><span class="s1">&#39;none&#39;</span><span class="p">,</span><span class="s1">&#39;edge&#39;</span><span class="p">,</span><span class="s1">&#39;maximum&#39;</span><span class="p">,</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span><span class="s1">&#39;median&#39;</span><span class="p">,</span><span class="s1">&#39;minimum&#39;</span><span class="p">,</span><span class="s1">&#39;reflect&#39;</span><span class="p">,</span><span class="s1">&#39;symmetric&#39;</span><span class="p">,</span><span class="s1">&#39;wrap&#39;</span><span class="p">]),</span>
+              <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Pad to use around the image, default : edge&quot;</span> 
+                  <span class="s2">&quot;(see https://numpy.org/doc/stable/reference/generated/numpy.pad.html&quot;</span>
+                  <span class="s2">&quot; for more information)&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">_extract_files_from_list</span><span class="p">(</span><span class="n">cmd_inputs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts a list of file paths from a command line input.</span>
+
+<span class="sd">    If the input is a single file with a `.lst` extension, it reads the file line-by-line and treats each</span>
+<span class="sd">    line as an individual file path, returning the list of paths. If the input is already a</span>
+<span class="sd">    list of file paths, it is returned as-is.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        cmd_inputs (list of str):</span>
+<span class="sd">            Command line inputs for file paths. If it contains a single `.lst` file, this file</span>
+<span class="sd">            is read to obtain the list of files. Otherwise, it is assumed to be a direct list of files.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list of str: A list of file paths, either extracted from the `.lst` file or passed directly.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        _extract_files_from_list([&quot;files.lst&quot;])</span>
+
+<span class="sd">        _extract_files_from_list([&quot;file1.tif&quot;, &quot;file2.tif&quot;])</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        The `.lst` file is expected to have one file path per line. Blank lines in the `.lst`</span>
+<span class="sd">        file will be ignored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># handle the input file of type &quot;lst&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cmd_inputs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">cmd_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;.lst&quot;</span><span class="p">:</span>
+        <span class="c1"># parse the listing</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cmd_inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">cmd_inputs</span>
+
+    <span class="k">return</span> <span class="n">inputs</span>
+
+
+<div class="viewcode-block" id="apply_process"><a class="viewcode-back" href="../../../../api/eolab.rastertools.cli.utils_cli.apply_process.html#eolab.rastertools.cli.utils_cli.apply_process">[docs]</a><span class="k">def</span> <span class="nf">apply_process</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">tool</span><span class="p">,</span> <span class="n">inputs</span> <span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply the chosen process to a set of input files.</span>
+
+<span class="sd">    This function extracts input files from a provided list or direct paths, configures the specified tool,</span>
+<span class="sd">    and processes the files through the given tool. Additionally, it handles debug settings (such as storing</span>
+<span class="sd">    intermediate VRT files) and manages any exceptions during the process. If an error occurs, the function</span>
+<span class="sd">    logs the exception and terminates the process with an appropriate exit code.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        ctx (click.Context):</span>
+<span class="sd">            The context object that contains configuration options.</span>
+
+<span class="sd">        tool (Filtering or Hillshade or any raster processing tool):</span>
+<span class="sd">            The configured tool instance that will apply the process to the input files. The tool should have</span>
+<span class="sd">            been properly set up with parameters.</span>
+
+<span class="sd">        inputs (list or str):</span>
+<span class="sd">            A list of input file paths or a path to a `.lst` file containing a list of input file paths.</span>
+<span class="sd">            This argument specifies the files that the tool will process.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        RastertoolConfigurationException:</span>
+<span class="sd">            If there is a configuration error with the tool or its parameters.</span>
+
+<span class="sd">        Exception:</span>
+<span class="sd">            Any other exceptions that occur during the processing of the input files.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># handle the input file of type &quot;lst&quot;</span>
+        <span class="n">inputs_extracted</span> <span class="o">=</span> <span class="n">_extract_files_from_list</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+        <span class="c1"># setup debug mode in which intermediate VRT files are stored to disk or not</span>
+        <span class="n">tool</span><span class="o">.</span><span class="n">with_vrt_stored</span><span class="p">(</span><span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;keep_vrt&#39;</span><span class="p">))</span>
+
+        <span class="c1"># launch process</span>
+        <span class="n">tool</span><span class="o">.</span><span class="n">process_files</span><span class="p">(</span><span class="n">inputs_extracted</span><span class="p">)</span>
+
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">RastertoolConfigurationException</span> <span class="k">as</span> <span class="n">rce</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">rce</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

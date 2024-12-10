@@ -7,7 +7,6 @@ README.rst
 env_test.yml
 env_update.yml
 environment.yml
-pyproject.toml
 setup.cfg
 setup.py
 tox.ini
@@ -55,6 +54,7 @@ docs/cli/svf.rst
 docs/cli/tiling.rst
 docs/cli/timeseries.rst
 docs/cli/zonalstats.rst
+<<<<<<< HEAD
 src/eolab/rastertools/__init__.py
 src/eolab/rastertools/filtering.py
 src/eolab/rastertools/hillshade.py
@@ -118,6 +118,9 @@ src/eolab/rastertools/product/__pycache__/__init__.cpython-38.pyc
 src/eolab/rastertools/product/__pycache__/rasterproduct.cpython-38.pyc
 src/eolab/rastertools/product/__pycache__/rastertype.cpython-38.pyc
 src/eolab/rastertools/product/__pycache__/vrt.cpython-38.pyc
+=======
+src/eolab/rastertools/cli/utils_cli.py
+>>>>>>> rasterio_plugin_vsimem
 src/rastertools.egg-info/PKG-INFO
 src/rastertools.egg-info/SOURCES.txt
 src/rastertools.egg-info/dependency_links.txt
@@ -185,12 +188,11 @@ tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndwi.tif
 tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip
 tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_tar.tar
 tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_targz.TAR.GZ
+tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D_targz.TAR.GZ.properties
 tests/tests_data/SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz
+tests/tests_data/SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz.properties
 tests/tests_data/additional_rastertypes.json
 tests/tests_data/grid.geojson
-tests/tests_data/listing.lst
-tests/tests_data/listing2.lst
-tests/tests_data/listing3.lst
 tests/tests_data/tif_file.tif
 tests/tests_data/toulouse-mnh.tif
 tests/tests_refs/test_radioindice/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi-speed-20180928-105515.tif

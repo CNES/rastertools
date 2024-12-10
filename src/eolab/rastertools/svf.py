@@ -4,7 +4,6 @@
 This module defines a rastertool named SVF (Sky View Factor) which computes the SVF
 of a Digital Height Model.
 """
-import logging
 import logging.config
 from pathlib import Path
 import numpy as np

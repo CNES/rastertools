@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 
-import pytest
-import filecmp
 import logging
 from eolab.rastertools import Radioindice
 from eolab.rastertools.processing.rasterproc import RadioindiceProcessing
@@ -14,6 +13,7 @@ __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
 __license__ = "Apache v2.0"
 
+from .utils4test import RastertoolsTestsData
 
 __refdir = utils4test.get_refdir("test_radioindice/")
 
@@ -36,16 +36,19 @@ def test_radioindice_process_file_merge():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
-    inputfile = utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+    origin_path = RastertoolsTestsData.tests_input_data_dir + "/".split(os.getcwd() + "/")[-1]
+
+    inputfile = origin_path + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
     indices = [indice for indice in Radioindice.get_default_indices()]
 
     tool = Radioindice(indices)
-    tool.with_output(utils4test.outdir, merge=True)
-    tool.with_roi(utils4test.indir + "COMMUNE_32001.shp")
+    shapefile = RastertoolsTestsData.tests_input_data_dir + "/COMMUNE_32001.shp"
+    tool.with_output(RastertoolsTestsData.tests_output_data_dir , merge=True)
+    tool.with_roi(shapefile)
     outputs = tool.process_file(inputfile)
 
     assert outputs == [
-        utils4test.outdir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-indices.tif"]
+        RastertoolsTestsData.tests_output_data_dir + "/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-indices.tif"]
 
     utils4test.clear_outdir()
 
@@ -73,18 +76,17 @@ def test_radioindice_process_file_separate(compare : bool, save_gen_as_ref : boo
     indices = [Radioindice.ndvi, Radioindice.ndwi]
 
     tool = Radioindice(indices)
-    tool.with_output(utils4test.outdir, merge=False)
+    tool.with_output(RastertoolsTestsData.tests_output_data_dir , merge=False)
     tool.with_vrt_stored(False)
-    outputs = tool.process_file(utils4test.indir + inputfile + ".zip")
+    outputs = tool.process_file(RastertoolsTestsData.tests_input_data_dir + "/" + inputfile + ".zip")
 
     # check outputs
-    assert outputs == [utils4test.outdir + inputfile + "-ndvi.tif",
-                       utils4test.outdir + inputfile + "-ndwi.tif"]
+    assert outputs == [RastertoolsTestsData.tests_output_data_dir + "/" + inputfile + "-ndvi.tif",
+                       RastertoolsTestsData.tests_output_data_dir + "/" + inputfile + "-ndwi.tif"]
 
     gen_files = [inputfile + "-ndvi.tif", inputfile + "-ndwi.tif"]
     if compare:
-        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
-        print(mismatch)
+        match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir , __refdir, gen_files)
         assert len(match) == 2
         assert len(mismatch) == 0
         assert len(err) == 0
@@ -110,18 +112,18 @@ def test_radioindice_process_files():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
-    inputfiles = [utils4test.indir + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
-                  utils4test.indir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"]
+    inputfiles = [RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
+                  RastertoolsTestsData.tests_input_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"]
     indices = [Radioindice.ndvi, Radioindice.ndwi]
 
     tool = Radioindice(indices)
-    tool.with_output(utils4test.outdir, merge=True)
-    tool.with_roi(utils4test.indir + "COMMUNE_32001.shp")
+    tool.with_output(RastertoolsTestsData.tests_output_data_dir, merge=True)
+    tool.with_roi(RastertoolsTestsData.tests_input_data_dir + "/COMMUNE_32001.shp")
     outputs = tool.process_files(inputfiles)
 
     assert outputs == [
-        utils4test.outdir + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-indices.tif",
-        utils4test.outdir + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-indices.tif"]
+        RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-indices.tif",
+        RastertoolsTestsData.tests_output_data_dir + "/" + "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-indices.tif"]
 
     utils4test.clear_outdir()
 
@@ -146,11 +148,11 @@ def test_radioindice_incompatible_indice_rastertype(caplog):
     utils4test.create_outdir()
 
     file = "SPOT6_2018_France-Ortho_NC_DRS-MS_SPOT6_2018_FRANCE_ORTHO_NC_GEOSUD_MS_82.tar.gz"
-    inputfile = utils4test.indir + file
+    inputfile = RastertoolsTestsData.tests_input_data_dir + "/" + file
     indice = RadioindiceProcessing("my_indice").with_channels([BandChannel.mir, BandChannel.swir])
 
     tool = Radioindice([indice])
-    tool.with_output(utils4test.outdir)
+    tool.with_output(RastertoolsTestsData.tests_output_data_dir)
 
     caplog.set_level(logging.ERROR)
     outputs = tool.process_file(inputfile)

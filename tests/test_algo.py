@@ -232,7 +232,6 @@ def test_local_sum():
 
         assert (output[0] == results[i - 1]).all()
 
-
 # @pytest.mark.parametrize("input_np, input_xarray, kernel_width", [(zero_np,zero_xarr, 5)])
 #
 # def test_xarray_local_mean(input_np : np.ndarray, input_xarray : xr.DataArray, kernel_width : int):
@@ -250,7 +249,6 @@ def test_local_sum():
 def test_local_mean():
     """
     Test the local mean filter with a kernel size of 2.
-
     This test verifies the local mean filter by comparing its output on a 5x5 matrix to an expected result matrix.
     """
     result = np.array(
@@ -281,7 +279,7 @@ def test_local_mean():
     )
     mask = np.pad(mask, (radius, radius), mode="edge")
 
-    array = ma.array(band, mask=mask)  # masks the band array
+    array = ma.array(band, mask=mask) # masks the band array
     # ie. removes the first line and first column of band
 
     # output shape is array shape - kernel_width

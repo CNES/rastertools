@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Reference &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="_static/style.css" type="text/css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Filtering" href="api/eolab.rastertools.Filtering.html" />
+    <link rel="prev" title="zonalstats" href="cli/zonalstats.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rastertools">rastertools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Filtering.html">Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Hillshade.html">Hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Radioindice.html">Radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Speed.html">Speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.SVF.html">SVF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Tiling.html">Tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Timeseries.html">Timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Zonalstats.html">Zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#raster-products">Raster products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-custom-raster-types">Adding custom raster types</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#eolab.rastertools.add_custom_rastertypes"><code class="docutils literal notranslate"><span class="pre">add_custom_rastertypes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#design-rules-of-raster-tools">Design rules of raster tools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Rastertool.html">Rastertool</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.Windowable.html">Windowable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/eolab.rastertools.RastertoolConfigurationException.html">RastertoolConfigurationException</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-reference">
+<span id="usage"></span><h1>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this heading"></a></h1>
+<section id="rastertools">
+<h2>rastertools<a class="headerlink" href="#rastertools" title="Permalink to this heading"></a></h2>
+<p>Rastertools can be activated by calling the API <code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.run_tool</span></code>.</p>
+<p>Example of use in python code:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">run_tool</span>
+<span class="n">run_tool</span><span class="p">(</span><span class="n">args</span><span class="o">=</span><span class="s2">&quot;radioindice --help&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>Alternatively, every raster tools can be activated with their own API:</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/eolab.rastertools.Filtering.html#eolab.rastertools.Filtering" title="eolab.rastertools.Filtering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Filtering</span></code></a>(raster_filter, kernel_size[, bands])</p></td>
+<td><p>Raster tool that applies a filter on a raster image.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/eolab.rastertools.Hillshade.html#eolab.rastertools.Hillshade" title="eolab.rastertools.Hillshade"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Hillshade</span></code></a>(elevation, azimuth, resolution[, ...])</p></td>
+<td><p>Raster tool that computes the hillshades of a Digital Elevation / Surface / Height Model corresponding to a given solar position.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/eolab.rastertools.Radioindice.html#eolab.rastertools.Radioindice" title="eolab.rastertools.Radioindice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Radioindice</span></code></a>(indices)</p></td>
+<td><p>Raster tool that computes radiometric indices of a raster product.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/eolab.rastertools.Speed.html#eolab.rastertools.Speed" title="eolab.rastertools.Speed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed</span></code></a>([bands])</p></td>
+<td><p>Raster tool that computes the time derivative (speed) of raster images.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/eolab.rastertools.SVF.html#eolab.rastertools.SVF" title="eolab.rastertools.SVF"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF</span></code></a>(nb_directions, radius, resolution)</p></td>
+<td><p>Raster tool that computes the Sky View Factor (SVF) of a Digital Elevation / Surface / Height Model.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/eolab.rastertools.Tiling.html#eolab.rastertools.Tiling" title="eolab.rastertools.Tiling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tiling</span></code></a>(geometry_file)</p></td>
+<td><p>Raster tool that tiles a raster following the geometries of a grid.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/eolab.rastertools.Timeseries.html#eolab.rastertools.Timeseries" title="eolab.rastertools.Timeseries"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Timeseries</span></code></a>(start_date, end_date, period[, bands])</p></td>
+<td><p>Raster tool that generates the time series of raster images.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/eolab.rastertools.Zonalstats.html#eolab.rastertools.Zonalstats" title="eolab.rastertools.Zonalstats"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Zonalstats</span></code></a>(stats[, categorical, ...])</p></td>
+<td><p>Raster tool that computes zonal statistics of a raster product.</p></td>
+</tr>
+</tbody>
+</table>
+<p>All these objects provide:</p>
+<ul class="simple">
+<li><p>a fluent API to configure the processing. The methods are all named with the following pattern “with_&lt;something&gt;” and
+return the current instance so that the methods can be chained.</p></li>
+<li><p>methods to process a single file or a set of files (see <a class="reference internal" href="api/eolab.rastertools.Rastertool.process_file.html#eolab.rastertools.Rastertool.process_file" title="eolab.rastertools.Rastertool.process_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.Rastertool.process_file</span></code></a>
+and <a class="reference internal" href="api/eolab.rastertools.Rastertool.process_files.html#eolab.rastertools.Rastertool.process_files" title="eolab.rastertools.Rastertool.process_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.Rastertool.process_files</span></code></a>)</p></li>
+</ul>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">Radioindice</span>
+<span class="n">proc</span> <span class="o">=</span> <span class="n">Radioindice</span><span class="p">(</span><span class="n">Radioindice</span><span class="o">.</span><span class="n">ndvi</span><span class="p">)</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">with_output</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+              <span class="o">.</span><span class="n">with_roi</span><span class="p">(</span><span class="s2">&quot;./roi.geojson&quot;</span><span class="p">)</span>
+              <span class="o">.</span><span class="n">process_file</span><span class="p">(</span><span class="s2">&quot;./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="raster-products">
+<h2>Raster products<a class="headerlink" href="#raster-products" title="Permalink to this heading"></a></h2>
+<p>Rastertools provides a useful API to open raster products that are provided as an archive or a directory containing
+several images.</p>
+<p>The API is very simple to use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">RasterProduct</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+
+<span class="k">with</span> <span class="n">RasterProduct</span><span class="p">(</span><span class="s2">&quot;tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">rp</span><span class="p">:</span>
+   <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">GDAL_VRT_ENABLE_PYTHON</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+      <span class="k">with</span> <span class="n">rp</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="s2">&quot;tests/tests_data/COMMUNE_32001.shp&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">dataset</span><span class="p">:</span>
+         <span class="n">data</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="adding-custom-raster-types">
+<h2>Adding custom raster types<a class="headerlink" href="#adding-custom-raster-types" title="Permalink to this heading"></a></h2>
+<p>To add custom raster types, use the method <a class="reference internal" href="#eolab.rastertools.add_custom_rastertypes" title="eolab.rastertools.add_custom_rastertypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.add_custom_rastertypes</span></code></a>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="eolab.rastertools.add_custom_rastertypes">
+<span class="sig-prename descclassname"><span class="pre">eolab.rastertools.</span></span><span class="sig-name descname"><span class="pre">add_custom_rastertypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rastertypes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/eolab/rastertools/main.html#add_custom_rastertypes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eolab.rastertools.add_custom_rastertypes" title="Permalink to this definition"></a></dt>
+<dd><p>Add definition of new raster types. The json string shall have the following format:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;rastertypes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RGB_TIF&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;product_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^RGB_TIF_(?P&lt;date&gt;[0-9_]*)\.(tif|TIF)$&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;bands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;red&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;green&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blue&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nir&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nir&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;date_format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;%Y%m%d_%H%M%S&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;nodata&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;RGB_TIF_ARCHIVE&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;product_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^RGB_TIF_(?P&lt;date&gt;[0-9\_]*).*$&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;bands_pattern&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;^TIF_(?P&lt;bands&gt;{}).*\.(tif|TIF)$&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;bands&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;red&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;r&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;red&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;g&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;green&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;b&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;blue&quot;</span>
+<span class="w">        </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span>
+<span class="w">          </span><span class="nt">&quot;channel&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nir&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;identifier&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;n&quot;</span><span class="p">,</span>
+<span class="w">          </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nir&quot;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;date_format&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;%Y%m%d_%H%M%S&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;nodata&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>name : unique name of raster type</p></li>
+<li><p>product_pattern: regexp to identify raster product matching the raster type. Regexp can
+contain catching groups that identifies metadata: date (groupe name=date), relative
+orbit number (relorbit), tile number (tile), any other group (free name of the group).</p></li>
+<li><p>bands_pattern (optional) : when the raster product of this type is an archive
+(zip, tar, tar.gz, etc.), the pattern enables to identify the files of the different
+raster bands. The raster product can contain one raster file per band or one multi-bands
+raster file. In the first case, the pattern must contain a group that identify
+the band to which the file corresponds. This group must be defined as follows (?P&lt;bands&gt;{})
+in which the variable part {} will be replaced by the identifier of the band (see below).</p></li>
+<li><p>date_format (optional): date format in the product name. By default: %Y%m%d-%H%M%S</p></li>
+<li><p>nodata (optional): no data value of raster bands. By default: -10000</p></li>
+<li><p>masknnodata (optional): nodata value in the mask band</p></li>
+<li><p>For every bands:</p>
+<ul>
+<li><p>channel: channel of the band. Must be one of: blue, green, red, nir, mir, swir,
+red_edge1, red_edge2, red_edge3, red_edge4, blue_60m, nir_60m and mir_60m.</p></li>
+<li><p>identifier (optional): string that identifies the band in the filenames of a raster
+product that it is an archive. This identifier is inserted in the group <code class="docutils literal notranslate"><span class="pre">bands</span></code> of
+the bands_pattern.</p></li>
+<li><p>description (optional): band description that will be reused in the generated products.</p></li>
+</ul>
+</li>
+<li><p>For every masks:</p>
+<ul>
+<li><p>identifier (optional): string that identifies the mask band in the filenames of a raster
+product that it is an archive. This identifier is inserted in the group <code class="docutils literal notranslate"><span class="pre">bands</span></code> of
+the bands_pattern.</p></li>
+<li><p>description (optional): mask band description that will be reused in the generated products.</p></li>
+<li><p>maskfunc (optional): fully qualified name of the python function that converts the mask
+band values to a binary mask (0 = masked; 1 = unmasked)</p></li>
+</ul>
+</li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rastertypes</strong> – JSON string that contains the new raster types definition</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">add_custom_rastertypes</span>
+
+<span class="n">my_rastertypes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;rastertypes&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;RGB_TIF&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;product_pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^RGB_TIF_(?P&lt;date&gt;[0-9_]*)_test</span><span class="se">\\</span><span class="s2">.(tif|TIF)$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bands&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;nir&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;nir&quot;</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;date_format&quot;</span><span class="p">:</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nodata&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;RGB_TIF_ARCHIVE&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;product_pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^RGB_TIF_(?P&lt;date&gt;[0-9</span><span class="se">\\</span><span class="s2">_]*).*$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bands_pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^TIF_(?P&lt;bands&gt;</span><span class="si">{}</span><span class="s2">).*</span><span class="se">\\</span><span class="s2">.(tif|TIF)$&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bands&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;g&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;green&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;channel&quot;</span><span class="p">:</span> <span class="s2">&quot;nir&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;identifier&quot;</span><span class="p">:</span> <span class="s2">&quot;n&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;nir&quot;</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;date_format&quot;</span><span class="p">:</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nodata&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">add_custom_rastertypes</span><span class="p">(</span><span class="n">json</span><span class="p">)</span>
+
+<span class="c1"># now any rastertools can handle products of the two new rastertypes</span>
+<span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="design-rules-of-raster-tools">
+<h2>Design rules of raster tools<a class="headerlink" href="#design-rules-of-raster-tools" title="Permalink to this heading"></a></h2>
+<p>Every raster tool object inherits from base class <a class="reference internal" href="api/eolab.rastertools.Rastertool.html#eolab.rastertools.Rastertool" title="eolab.rastertools.Rastertool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.Rastertool</span></code></a>.
+If the process supports windowing, the raster tool can also inherit from <a class="reference internal" href="api/eolab.rastertools.Windowable.html#eolab.rastertools.Windowable" title="eolab.rastertools.Windowable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.Windowable</span></code></a>.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/eolab.rastertools.Rastertool.html#eolab.rastertools.Rastertool" title="eolab.rastertools.Rastertool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Rastertool</span></code></a>()</p></td>
+<td><p>Base class for every raster tool which contains the common configuration:</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="api/eolab.rastertools.Windowable.html#eolab.rastertools.Windowable" title="eolab.rastertools.Windowable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Windowable</span></code></a>()</p></td>
+<td><p>Decorator of a <a class="reference internal" href="api/eolab.rastertools.Rastertool.html#eolab.rastertools.Rastertool" title="eolab.rastertools.Rastertool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.Rastertool</span></code></a> that adds configuration parameters to set the windowable capability of the tool:</p></td>
+</tr>
+</tbody>
+</table>
+<p>A rastertool raises a <a class="reference internal" href="api/eolab.rastertools.RastertoolConfigurationException.html#eolab.rastertools.RastertoolConfigurationException" title="eolab.rastertools.RastertoolConfigurationException"><code class="xref py py-obj docutils literal notranslate"><span class="pre">eolab.rastertools.RastertoolConfigurationException</span></code></a> when invalid
+input parameter is provided.</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="api/eolab.rastertools.RastertoolConfigurationException.html#eolab.rastertools.RastertoolConfigurationException" title="eolab.rastertools.RastertoolConfigurationException"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RastertoolConfigurationException</span></code></a></p></td>
+<td><p>This class defines an exception that is raised when the configuration of the raster tool is invalid (wrong input parameter)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Moreover, a rastertool can raise any type of Exception during its execution. The best practice is
+thus to catch exceptions that can raise as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">Radioindice</span><span class="p">,</span> <span class="n">RastertoolConfigurationException</span>
+
+<span class="n">proc</span> <span class="o">=</span> <span class="n">Radioindice</span><span class="p">(</span><span class="n">Radioindice</span><span class="o">.</span><span class="n">ndvi</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">outputs</span> <span class="o">=</span> <span class="n">proc</span><span class="o">.</span><span class="n">with_output</span><span class="p">(</span><span class="s2">&quot;unknown_dir&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                  <span class="o">.</span><span class="n">process_file</span><span class="p">(</span><span class="s2">&quot;./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="n">RastertoolConfigurationException</span> <span class="k">as</span> <span class="n">rce</span><span class="p">:</span>
+    <span class="c1"># do something</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid configuration of radioindice processing: </span><span class="si">{</span><span class="n">rce</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+    <span class="c1"># do something</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An unexpected error occurs while processing file: </span><span class="si">{</span><span class="n">err</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this example, a RastertoolConfigurationException is raises because the specified output dir does not
+exist.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cli/zonalstats.html" class="btn btn-neutral float-left" title="zonalstats" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api/eolab.rastertools.Filtering.html" class="btn btn-neutral float-right" title="Filtering" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

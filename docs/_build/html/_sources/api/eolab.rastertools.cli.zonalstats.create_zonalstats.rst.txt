@@ -1,0 +1,6 @@
+create\_zonalstats
+==================
+
+.. currentmodule:: eolab.rastertools.cli.zonalstats
+
+.. autofunction:: create_zonalstats

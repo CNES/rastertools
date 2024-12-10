@@ -3,120 +3,108 @@
 """
 CLI definition for the radioindice tool
 """
-import eolab.rastertools.cli as cli
+import logging
+
 from eolab.rastertools import RastertoolConfigurationException, Radioindice
+from eolab.rastertools.cli.utils_cli import apply_process, win_opt
 from eolab.rastertools.product import BandChannel
 from eolab.rastertools.processing import RadioindiceProcessing
+import sys
+import click
+import os
+
+_logger = logging.getLogger(__name__)
+
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 
-def create_argparser(rastertools_parsers):
-    """Adds the radioindice subcommand to the given rastertools subparser
-
-    Args:
-        rastertools_parsers:
-            The rastertools subparsers to which this subcommand shall be added.
-
-            This argument provides from a code like this::
-
-                import argparse
-                main_parser = argparse.ArgumentParser()
-                rastertools_parsers = main_parser.add_subparsers()
-                radioindice.create_argparser(rastertools_parsers)
-
-    Returns:
-        The rastertools subparsers updated with this subcommand
+def indices_opt(function):
     """
-    indicenames = ', '.join(sorted([indice.name for indice in Radioindice.get_default_indices()]))
-    parser = rastertools_parsers.add_parser(
-        "radioindice", aliases=["ri"],
-        help="Compute radiometric indices",
-        description="Compute a list of radiometric indices (NDVI, NDWI, etc.) on a raster image",
-        epilog="If no indice option is explicitly set, NDVI, NDWI and NDWI2 are computed.")
-    parser.add_argument(
-        "inputs",
-        nargs='+',
-        help="Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). "
-             "You can provide a single file with extension \".lst\" (e.g. \"radioindice.lst\") "
-             "that lists the input files to process (one input file per line in .lst)")
-    cli.with_outputdir_arguments(parser)
-    parser.add_argument(
-        '-m',
-        '--merge',
-        dest="merge",
-        action="store_true",
-        help="Merge all indices in the same image (i.e. one band per indice).")
-    parser.add_argument(
-        '-r',
-        '--roi',
-        dest="roi",
-        help="Region of interest in the input image (vector)")
-    indices_pc = parser.add_argument_group("Options to select the indices to compute")
-    indices_pc.add_argument(
-        '-i',
-        '--indices',
-        dest="indices",
-        nargs="+",
-        help="List of indices to compute"
-             f"Possible indices are: {indicenames}")
-    for indice in Radioindice.get_default_indices():
-        indices_pc.add_argument(
-            f"--{indice.name}",
-            dest=indice.name,
-            action="store_true",
-            help=f"Compute {indice.name} indice")
-    indices_pc.add_argument(
-        '-nd',
-        "-normalized_difference",
-        nargs=2,
-        action="append",
-        metavar=("band1", "band2"),
-        help="Compute the normalized difference of two bands defined as parameter of this option, "
-             "e.g. \"-nd red nir\" will compute (red-nir)/(red+nir). "
-             "See eolab.rastertools.product.rastertype.BandChannel for the list of bands names. "
-             "Several nd options can be set to compute several normalized differences.")
-    cli.with_window_arguments(parser, pad=False)
-
-    # set the function to call when this subcommand is called
-    parser.set_defaults(func=create_radioindice)
-
-    return rastertools_parsers
-
-
-def create_radioindice(args) -> Radioindice:
-    """Create and configure a new rastertool "Radioindice" according to argparse args
-
-    Args:
-        args: args extracted from command line
-
-    Returns:
-        :obj:`eolab.rastertools.Radioindice`: The configured rastertool to run
+    Create options for all the possible indices
     """
+    dict_indices = {'--ndvi' : "ndvi", '--tndvi' : "tndvi", '--rvi' : "rvi", '--pvi' : "pvi", '--savi' : "savi", '--tsavi' : "tsavi",
+                    '--msavi' : "msavi", '--msavi2' : "msavi2", '--ipvi' : "ipvi",
+                    '--evi' : "evi", '--ndwi' : "ndwi", '--ndwi2' : "ndwi2", '--mndwi' : "mndwi",
+                    '--ndpi' : "ndpi", '--ndti' : "ndti", '--ndbi' : "ndbi", '--ri' : "ri", '--bi' : "bi", '--bi2' : "bi2"}
+
+    for idc in dict_indices.keys():
+        function = click.option(idc, is_flag=True, help=f"Compute " + dict_indices[idc] + " indice")(function)
+    return function
+
+
+#Radioindice command
+@click.command("radioindice",context_settings=CONTEXT_SETTINGS)
+@click.argument('inputs', type=str, nargs = -1, required = 1)
+
+@click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
+
+@click.option('-m', '--merge', is_flag =  True, help="Merge all indices in the same image (i.e. one band per indice)")
+
+@click.option('-r', '--roi', type= str, help="Region of interest in the input image (vector)")
+
+@win_opt
+
+@click.option('-i', '--indices', type=str, multiple = True,
+                    help=" List of indices to compute. Possible indices are: bi, bi2, evi, ipvi, mndwi, msavi, msavi2, ndbi, ndpi,"
+                        " ndti, ndvi, ndwi, ndwi2, pvi, ri, rvi, savi, tndvi, tsavi")
+
+
+@indices_opt
+
+@click.option('-nd', '--normalized_difference','nd',type=str,
+    multiple=True, nargs=2, metavar="band1 band2",
+              help="Compute the normalized difference of two bands defined"
+                        " as parameter of this option, e.g. \"-nd red nir\" will compute (red-nir)/(red+nir). "
+                        "See eolab.rastertools.product.rastertype.BandChannel for the list of bands names. "
+                        "Several nd options can be set to compute several normalized differences.")
+
+
+@click.pass_context
+def radioindice(ctx, inputs : list, output : str, indices : list, merge : bool, roi : str, window_size : int, nd : str, **kwargs) :
+    """
+    Compute the requested radio indices on raster data.
+
+    This command computes various vegetation and environmental indices on satellite or raster data based on the
+    provided input images and options. The tool can compute specific indices, merge the results into one image,
+    compute normalized differences between bands, and apply processing using a region of interest (ROI) and specified
+    tile/window size.
+
+    Arguments:
+
+        inputs TEXT
+
+        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
+    You can provide a single file with extension \".lst\" (e.g. \"radioindice.lst\") that lists
+    the input files to process (one input file per line in .lst).
+    """
+    indices_opt = [key for key, value in kwargs.items() if value]
     indices_to_compute = []
-    argsdict = vars(args)
 
     # append indices defined with --<name_of_indice>
     indices_to_compute.extend([indice for indice in Radioindice.get_default_indices()
-                               if argsdict[indice.name]])
+                               if indice.name in indices_opt])
+
     # append indices defined with --indices
-    if args.indices:
+    if indices:
         indices_dict = {indice.name: indice for indice in Radioindice.get_default_indices()}
-        for ind in args.indices:
+        for ind in indices:
             if ind in indices_dict:
                 indices_to_compute.append(indices_dict[ind])
             else:
-                raise RastertoolConfigurationException(f"Invalid indice name: {ind}")
+                _logger.exception(RastertoolConfigurationException(f"Invalid indice name: {ind}"))
+                sys.exit(2)
 
-    if args.nd:
-        for nd in args.nd:
-            if nd[0] in BandChannel.__members__ and nd[1] in BandChannel.__members__:
-                channel1 = BandChannel[nd[0]]
-                channel2 = BandChannel[nd[1]]
-                new_indice = RadioindiceProcessing(f"nd[{nd[0]}-{nd[1]}]").with_channels(
+    if nd:
+        for nd_bands in nd:
+            if nd_bands[0] in BandChannel.__members__ and nd_bands[1] in BandChannel.__members__:
+                channel1 = BandChannel[nd_bands[0]]
+                channel2 = BandChannel[nd_bands[1]]
+                new_indice = RadioindiceProcessing(f"nd[{nd_bands[0]}-{nd_bands[1]}]").with_channels(
                     [channel2, channel1])
                 indices_to_compute.append(new_indice)
             else:
-                raise RastertoolConfigurationException(
-                    f"Invalid band(s) in normalized difference: {nd[0]} and/or {nd[1]}")
+                _logger.exception(RastertoolConfigurationException(f"Invalid band(s) in normalized difference: {nd_bands[0]} and/or {nd_bands[1]}"))
+                sys.exit(2)
 
     # handle special case: no indice setup
     if len(indices_to_compute) == 0:
@@ -128,8 +116,10 @@ def create_radioindice(args) -> Radioindice:
     tool = Radioindice(indices_to_compute)
 
     # set up config with args values
-    tool.with_output(args.output, args.merge)
-    tool.with_roi(args.roi)
-    tool.with_windows(args.window_size)
+    tool.with_output(output, merge)
+    tool.with_roi(roi)
+    tool.with_windows(window_size)
 
-    return tool
+    apply_process(ctx, tool, inputs)
+
+

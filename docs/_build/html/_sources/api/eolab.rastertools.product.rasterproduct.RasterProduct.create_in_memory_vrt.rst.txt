@@ -1,0 +1,6 @@
+RasterProduct.create\_in\_memory\_vrt
+=====================================
+
+.. currentmodule:: eolab.rastertools.product.rasterproduct
+
+.. automethod:: RasterProduct.create_in_memory_vrt

@@ -1,0 +1,677 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.radioindice &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.radioindice</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.radioindice</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines a command line named radioindice that computes radiometric</span>
+<span class="sd">indices on raster images: ndvi, ndwi, etc..</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">Rastertool</span><span class="p">,</span> <span class="n">Windowable</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">algo</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">RadioindiceProcessing</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">BandChannel</span><span class="p">,</span> <span class="n">RasterProduct</span>
+
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Radioindice"><a class="viewcode-back" href="../../../api/eolab.rastertools.Radioindice.html#eolab.rastertools.radioindice.Radioindice">[docs]</a><span class="k">class</span> <span class="nc">Radioindice</span><span class="p">(</span><span class="n">Rastertool</span><span class="p">,</span> <span class="n">Windowable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raster tool that computes radiometric indices of a raster product.</span>
+
+<span class="sd">    If several indices are requested, the tool can generate one output image with one</span>
+<span class="sd">    band per indice (merge=True), or it can generate several images, one image per indice</span>
+<span class="sd">    (merge=False).</span>
+
+<span class="sd">    The computation can be realized on a subset of the input image (a Region Of Interest)</span>
+<span class="sd">    defined by a vector file (e.g. shapefile, geojson).</span>
+
+<span class="sd">    The radiometric indice is an instance of</span>
+<span class="sd">    :obj:`eolab.rastertools.processing.RadioindiceProcessing`</span>
+<span class="sd">    which defines the list of channels it needs to compute the indice. The input raster product</span>
+<span class="sd">    must be of a recognized raster type so that it is possible to match every channels required by</span>
+<span class="sd">    the indice with an existing band in the raster product.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Preconfigured radioindices</span>
+    <span class="c1"># Vegetation indices: ndvi</span>
+    <span class="n">ndvi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ndvi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalized Difference Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ndvi = \\frac{nir - red}{nir + red}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Rouse J.W., Haas R.H., Schell J.A., Deering D.W., 1973. Monitoring vegetation systems in</span>
+<span class="sd">        the great plains with ERTS. Third ERTS Symposium, NASA SP-351. 1:309-317</span>
+
+<span class="sd">        Tucker C.J., 1979. Red and photographic infrared linear combinations for monitoring</span>
+<span class="sd">        vegetation. Remote Sens Environ 8:127-150</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: tndvi</span>
+    <span class="n">tndvi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;tndvi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">tndvi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transformed Normalized Difference Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        :nowrap:</span>
+
+<span class="sd">        \\begin{eqnarray}</span>
+<span class="sd">            ndvi &amp; = &amp; \\frac{nir - red}{nir + red} \\\\</span>
+<span class="sd">            tndvi &amp; = &amp; \\sqrt{ndvi + 0.5}</span>
+<span class="sd">        \\end{eqnarray}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Deering D.W., Rouse J.W., Haas R.H., and Schell J.A., 1975. Measuring forage production</span>
+<span class="sd">        of grazing units from Landsat MSS data. Pages 1169-1178 In: Cook J.J. (Ed.), Proceedings</span>
+<span class="sd">        of the Tenth International Symposium on Remote Sensing of Environment (Ann Arbor, 1975),</span>
+<span class="sd">        Vol. 2, Ann Arbor, Michigan, USA. &lt;https://www.scirp.org/reference/referencespapers?referenceid=1046714&gt;`_</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: rvi</span>
+    <span class="n">rvi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;rvi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">rvi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ratio Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        rvi = \\frac{nir}{red}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Jordan C.F., 1969. Derivation of leaf area index from quality of light on the forest</span>
+<span class="sd">        floor. Ecology 50:663-666 &lt;https://esajournals.onlinelibrary.wiley.com/doi/10.2307/1936256&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: pvi</span>
+    <span class="n">pvi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;pvi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">pvi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perpendicular Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        pvi = (nir - 0.90893 * red - 7.46216) * 0.74</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Richardson A.J., Wiegand C.L., 1977. Distinguishing vegetation from soil background</span>
+<span class="sd">        information. Photogramm Eng Rem S 43-1541-1552 &lt;https://www.asprs.org/wp-content/uploads/pers/1977journal/dec/1977_dec_1541-1552.pdf&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: savi</span>
+    <span class="n">savi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;savi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">savi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Soil Adjusted Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        savi = \\frac{(nir - red) * (1. + 0.5)}{nir + red + 0.5}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Huete A.R., 1988. A soil-adjusted vegetation index (SAVI). Remote Sens Environ 25:295-309 &lt;https://www.sciencedirect.com/science/article/abs/pii/003442578890106X&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: tsavi</span>
+    <span class="n">tsavi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;tsavi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">tsavi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Transformed Soil Adjusted Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        tsavi = \\frac{0.7 * (nir - 0.7 * red - 0.9)}{0.7 * nir + red + 0.08 * (1 + 0.7^2)}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Baret F., Guyot G., Major D., 1989. TSAVI: a vegetation index which minimizes soil</span>
+<span class="sd">        brightness effects on LAI or APAR estimation. 12th Canadian Symposium on Remote</span>
+<span class="sd">        Sensing and IGARSS 1990, Vancouver, Canada, 07/10-14. &lt;https://www.researchgate.net/publication/3679422_TSAVI_A_vegetation_index_which_minimizes_soil_brightness_effects_on_LAI_and_APAR_estimation&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: msavi</span>
+    <span class="n">msavi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;msavi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">msavi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modified Soil Adjusted Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        :nowrap:</span>
+
+<span class="sd">        \\begin{eqnarray}</span>
+<span class="sd">            wdvi &amp; = &amp; nir - 0.4 * red \\\\</span>
+<span class="sd">            ndvi &amp; = &amp; \\frac{nir - red}{nir + red} \\\\</span>
+<span class="sd">            L &amp; = &amp; 1 - 2 * 0.4 * ndvi * wdvi \\\\</span>
+<span class="sd">            msavi &amp; = &amp; \\frac{(nir - red) * (1 + L)}{nir + red + L}</span>
+<span class="sd">        \\end{eqnarray}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Qi J., Chehbouni A., Huete A.R., Kerr Y.H., 1994. Modified Soil Adjusted Vegetation</span>
+<span class="sd">        Index (MSAVI). Remote Sens Environ 48:119-126 &lt;https://www.researchgate.net/publication/223906415_A_Modified_Soil_Adjusted_Vegetation_Index&gt;`_</span>
+
+<span class="sd">        `Qi J., Kerr Y., Chehbouni A., 1994. External factor consideration in vegetation index</span>
+<span class="sd">        development. Proc. of Physical Measurements and Signatures in Remote Sensing,</span>
+<span class="sd">        ISPRS, 723-730. &lt;https://www.academia.edu/20596726/External_factor_consideration_in_vegetation_index_development&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: msavi2</span>
+    <span class="n">msavi2</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;msavi2&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">msavi2</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modified Soil Adjusted Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        :nowrap:</span>
+
+<span class="sd">        \\begin{eqnarray}</span>
+<span class="sd">            val &amp; = &amp; (2 * nir + 1)^2 - 8 * (nir - red) \\\\</span>
+<span class="sd">            msavi2 &amp; = &amp; (2 * nir + 1 - \\sqrt{val}) / 2</span>
+<span class="sd">        \\end{eqnarray}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: ipvi</span>
+    <span class="n">ipvi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ipvi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">ipvi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Infrared Percentage Vegetation Index (red, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        ipvi = \\frac{nir}{nir + red}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        `Crippen, R. E. 1990. Calculating the Vegetation Index Faster, Remote Sensing of</span>
+<span class="sd">        Environment, vol 34., pp. 71-73. &lt;https://www.sciencedirect.com/science/article/abs/pii/003442579090085Z&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Vegetation indices: evi</span>
+    <span class="n">evi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;evi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">evi</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">blue</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced vegetation index (red, nir, blue channels)</span>
+
+<span class="sd">    .. math::</span>
+<span class="sd">        evi = \\frac{2.5 * (nir - red)}{nir + 6.0 * red - 7.5 * blue + 1.0}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Water indices: ndwi</span>
+    <span class="n">ndwi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ndwi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">mir</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalized Difference Water Index (mir, nir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ndwi = \\frac{nir - mir}{nir + mir}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Gao, B. C., 1996. NDWI - A normalized difference water index for remote sensing</span>
+<span class="sd">        of vegetation liquid water from space. Remote Sensing of Environment 58, 257-266.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Water indices: ndwi2</span>
+    <span class="n">ndwi2</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ndwi2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalized Difference Water Index (nir, green channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ndwi2 = \\frac{green - nir}{green + nir}</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Water indices: mdwi</span>
+    <span class="n">mndwi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;mndwi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">mir</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Modified Normalized Difference Water Index (green, mir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        mndwi = \\frac{green - mir}{green + mir}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Xu, H. Q., 2006. Modification of normalised difference water index (NDWI) to enhance</span>
+<span class="sd">        open water features in remotely sensed imagery. International Journal of Remote Sensing</span>
+<span class="sd">        27, 3025-3033</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Water indices: ndpi</span>
+    <span class="n">ndpi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ndpi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">mir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalized Difference Pond Index (green, mir channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ndpi = \\frac{mir - green}{mir + green}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        J-P. Lacaux, Y. M. Tourre, C. Vignolle, J-A. Ndione, and M. Lafaye, &quot;Classification</span>
+<span class="sd">        of Ponds from High-Spatial Resolution Remote Sensing: Application to Rift Valley Fever</span>
+<span class="sd">        Epidemics in Senegal,&quot; Remote Sensing of Environment 106 66–74, Elsevier Publishers: 2007</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Water indices: ndti</span>
+    <span class="n">ndti</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ndti&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalized Difference Turbidity Index (green, red channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ndti = \\frac{red - green}{red + green}</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        J-P. Lacaux, Y. M. Tourre, C. Vignolle, J-A. Ndione, and M. Lafaye, &quot;Classification</span>
+<span class="sd">        of Ponds from High-Spatial Resolution Remote Sensing: Application to Rift Valley Fever</span>
+<span class="sd">        Epidemics in Senegal,&quot; Remote Sensing of Environment 106 66–74, Elsevier Publishers: 2007</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># urban indices: ndbi</span>
+    <span class="n">ndbi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ndbi&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">mir</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Normalized Difference Built Up Index (nir, mir channels)</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ndbi = \\frac{mir - nir}{mir + nir}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Soil indices: ri</span>
+    <span class="n">ri</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;ri&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">redness_index</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Redness index (red, green channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        ri = \\frac{red^2}{green^3}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Soil indices: bi</span>
+    <span class="n">bi</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;bi&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">brightness_index</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Brightness index (red, green channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        bi = \\frac{red^2 + green^2}{2}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Soil indices: bi2</span>
+    <span class="n">bi2</span> <span class="o">=</span> <span class="n">RadioindiceProcessing</span><span class="p">(</span><span class="s2">&quot;bi2&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">brightness_index2</span><span class="p">)</span><span class="o">.</span><span class="n">with_channels</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">BandChannel</span><span class="o">.</span><span class="n">nir</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">red</span><span class="p">,</span> <span class="n">BandChannel</span><span class="o">.</span><span class="n">green</span><span class="p">])</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Brightness index (nir, red, green channels)</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        bi2 = \\frac{nir^2 + red^2 + green^2}{3}</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Radioindice.get_default_indices"><a class="viewcode-back" href="../../../api/eolab.rastertools.Radioindice.get_default_indices.html#eolab.rastertools.radioindice.Radioindice.get_default_indices">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_default_indices</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the list of predefined radiometric indices</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [:obj:`eolab.rastertools.processing.RadioindiceProcessing`]: list of</span>
+<span class="sd">            predefined radioindice.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># returns all predefined radiometric indices</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">Radioindice</span><span class="o">.</span><span class="n">ndvi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">tndvi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">rvi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">pvi</span><span class="p">,</span>
+            <span class="n">Radioindice</span><span class="o">.</span><span class="n">savi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">tsavi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">msavi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">msavi2</span><span class="p">,</span>
+            <span class="n">Radioindice</span><span class="o">.</span><span class="n">ipvi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">evi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">ndwi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">ndwi2</span><span class="p">,</span>
+            <span class="n">Radioindice</span><span class="o">.</span><span class="n">mndwi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">ndpi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">ndti</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">ndbi</span><span class="p">,</span>
+            <span class="n">Radioindice</span><span class="o">.</span><span class="n">ri</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">bi</span><span class="p">,</span> <span class="n">Radioindice</span><span class="o">.</span><span class="n">bi2</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Radioindice.__init__"><a class="viewcode-back" href="../../../api/eolab.rastertools.Radioindice.__init__.html#eolab.rastertools.radioindice.Radioindice.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RadioindiceProcessing</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            indices ([:obj:`eolab.rastertools.processing.RadioindiceProcessing`]):</span>
+<span class="sd">                List of indices to compute (class Indice)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">with_windows</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span> <span class="o">=</span> <span class="n">indices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">indices</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RadioindiceProcessing</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of radiometric indices to compute&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_indices</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;If true, all indices are in the same output image (one band per indice).</span>
+<span class="sd">        Otherwise, each indice is in its own output image.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">roi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filename of the vector data defining the ROI&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span>
+
+<div class="viewcode-block" id="Radioindice.with_output"><a class="viewcode-back" href="../../../api/eolab.rastertools.Radioindice.with_output.html#eolab.rastertools.radioindice.Radioindice.with_output">[docs]</a>    <span class="k">def</span> <span class="nf">with_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputdir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">merge</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the output.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            outputdir (str, optional, default=&quot;.&quot;):</span>
+<span class="sd">                Output dir where to store results. If none, it is set to current dir</span>
+<span class="sd">            merge (bool, optional, default=False):</span>
+<span class="sd">                Whether to merge all indices in the same image (i.e. one band per indice)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Radioindice`: The current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">with_output</span><span class="p">(</span><span class="n">outputdir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_merge</span> <span class="o">=</span> <span class="n">merge</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Radioindice.with_roi"><a class="viewcode-back" href="../../../api/eolab.rastertools.Radioindice.with_roi.html#eolab.rastertools.radioindice.Radioindice.with_roi">[docs]</a>    <span class="k">def</span> <span class="nf">with_roi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roi</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the region of interest</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            roi (str):</span>
+<span class="sd">                Filename of the vector data defining the ROI</span>
+<span class="sd">                (output images will be cropped to the geometry)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.Radioindice`: The current instance so that it is</span>
+<span class="sd">            possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_roi</span> <span class="o">=</span> <span class="n">roi</span></div>
+
+<div class="viewcode-block" id="Radioindice.process_file"><a class="viewcode-back" href="../../../api/eolab.rastertools.Radioindice.process_file.html#eolab.rastertools.radioindice.Radioindice.process_file">[docs]</a>    <span class="k">def</span> <span class="nf">process_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the indices for a single file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfile (str):</span>
+<span class="sd">                Input image to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: List of indice images (posix paths) that have been generated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file </span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+
+        <span class="c1"># STEP 1: Prepare the input image so that it can be processed</span>
+        <span class="k">with</span> <span class="n">RasterProduct</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">vrt_outputdir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vrt_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">product</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raster product is : </span><span class="si">{</span><span class="n">product</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">rastertype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unsupported input file, no matching raster type &quot;</span>
+                                 <span class="s2">&quot;identified to handle the file&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Raster type of image </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> is </span><span class="si">{</span><span class="n">product</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># check if all indices can be computed for this raster</span>
+                <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">indice</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">:</span>
+                    <span class="c1"># check if the rastertype has all channels</span>
+                    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">product</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">has_channels</span><span class="p">(</span><span class="n">indice</span><span class="o">.</span><span class="n">channels</span><span class="p">)):</span>
+                        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can not compute </span><span class="si">{</span><span class="n">indice</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">: &quot;</span>
+                                      <span class="s2">&quot;raster product does not contain all required bands.&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># indice is valid, add it to the list of indices to compute</span>
+                        <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indice</span><span class="p">)</span>
+
+            <span class="c1"># get the raster</span>
+            <span class="n">raster</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">get_raster</span><span class="p">(</span><span class="n">roi</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">roi</span><span class="p">)</span>
+
+            <span class="c1"># STEP 2: Compute the indices</span>
+            <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">merge</span><span class="p">:</span>
+                <span class="c1"># merge is True, compute all indices and generate a single image</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compute indices: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">indice</span><span class="o">.</span><span class="n">name</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">indice</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">indices</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">indice_image</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="si">}</span><span class="s2">-indices.tif&quot;</span><span class="p">)</span>
+                <span class="n">compute_indices</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">indice_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+                                <span class="n">indices</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indice_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># merge is False, compute all indices and generate one image per indice</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">indice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">):</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Compute </span><span class="si">{</span><span class="n">indice</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">indice_image</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">indice</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">)</span>
+                    <span class="n">compute_indices</span><span class="p">(</span><span class="n">raster</span><span class="p">,</span> <span class="n">product</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span> <span class="n">indice_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+                                    <span class="p">[</span><span class="n">indice</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span>
+                    <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indice_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+
+        <span class="c1"># return the list of generated files</span>
+        <span class="k">return</span> <span class="n">outputs</span></div></div>
+
+<div class="viewcode-block" id="compute_indices"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.radioindice.compute_indices">[docs]</a><span class="k">def</span> <span class="nf">compute_indices</span><span class="p">(</span><span class="n">input_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">image_channels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BandChannel</span><span class="p">],</span>
+                    <span class="n">indice_image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RadioindiceProcessing</span><span class="p">],</span>
+                    <span class="n">window_size</span><span class="p">:</span> <span class="nb">tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the indices on the input image and produce a multiple bands</span>
+<span class="sd">    image (one band per indice)</span>
+
+<span class="sd">    The possible indices are the following :</span>
+<span class="sd">    ndvi, tndvi, rvi, pvi, savi, tsavi, msavi, msavi2, ipvi, evi, ndwi, ndwi2, mndwi, ndpi, ndti, ndbi, ri, bi, bi2</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_image (str):</span>
+<span class="sd">            Path of the raster to compute</span>
+<span class="sd">        image_channels ([:obj:`eolab.rastertools.product.BandChannel`]):</span>
+<span class="sd">            Ordered list of bands in the raster</span>
+<span class="sd">        indice_image (str):</span>
+<span class="sd">            Path of the output raster image</span>
+<span class="sd">        indices ([:obj:`eolab.rastertools.processing.RadioindiceProcessing`]):</span>
+<span class="sd">            List of indices to compute</span>
+<span class="sd">        window_size (tuple(int, int), optional, default=(1024, 1024)):</span>
+<span class="sd">            Size of windows for splitting the processed image in small parts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">Env</span><span class="p">(</span><span class="n">GDAL_VRT_ENABLE_PYTHON</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">input_image</span><span class="p">)</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">profile</span>
+
+        <span class="c1"># set block size to the configured window_size of first indice</span>
+        <span class="n">blockxsize</span><span class="p">,</span> <span class="n">blockysize</span> <span class="o">=</span> <span class="n">window_size</span>
+        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">width</span> <span class="o">&lt;</span> <span class="n">blockxsize</span><span class="p">:</span>
+            <span class="n">blockxsize</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">highest_power_of_2</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">src</span><span class="o">.</span><span class="n">height</span> <span class="o">&lt;</span> <span class="n">blockysize</span><span class="p">:</span>
+            <span class="n">blockysize</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">highest_power_of_2</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
+
+        <span class="c1"># dtype of output data</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">or</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">float32</span>
+
+        <span class="c1"># setup profile for output image</span>
+        <span class="n">profile</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">driver</span><span class="o">=</span><span class="s1">&#39;GTiff&#39;</span><span class="p">,</span>
+                       <span class="n">blockxsize</span><span class="o">=</span><span class="n">blockysize</span><span class="p">,</span> <span class="n">blockysize</span><span class="o">=</span><span class="n">blockxsize</span><span class="p">,</span> <span class="n">tiled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                       <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">nodata</span><span class="o">=</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">nodata</span><span class="p">,</span>
+                       <span class="n">count</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">))</span>
+
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">indice_image</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">profile</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+            <span class="c1"># Materialize a list of destination block windows</span>
+            <span class="n">windows</span> <span class="o">=</span> <span class="p">[</span><span class="n">window</span> <span class="k">for</span> <span class="n">ij</span><span class="p">,</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">dst</span><span class="o">.</span><span class="n">block_windows</span><span class="p">()]</span>
+
+            <span class="c1"># disable status of tqdm progress bar</span>
+            <span class="n">disable</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;RASTERTOOLS_NOTQDM&quot;</span><span class="p">,</span> <span class="s1">&#39;False&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">]</span>
+
+            <span class="c1"># Dictionary to store statistics for each band</span>
+            <span class="n">band_stats</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;min&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">),</span> <span class="s2">&quot;max&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">),</span> <span class="s2">&quot;sum&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;total_pix&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+                          <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)}</span>
+
+            <span class="c1"># compute every indices</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">indice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">indices</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="c1"># Get the bands necessary to compute the indice</span>
+                <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="n">image_channels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">indice</span><span class="o">.</span><span class="n">channels</span><span class="p">]</span>
+
+                <span class="n">read_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+                <span class="n">write_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+                <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+<span class="w">                    </span><span class="sd">&quot;&quot;&quot;Read input raster, compute indice and write output raster&quot;&quot;&quot;</span>
+                    <span class="k">with</span> <span class="n">read_lock</span><span class="p">:</span>
+                        <span class="n">src_array</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="n">src_array</span><span class="p">[</span><span class="n">src_array</span> <span class="o">==</span> <span class="n">src</span><span class="o">.</span><span class="n">nodata</span><span class="p">]</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked</span>
+                        <span class="n">src_array</span> <span class="o">=</span> <span class="n">src_array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
+
+                    <span class="c1"># The computation can be performed concurrently</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">indice</span><span class="o">.</span><span class="n">algo</span><span class="p">(</span><span class="n">src_array</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">filled</span><span class="p">(</span><span class="n">indice</span><span class="o">.</span><span class="n">nodata</span><span class="p">)</span>
+
+                    <span class="c1"># Update statistics</span>
+                    <span class="n">valid_pixels</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">result</span> <span class="o">!=</span> <span class="n">indice</span><span class="o">.</span><span class="n">nodata</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">valid_pixels</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;min&quot;</span><span class="p">],</span> <span class="n">valid_pixels</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+                        <span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;max&quot;</span><span class="p">],</span> <span class="n">valid_pixels</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+                        <span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;sum&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">valid_pixels</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                        <span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;total_pix&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">result</span><span class="o">.</span><span class="n">size</span>
+                        <span class="n">band_stats</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">valid_pixels</span><span class="o">.</span><span class="n">size</span>
+
+                    <span class="k">with</span> <span class="n">write_lock</span><span class="p">:</span>
+                        <span class="n">dst</span><span class="o">.</span><span class="n">write_band</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+
+                <span class="c1"># compute using concurrent.futures.ThreadPoolExecutor and tqdm</span>
+                <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">windows</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="n">disable</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indice</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+                    <span class="n">process</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+
+                <span class="n">dst</span><span class="o">.</span><span class="n">set_band_description</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">indice</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+            <span class="c1"># Compute and set metadata tags</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">band_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Compute and set metadata tags</span>
+                <span class="n">mean</span> <span class="o">=</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;sum&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span>
+                <span class="n">sum_sq</span> <span class="o">=</span> <span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;sum&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">mean</span> <span class="o">*</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="n">variance</span> <span class="o">=</span> <span class="n">sum_sq</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span>
+                <span class="n">stddev</span> <span class="o">=</span> <span class="n">variance</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">variance</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">0</span>
+
+                <span class="n">dst</span><span class="o">.</span><span class="n">update_tags</span><span class="p">(</span><span class="n">i</span><span class="p">,</span>
+                                <span class="n">STATISTICS_MINIMUM</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.14g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">STATISTICS_MAXIMUM</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stats</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.14g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="n">STATISTICS_MEAN</span><span class="o">=</span><span class="n">mean</span><span class="p">,</span>
+                                <span class="n">STATISTICS_STDDEV</span><span class="o">=</span><span class="n">stddev</span><span class="p">,</span>
+                                <span class="n">STATISTICS_VALID_PERCENT</span><span class="o">=</span><span class="p">(</span><span class="n">stats</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">stats</span><span class="p">[</span><span class="s2">&quot;total_pix&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

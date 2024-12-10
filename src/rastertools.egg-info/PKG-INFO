@@ -17,7 +17,10 @@ Description-Content-Type: text/x-rst; charset=UTF-8
 License-File: LICENSE.txt
 License-File: AUTHORS.rst
 Requires-Dist: click
+<<<<<<< HEAD
 Requires-Dist: rasterio==1.3.0
+=======
+>>>>>>> rasterio_plugin_vsimem
 Requires-Dist: pytest>=3.6
 Requires-Dist: pytest-cov
 Requires-Dist: geopandas==0.13
@@ -33,8 +36,11 @@ Requires-Dist: fiona==1.8.21
 Requires-Dist: Pillow==9.2.0
 Requires-Dist: sphinx_rtd_theme==3.0.1
 Requires-Dist: pip==24.2
+<<<<<<< HEAD
 Requires-Dist: dask
 Requires-Dist: xarray==2022.11.0
+=======
+>>>>>>> rasterio_plugin_vsimem
 Requires-Dist: pyproj==3.4.0
 Requires-Dist: sphinx==7.1.2
 Requires-Dist: scipy==1.8

@@ -1,0 +1,265 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SVF &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SVF.altitude" href="eolab.rastertools.SVF.altitude.html" />
+    <link rel="prev" title="Speed.with_vrt_stored" href="eolab.rastertools.Speed.with_vrt_stored.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../usage.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Filtering.html">Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Hillshade.html">Hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Radioindice.html">Radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Speed.html">Speed</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">SVF</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eolab.rastertools.SVF"><code class="docutils literal notranslate"><span class="pre">SVF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.altitude.html">SVF.altitude</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.keep_vrt.html">SVF.keep_vrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.nb_directions.html">SVF.nb_directions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.outputdir.html">SVF.outputdir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.pad_mode.html">SVF.pad_mode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.radius.html">SVF.radius</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.resolution.html">SVF.resolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.vrt_dir.html">SVF.vrt_dir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.window_size.html">SVF.window_size</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.__init__.html">SVF.__init__</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.postprocess_files.html">SVF.postprocess_files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.process_file.html">SVF.process_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.process_files.html">SVF.process_files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.with_altitude.html">SVF.with_altitude</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.with_output.html">SVF.with_output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.with_vrt_stored.html">SVF.with_vrt_stored</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.SVF.with_windows.html">SVF.with_windows</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Tiling.html">Tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Timeseries.html">Timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Zonalstats.html">Zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#raster-products">Raster products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#adding-custom-raster-types">Adding custom raster types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#design-rules-of-raster-tools">Design rules of raster tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">API Reference</a></li>
+      <li class="breadcrumb-item active">SVF</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eolab.rastertools.SVF.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="svf">
+<h1>SVF<a class="headerlink" href="#svf" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="eolab.rastertools.SVF">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eolab.rastertools.</span></span><span class="sig-name descname"><span class="pre">SVF</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nb_directions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#float" title="(in Python v3.8)"><span class="pre">float</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eolab/rastertools/svf.html#SVF"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eolab.rastertools.SVF" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool" title="eolab.rastertools.rastertools.Rastertool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rastertool</span></code></a>, <a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Windowable" title="eolab.rastertools.rastertools.Windowable"><code class="xref py py-class docutils literal notranslate"><span class="pre">Windowable</span></code></a></p>
+<p>Raster tool that computes the Sky View Factor (SVF) of a
+Digital Elevation / Surface / Height Model.</p>
+<p>Kokalj, Žiga &amp; all 2013:</p>
+<p>SVF is a geophysical parameter that measures the portion of the sky visible from a certain
+point. The portion of the sky visible above the surface is especially relevant in energy balance
+studies and computation of diffuse solar insolation.</p>
+<p>Sky-view factor is defined as the proportion of visible sky (<span class="math notranslate nohighlight">\(\Omega\)</span>) above a certain
+observation point as seen from a two-dimensional representation.</p>
+<p>The light that falls from the sky onto a certain part of the surface is reduced by the obstacles
+that form the horizon. These obstacles can be described in all directions by the vertical
+elevation angle above the horizontal plane.</p>
+<p>A good SVF approximation can therefore be performed with the estimate of this angle
+in several directions. After the vertical elevation angle is determined in the chosen
+number of directions n, the SVF is determined as a sum of all portions of the sky within
+each direction: <span class="math notranslate nohighlight">\(\sum \frac {\cos \gamma_i}{n}\)</span>, where <span class="math notranslate nohighlight">\(\gamma_i\)</span> is the
+vertical angle of the horizon in the`direction i.</p>
+<p>The angle <span class="math notranslate nohighlight">\(\gamma\)</span> is extracted from the Digital Model:
+<span class="math notranslate nohighlight">\(\tan \frac{Height}{Distance}\)</span>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                    <span class="n">_____</span>
+                  <span class="n">x</span><span class="o">|</span>     <span class="o">|</span>  <span class="o">^</span>
+              <span class="n">x</span>    <span class="o">|</span>     <span class="o">|</span>  <span class="o">|</span> <span class="n">Height</span> <span class="p">(</span><span class="kn">from</span> <span class="nn">Digital</span> <span class="n">Model</span><span class="p">)</span>
+         <span class="n">x</span>   <span class="n">__</span>    <span class="o">|</span>     <span class="o">|</span>  <span class="o">|</span>
+<span class="n">____p_______</span><span class="o">|</span>  <span class="o">|</span><span class="n">___</span><span class="o">|</span>     <span class="o">|</span><span class="n">__v____________</span>
+    <span class="o">&lt;--------------&gt;</span>
+        <span class="n">Distance</span>
+</pre></div>
+</div>
+<p>Where p is the current pixel where the SVF is computed.</p>
+<p>In a direction, the algorithm computes all angles and keeps the largest one. To avoid testing
+too many points, the “radius” parameter defines the max distance of the pixel to test.</p>
+<p>The output image of SVF rastertool is a raster image with the SVF value computed at every pixels
+of the input Digital Height Model.</p>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.altitude.html#eolab.rastertools.SVF.altitude" title="eolab.rastertools.SVF.altitude"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.altitude</span></code></a></p></td>
+<td><p>The altitude at which SVF is computed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.keep_vrt.html#eolab.rastertools.SVF.keep_vrt" title="eolab.rastertools.SVF.keep_vrt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.keep_vrt</span></code></a></p></td>
+<td><p>Whether intermediate VRT images shall be kept</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.nb_directions.html#eolab.rastertools.SVF.nb_directions" title="eolab.rastertools.SVF.nb_directions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.nb_directions</span></code></a></p></td>
+<td><p>Number of directions to compute the SVF</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.outputdir.html#eolab.rastertools.SVF.outputdir" title="eolab.rastertools.SVF.outputdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.outputdir</span></code></a></p></td>
+<td><p>Path of the output directory where are stored the results</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.pad_mode.html#eolab.rastertools.SVF.pad_mode" title="eolab.rastertools.SVF.pad_mode"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.pad_mode</span></code></a></p></td>
+<td><p>//numpy.org/doc/stable/reference/generated/numpy.pad.html&gt;`_ the image when the window is on the edge of the image The mode can be self defined or among [constant (default), edge, linear_ramp, maximum, mean, median, minimum, reflect, symmetric, wrap, empty].</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.radius.html#eolab.rastertools.SVF.radius" title="eolab.rastertools.SVF.radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.radius</span></code></a></p></td>
+<td><p>Max distance from current point (in pixels) to consider for evaluating the max elevation angle</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.resolution.html#eolab.rastertools.SVF.resolution" title="eolab.rastertools.SVF.resolution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.resolution</span></code></a></p></td>
+<td><p>Resolution of the input Digital Height Model (in meter)</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.vrt_dir.html#eolab.rastertools.SVF.vrt_dir" title="eolab.rastertools.SVF.vrt_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.vrt_dir</span></code></a></p></td>
+<td><p>Dir where to store intermediate VRT images</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.window_size.html#eolab.rastertools.SVF.window_size" title="eolab.rastertools.SVF.window_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.window_size</span></code></a></p></td>
+<td><p>Size of the windows to split the image in small parts</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.__init__.html#eolab.rastertools.SVF.__init__" title="eolab.rastertools.SVF.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.__init__</span></code></a>(nb_directions, radius, resolution)</p></td>
+<td><p>Constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.postprocess_files.html#eolab.rastertools.SVF.postprocess_files" title="eolab.rastertools.SVF.postprocess_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.postprocess_files</span></code></a>(inputfiles, outputfiles)</p></td>
+<td><p>Run a postprocess when all input files have been processed.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.process_file.html#eolab.rastertools.SVF.process_file" title="eolab.rastertools.SVF.process_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.process_file</span></code></a>(inputfile)</p></td>
+<td><p>Compute SVF for the input file</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.process_files.html#eolab.rastertools.SVF.process_files" title="eolab.rastertools.SVF.process_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.process_files</span></code></a>(inputfiles)</p></td>
+<td><p>Run the rastertool to a set of input files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.with_altitude.html#eolab.rastertools.SVF.with_altitude" title="eolab.rastertools.SVF.with_altitude"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.with_altitude</span></code></a>(altitude)</p></td>
+<td><p>Configure the altitude at which the Sky View Factor shall be computed.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.with_output.html#eolab.rastertools.SVF.with_output" title="eolab.rastertools.SVF.with_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.with_output</span></code></a>([outputdir])</p></td>
+<td><p>Set up the output.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.SVF.with_vrt_stored.html#eolab.rastertools.SVF.with_vrt_stored" title="eolab.rastertools.SVF.with_vrt_stored"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.with_vrt_stored</span></code></a>(keep_vrt)</p></td>
+<td><p>Configure if the intermediate VRT images that are generated when handling the input files (which can be complex raster product composed of several band files) shall be stored to disk or not - for debug purpose for instance.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.SVF.with_windows.html#eolab.rastertools.SVF.with_windows" title="eolab.rastertools.SVF.with_windows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SVF.with_windows</span></code></a>([window_size, pad_mode])</p></td>
+<td><p>Configure the window generation for processing image</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eolab.rastertools.Speed.with_vrt_stored.html" class="btn btn-neutral float-left" title="Speed.with_vrt_stored" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eolab.rastertools.SVF.altitude.html" class="btn btn-neutral float-right" title="SVF.altitude" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

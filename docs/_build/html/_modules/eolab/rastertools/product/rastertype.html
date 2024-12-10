@@ -1,0 +1,536 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.product.rastertype &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../product.html">eolab.rastertools.product</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.product.rastertype</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.product.rastertype</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Data Model for raster product enabling to extract bands, timestamp, etc.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Olivier Queyrut&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, CNES&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache v2.0&quot;</span>
+
+
+<div class="viewcode-block" id="BandChannel"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.BandChannel.html#eolab.rastertools.product.rastertype.BandChannel">[docs]</a><span class="k">class</span> <span class="nc">BandChannel</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines the band channel of a raster product</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">blue</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+    <span class="n">green</span> <span class="o">=</span> <span class="s2">&quot;green&quot;</span>
+    <span class="n">red</span> <span class="o">=</span> <span class="s2">&quot;red&quot;</span>
+    <span class="n">nir</span> <span class="o">=</span> <span class="s2">&quot;nir&quot;</span>
+    <span class="n">mir</span> <span class="o">=</span> <span class="s2">&quot;mir&quot;</span>
+    <span class="n">swir</span> <span class="o">=</span> <span class="s2">&quot;swir&quot;</span>
+
+    <span class="c1"># specific to S2 products</span>
+    <span class="n">red_edge1</span> <span class="o">=</span> <span class="s2">&quot;red_edge1&quot;</span>
+    <span class="n">red_edge2</span> <span class="o">=</span> <span class="s2">&quot;red_edge2&quot;</span>
+    <span class="n">red_edge3</span> <span class="o">=</span> <span class="s2">&quot;red_edge3&quot;</span>
+    <span class="n">red_edge4</span> <span class="o">=</span> <span class="s2">&quot;red_edge4&quot;</span>
+    <span class="n">blue_60m</span> <span class="o">=</span> <span class="s2">&quot;blue_60m&quot;</span>
+    <span class="n">nir_60m</span> <span class="o">=</span> <span class="s2">&quot;nir_60m&quot;</span>
+    <span class="n">mir_60m</span> <span class="o">=</span> <span class="s2">&quot;mir_60m&quot;</span></div>
+
+
+<div class="viewcode-block" id="Band"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.Band.html#eolab.rastertools.product.rastertype.Band">[docs]</a><span class="k">class</span> <span class="nc">Band</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Definition of a band: its identifier in the product&#39;s name pattern and its description</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Band.__init__"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.Band.__init__.html#eolab.rastertools.product.rastertype.Band.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_identifier</span> <span class="o">=</span> <span class="n">identifier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span> <span class="ow">or</span> <span class="n">identifier</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Band </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_identifier</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;String that enables to identify the band in a raster product&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identifier</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Description of the band&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span></div>
+
+
+<div class="viewcode-block" id="RasterType"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.html#eolab.rastertools.product.rastertype.RasterType">[docs]</a><span class="k">class</span> <span class="nc">RasterType</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raster type definition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># initialize rastertypes with the default ones defined in rastertypes.json</span>
+    <span class="n">rastertypes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RasterType.get"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get.html#eolab.rastertools.product.rastertype.RasterType.get">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the raster type by its name&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">RasterType</span><span class="o">.</span><span class="n">rastertypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">RasterType</span><span class="o">.</span><span class="n">rastertypes</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterType.find"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.find.html#eolab.rastertools.product.rastertype.RasterType.find">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find</span><span class="p">(</span><span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the raster type corresponding to the input file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file (Path or str):</span>
+<span class="sd">                Product name or path to analyse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`eolab.rastertools.product.RasterType`: the RasterType corresponding</span>
+<span class="sd">            to the input file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">((</span><span class="n">t</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">RasterType</span><span class="o">.</span><span class="n">rastertypes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">accept</span><span class="p">(</span><span class="n">file</span><span class="p">)),</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterType.add"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.add.html#eolab.rastertools.product.rastertype.RasterType.add">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">rastertypes</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add new raster types definitions from a json file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rastertypes (str): rastertypes description as JSON string</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [(str, tuple)]: List of rastertype&#39;s name and parameters. Parameters are</span>
+<span class="sd">            provided as a tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_rastertypes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">rt</span> <span class="ow">in</span> <span class="n">rastertypes</span><span class="p">[</span><span class="s1">&#39;rastertypes&#39;</span><span class="p">]:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+            <span class="n">product_pattern</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;product_pattern&#39;</span><span class="p">]</span>
+            <span class="n">bands_pattern</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;bands_pattern&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;bands_pattern&quot;</span> <span class="ow">in</span> <span class="n">rt</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">date_format</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;date_format&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;date_format&quot;</span> <span class="ow">in</span> <span class="n">rt</span> <span class="k">else</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">-%H%M%S&quot;</span>
+            <span class="n">nodata</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;nodata&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;nodata&quot;</span> <span class="ow">in</span> <span class="n">rt</span> <span class="k">else</span> <span class="o">-</span><span class="mi">10000</span>
+            <span class="n">maskfunc</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;maskfunc&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;maskfunc&quot;</span> <span class="ow">in</span> <span class="n">rt</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="n">masknodata</span> <span class="o">=</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;masknodata&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;masknodata&quot;</span> <span class="ow">in</span> <span class="n">rt</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">bands</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;bands&#39;</span><span class="p">]:</span>
+                <span class="n">channel</span> <span class="o">=</span> <span class="n">band</span><span class="p">[</span><span class="s1">&#39;channel&#39;</span><span class="p">]</span>
+                <span class="n">identifier</span> <span class="o">=</span> <span class="n">band</span><span class="p">[</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;identifier&quot;</span> <span class="ow">in</span> <span class="n">band</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">description</span> <span class="o">=</span> <span class="n">band</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">in</span> <span class="n">band</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="n">bands</span><span class="p">[</span><span class="n">BandChannel</span><span class="p">[</span><span class="n">channel</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Band</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">description</span><span class="p">)</span>
+            <span class="n">masks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;masks&quot;</span> <span class="ow">in</span> <span class="n">rt</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">rt</span><span class="p">[</span><span class="s1">&#39;masks&#39;</span><span class="p">]:</span>
+                    <span class="n">identifier</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;identifier&quot;</span> <span class="ow">in</span> <span class="n">mask</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="n">description</span> <span class="o">=</span> <span class="n">mask</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;description&quot;</span> <span class="ow">in</span> <span class="n">mask</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="n">masks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Band</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">description</span><span class="p">))</span>
+
+            <span class="n">rt_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">product_pattern</span><span class="p">,</span> <span class="n">bands_pattern</span><span class="p">,</span> <span class="n">bands</span><span class="p">,</span> <span class="n">masks</span><span class="p">,</span>
+                        <span class="n">date_format</span><span class="p">,</span> <span class="n">maskfunc</span><span class="p">,</span> <span class="n">nodata</span><span class="p">,</span> <span class="n">masknodata</span><span class="p">)</span>
+            <span class="n">new_rastertypes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">RasterType</span><span class="p">(</span><span class="o">*</span><span class="n">rt_tuple</span><span class="p">)</span>
+
+        <span class="c1"># update the list of rastertypes with the new ones</span>
+        <span class="n">RasterType</span><span class="o">.</span><span class="n">rastertypes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_rastertypes</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="RasterType.__init__"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.__init__.html#eolab.rastertools.product.rastertype.RasterType.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">product_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">bands_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">bands</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">BandChannel</span><span class="p">,</span> <span class="n">Band</span><span class="p">],</span>
+                 <span class="n">masks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Band</span><span class="p">],</span>
+                 <span class="n">date_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">-%H%M%S&quot;</span><span class="p">,</span>
+                 <span class="n">maskfunc</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">nodata</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10000</span><span class="p">,</span>
+                 <span class="n">masknodata</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name (str):</span>
+<span class="sd">                Display name of the rastertype</span>
+<span class="sd">            product_pattern (str):</span>
+<span class="sd">                Pattern to identify a file corresponding to this RasterType</span>
+<span class="sd">                The pattern can contain a capturing group corresponding to</span>
+<span class="sd">                the product timestamp</span>
+<span class="sd">            bands_pattern (str):</span>
+<span class="sd">                Pattern to identify a band file in the product. The pattern can</span>
+<span class="sd">                contain a capturing group corresponding to the bands&#39; identifiers</span>
+<span class="sd">                in case bands are separated in different files</span>
+<span class="sd">            bands (dict(BandChannel, Band)):</span>
+<span class="sd">                Dictionary associating the channel and the band definition for all available bands</span>
+<span class="sd">            masks ([Band]):</span>
+<span class="sd">                List of bands that define the masks of the product type</span>
+<span class="sd">            date_format (str, optional, default=&quot;%Y%m%d-%H%M%S&quot;):</span>
+<span class="sd">                Date format ot the product timestamp (used to convert a string to datetime)</span>
+<span class="sd">            maskfunc (str, optional, default=None):</span>
+<span class="sd">                Name of the function to convert pixels of the band defined as the mask</span>
+<span class="sd">                (typically the cloud mask) to boolean values.</span>
+<span class="sd">            nodata (float, optional, default=-10000):</span>
+<span class="sd">                No data value of the raster product</span>
+<span class="sd">            masknodata (int, optional, default=1):</span>
+<span class="sd">                No data value of the mask</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_product_pattern</span> <span class="o">=</span> <span class="n">product_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bands_pattern</span> <span class="o">=</span> <span class="n">bands_pattern</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span> <span class="o">=</span> <span class="n">bands</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_masks</span> <span class="o">=</span> <span class="n">masks</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_date_format</span> <span class="o">=</span> <span class="n">date_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_maskfunc</span> <span class="o">=</span> <span class="n">maskfunc</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span> <span class="o">=</span> <span class="n">nodata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_masknodata</span> <span class="o">=</span> <span class="n">masknodata</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Name of the raster type&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">product_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pattern that enables to identify products of this rastertype&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_product_pattern</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bands_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pattern that enables to identify the bands in a product of this rastertype&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bands_pattern</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">date_format</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format of the date in the product&#39;s name&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_date_format</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">maskfunc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Function that defines the mask of cloud from the raster band&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_maskfunc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nodata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Nodata value&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodata</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">masknodata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Nodata value of the mask&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masknodata</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">BandChannel</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the list of all available channels</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [:obj:`eolab.rastertools.product.BandChannel`]:</span>
+<span class="sd">                List of available bands channels for this type of product</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+<div class="viewcode-block" id="RasterType.accept"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.accept.html#eolab.rastertools.product.rastertype.RasterType.accept">[docs]</a>    <span class="k">def</span> <span class="nf">accept</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the file corresponds to this raster type</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file (Path or str):</span>
+<span class="sd">                Product name or path to analyse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the file matches this RasterType</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">accept</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">accept</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">product_pattern</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">accept</span></div>
+
+<div class="viewcode-block" id="RasterType.get_date"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_date.html#eolab.rastertools.product.rastertype.RasterType.get_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_date</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the timestamp of the raster from the input file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file (Path or str):</span>
+<span class="sd">                Product name or path to analyse</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`datetime.datetime`: Timestamp of the input file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">datestr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;date&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">datestr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_format</span><span class="p">)</span> <span class="k">if</span> <span class="n">datestr</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterType.get_group"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_group.html#eolab.rastertools.product.rastertype.RasterType.get_group">[docs]</a>    <span class="k">def</span> <span class="nf">get_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">group</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts a group from the input file using the product pattern</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file (Path or str):</span>
+<span class="sd">                Product name or path to analyse</span>
+<span class="sd">            group (str):</span>
+<span class="sd">                Name of the group to extract</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Group extracted from the raster file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">product_pattern</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">regexp</span><span class="o">.</span><span class="n">groupindex</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">regexp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">file</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">output</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">group</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="RasterType.has_channel"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.has_channel.html#eolab.rastertools.product.rastertype.RasterType.has_channel">[docs]</a>    <span class="k">def</span> <span class="nf">has_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="n">BandChannel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the product type contains the expected channel.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channel (:obj:`eolab.rastertools.product.BandChannel`):</span>
+<span class="sd">                Band channel</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this RasterType contain the channel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span></div>
+
+<div class="viewcode-block" id="RasterType.has_channels"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.has_channels.html#eolab.rastertools.product.rastertype.RasterType.has_channels">[docs]</a>    <span class="k">def</span> <span class="nf">has_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BandChannel</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the product type contains all the expected channels.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channels ([:obj:`eolab.rastertools.product.BandChannel`]):</span>
+<span class="sd">                List of bands channels</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this RasterType contains all channels</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">has_channels</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">channels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">has_channels</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">has_channels</span></div>
+
+<div class="viewcode-block" id="RasterType.get_band_ids"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_band_ids.html#eolab.rastertools.product.rastertype.RasterType.get_band_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_band_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the bands identifiers.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: The bands ids</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RasterType.get_band_id"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_band_id.html#eolab.rastertools.product.rastertype.RasterType.get_band_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_band_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="n">BandChannel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the band identifier of the specified channel.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channel (:obj:`eolab.rastertools.product.BandChannel`):</span>
+<span class="sd">                Band channel</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The band id if found, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">identifier</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_channel</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterType.get_band_descriptions"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_band_descriptions.html#eolab.rastertools.product.rastertype.RasterType.get_band_descriptions">[docs]</a>    <span class="k">def</span> <span class="nf">get_band_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the descriptions of the bands.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The band description if found, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">description</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RasterType.get_band_description"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_band_description.html#eolab.rastertools.product.rastertype.RasterType.get_band_description">[docs]</a>    <span class="k">def</span> <span class="nf">get_band_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">:</span> <span class="n">BandChannel</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the band description of the given channel.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channel (:obj:`eolab.rastertools.product.BandChannel`):</span>
+<span class="sd">                Band channel</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The band description if found, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raster_bands</span><span class="p">[</span><span class="n">channel</span><span class="p">]</span><span class="o">.</span><span class="n">description</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_channel</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterType.get_bands_regexp"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_bands_regexp.html#eolab.rastertools.product.rastertype.RasterType.get_bands_regexp">[docs]</a>    <span class="k">def</span> <span class="nf">get_bands_regexp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">BandChannel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the regexp to identify the bands in the product.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            channels ([:obj:`eolab.rastertools.product.BandChannel`]):</span>
+<span class="sd">                List of bands channels</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The regexp to identify the bands in the product</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">regexp</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">channels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_channels</span><span class="p">(</span><span class="n">channels</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RasterType does not contain all the channels in </span><span class="si">{</span><span class="n">channels</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_band_id</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">]</span>
+            <span class="n">str_bands</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">regexp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">str_bands</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">regexp</span></div>
+
+<div class="viewcode-block" id="RasterType.has_mask"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.has_mask.html#eolab.rastertools.product.rastertype.RasterType.has_mask">[docs]</a>    <span class="k">def</span> <span class="nf">has_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the product type contains a mask.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if this RasterType contains a mask</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_masks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="RasterType.get_mask"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_mask.html#eolab.rastertools.product.rastertype.RasterType.get_mask">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mask_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Band</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the mask corresponding to the given id.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mask_id (str):</span>
+<span class="sd">                Id of the mask</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Band: the mask corresponding to the given id, or None if no mask corresponds to</span>
+<span class="sd">                  the id</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">selected_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mask</span><span class="o">.</span><span class="n">identifier</span> <span class="o">==</span> <span class="n">mask_id</span><span class="p">:</span>
+                <span class="n">selected_mask</span> <span class="o">=</span> <span class="n">mask</span>
+        <span class="k">return</span> <span class="n">selected_mask</span></div>
+
+<div class="viewcode-block" id="RasterType.get_mask_ids"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_mask_ids.html#eolab.rastertools.product.rastertype.RasterType.get_mask_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the identifier of the masks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: The identifiers of the masks if they are some, empty list otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mask</span><span class="o">.</span><span class="n">identifier</span> <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masks</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RasterType.get_mask_descriptions"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_mask_descriptions.html#eolab.rastertools.product.rastertype.RasterType.get_mask_descriptions">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask_descriptions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the descriptions of the masks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: The descriptions of the masks if they are some, empty list otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">mask</span><span class="o">.</span><span class="n">description</span> <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masks</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="RasterType.get_mask_regexp"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rastertype.RasterType.get_mask_regexp.html#eolab.rastertools.product.rastertype.RasterType.get_mask_regexp">[docs]</a>    <span class="k">def</span> <span class="nf">get_mask_regexp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the regexp to identify the masks</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The regexp to identify the masks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">regexp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_mask</span><span class="p">():</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mask_ids</span><span class="p">()</span>
+            <span class="n">str_masks</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="kc">None</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ids</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">regexp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">str_masks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">regexp</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

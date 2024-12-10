@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
 """
     Setup file for rastertools.
     Use setup.cfg to configure your project.
@@ -7,6 +8,8 @@
     PyScaffold helps you to put up the scaffold of your new Python project.
     Learn more under: https://pyscaffold.org/
 """
+=======
+>>>>>>> rasterio_plugin_vsimem
 from setuptools import setup, find_packages
 
 if __name__ == "__main__":
@@ -26,6 +29,7 @@ if __name__ == "__main__":
               setup_requires = ["setuptools_scm"],
               install_requires=[
                   'click',
+<<<<<<< HEAD
                   'rasterio==1.3.0',
                   'pytest>=3.6',
                   'pytest-cov',
@@ -46,6 +50,18 @@ if __name__ == "__main__":
                   # 'rioxarray',
                   'xarray==2022.11.0',
                   'pyproj==3.4.0',
+=======
+                  'rasterio',
+                  'pytest>=3.6',
+                  'pytest-cov',
+                  'geopandas==0.13',
+                  'kiwisolver==1.4.5',
+                  'matplotlib==3.7.3',
+                  'packaging==24.1',
+                  'fiona==1.8.21',
+                  'sphinx_rtd_theme==3.0.1',
+                  'pip==24.2',
+>>>>>>> rasterio_plugin_vsimem
                   'sphinx==7.1.2',
                   'scipy==1.8',
                   'pyscaffold',

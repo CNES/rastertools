@@ -1,0 +1,6 @@
+create\_argparser
+=================
+
+.. currentmodule:: eolab.rastertools.cli.radioindice
+
+.. autofunction:: create_argparser

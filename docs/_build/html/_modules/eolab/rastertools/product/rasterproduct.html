@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.product.rasterproduct &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html">
+            
+              <img src="../../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../product.html">eolab.rastertools.product</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.product.rasterproduct</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.product.rasterproduct</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Data Model for raster product enabling to extract bands, timestamp, etc.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span> <span class="nn">osgeo</span> <span class="kn">import</span> <span class="n">gdal</span>
+<span class="kn">import</span> <span class="nn">rasterio</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">RasterType</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product.vrt</span> <span class="kn">import</span> <span class="n">add_masks_to_vrt</span><span class="p">,</span> <span class="n">set_band_descriptions</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing.vector</span> <span class="kn">import</span> <span class="n">crop</span>
+
+<span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Olivier Queyrut&quot;</span>
+<span class="n">__copyright__</span> <span class="o">=</span> <span class="s2">&quot;Copyright 2019, CNES&quot;</span>
+<span class="n">__license__</span> <span class="o">=</span> <span class="s2">&quot;Apache v2.0&quot;</span>
+
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RasterProduct"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.html#eolab.rastertools.product.rasterproduct.RasterProduct">[docs]</a><span class="k">class</span> <span class="nc">RasterProduct</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Data model for a raster product that handles :</span>
+
+<span class="sd">       - a raster type</span>
+<span class="sd">       - the list of available bands</span>
+<span class="sd">       - the path to the product</span>
+
+<span class="sd">    A raster product can be easily like this::</span>
+
+<span class="sd">        with RasterProduct(&quot;my_product_filename.zip&quot;) as product:</span>
+<span class="sd">            rastertype = product.rastertype()</span>
+<span class="sd">            raster = product.get_raster()  # raster is an in-memory VRT that can</span>
+<span class="sd">                                           # be opened using rasterio</span>
+<span class="sd">            with rasterio.open(raster) as rst:</span>
+<span class="sd">                print(rst.count)</span>
+<span class="sd">                data = rst.read([1, 2, 3], masked=True)  # data is a numpy masked array</span>
+
+<span class="sd">    A raster product handles several in-memory VRTs that must be properly released. The</span>
+<span class="sd">    with statement enables this. If you want to control the clean-up of the in-memory VRTs</span>
+<span class="sd">    you have to call ``free_in_memory_vrts()``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RasterProduct.__init__"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.__init__.html#eolab.rastertools.product.rasterproduct.RasterProduct.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">vrt_outputdir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            file (Path or str):</span>
+<span class="sd">                Path to the raster product</span>
+<span class="sd">            vrt_outputdir (Path or str, optional, default=None):</span>
+<span class="sd">                Dir where to store the generated VRT image(s). If None, output is in memory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;file&#39; cannot be None&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vrt_outputdir</span> <span class="o">=</span> <span class="n">vrt_outputdir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_in_memory_vrts</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># try to identify the type of raster product from the input file name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="o">=</span> <span class="n">RasterType</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+
+        <span class="c1"># if input file is an archive (or a dir)</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_suffixes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_archive</span> <span class="o">=</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.zip&quot;</span><span class="p">,</span> <span class="s2">&quot;.gz&quot;</span><span class="p">,</span> <span class="s2">&quot;.tar&quot;</span><span class="p">,</span> <span class="s2">&quot;.tar.gz&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span>
+
+        <span class="c1"># check if we will be able to open the raster and gets the list of bands and masks</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_archive</span><span class="p">:</span>
+            <span class="c1"># inputfile is an archive, need to know its rastertype to open it</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unrecognized raster type, &quot;</span>
+                              <span class="s2">&quot;can not create a raster product from an archive of &quot;</span>
+                              <span class="s2">&quot;unknown raster type&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized raster type for input file </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># extract bands files and masks files</span>
+            <span class="n">bands_regexp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_bands_regexp</span><span class="p">()</span>
+            <span class="n">masks_regexp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_mask_regexp</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bands_files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masks_files</span> <span class="o">=</span> \
+                <span class="n">_extract_bands</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">bands_regexp</span><span class="p">,</span> <span class="n">masks_regexp</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># inputfile is a regular image file.</span>
+            <span class="c1"># Check if the file can be opened using rasterio directly</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">dataset</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_bands_files</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_masks_files</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported input file </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="si">}</span><span class="s2">]&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enter method for with statement&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exit method for with statement, it cleans the in memory vrt products&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">free_in_memory_vrts</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RasterProduct.free_in_memory_vrts"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.free_in_memory_vrts.html#eolab.rastertools.product.rasterproduct.RasterProduct.free_in_memory_vrts">[docs]</a>    <span class="k">def</span> <span class="nf">free_in_memory_vrts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Free in-memory VRTs by closing all MemoryFile objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">vrt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_in_memory_vrts</span><span class="p">:</span>
+            <span class="n">gdal</span><span class="o">.</span><span class="n">Unlink</span><span class="p">(</span><span class="n">vrt</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_in_memory_vrts</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Product path&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rastertype</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RasterType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Type of the raster&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">channels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;List of available channels in the product&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="o">.</span><span class="n">channels</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bands_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary of available bands. Key is the identifier of the band,</span>
+<span class="sd">        value is the path to the band. If all bands are in the same file, the</span>
+<span class="sd">        dictionary contains only one key named &quot;all&quot;.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bands_files</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">masks_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dictionary of available mask bands. Key is the identifier of the mask band,</span>
+<span class="sd">        value is the path to the band.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_masks_files</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whether the raster product is an archive (zip, tar, dir, ...) or</span>
+<span class="sd">        a regular raster image&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_archive</span>
+
+<div class="viewcode-block" id="RasterProduct.get_date"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.get_date.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_date</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the timestamp of the raster</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :obj:`datetime.datetime`: Timestamp of the raster</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="o">.</span><span class="n">get_date</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterProduct.get_date_string"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.get_date_string.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_date_string">[docs]</a>    <span class="k">def</span> <span class="nf">get_date_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strformat</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the timestamp of the raster and returns it as a formatted string</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: String formatted timestamp of the raster</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_date</span><span class="p">()</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">strformat</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="o">.</span><span class="n">date_format</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="k">else</span> <span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">T%H%M%S&quot;</span>
+        <span class="k">return</span> <span class="n">date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">if</span> <span class="n">date</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span></div>
+
+<div class="viewcode-block" id="RasterProduct.get_tile"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.get_tile.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_tile">[docs]</a>    <span class="k">def</span> <span class="nf">get_tile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the tile identifier of the raster</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Tile tile identifier of the raster</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span>
+                                          <span class="s1">&#39;tile&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterProduct.get_relative_orbit"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.get_relative_orbit.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_relative_orbit">[docs]</a>    <span class="k">def</span> <span class="nf">get_relative_orbit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the relative orbit number of the raster</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Relative orbit number of the raster</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">relorbit</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">strval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span> <span class="s1">&#39;relorbit&#39;</span><span class="p">)</span>
+            <span class="n">relorbit</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">strval</span><span class="p">)</span> <span class="k">if</span> <span class="n">strval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">relorbit</span></div>
+
+<div class="viewcode-block" id="RasterProduct.get_satellite"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.get_satellite.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_satellite">[docs]</a>    <span class="k">def</span> <span class="nf">get_satellite</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extracts the satellite&#39;s name of the raster</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Name of the satellite</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span><span class="o">.</span><span class="n">get_group</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file</span><span class="p">,</span>
+                                          <span class="s1">&#39;satellite&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rastertype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="RasterProduct.open"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.open.html#eolab.rastertools.product.rasterproduct.RasterProduct.open">[docs]</a>    <span class="k">def</span> <span class="nf">open</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+             <span class="n">bands</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+             <span class="n">masks</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+             <span class="n">roi</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_raster</span><span class="p">(</span><span class="n">bands</span><span class="o">=</span><span class="n">bands</span><span class="p">,</span> <span class="n">masks</span><span class="o">=</span><span class="n">masks</span><span class="p">,</span> <span class="n">roi</span><span class="o">=</span><span class="n">roi</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RasterProduct.get_raster"><a class="viewcode-back" href="../../../../api/eolab.rastertools.product.rasterproduct.RasterProduct.get_raster.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_raster">[docs]</a>    <span class="k">def</span> <span class="nf">get_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                   <span class="n">bands</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                   <span class="n">masks</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">,</span>
+                   <span class="n">roi</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">create_maskband</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the path to the raster corresponding to this product.</span>
+<span class="sd">        This method allows to crop the raster to a specified ROI and to apply the band masks.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bands (str or [str], default=&quot;all&quot;):</span>
+<span class="sd">                List of bands ids to get in the generated raster. If &quot;all&quot;, all bands</span>
+<span class="sd">                defined in the rastertype will be present in the raster.</span>
+<span class="sd">            masks (str or [str], default=&quot;all&quot;):</span>
+<span class="sd">                List of masks bands ids to get in the generated raster. If &quot;all&quot;, all</span>
+<span class="sd">                masks bands defined in the rastertype will be present in the raster. If</span>
+<span class="sd">                None, no mask band will be present in the rastertype.</span>
+<span class="sd">            roi (Path or str, optional, default=None):</span>
+<span class="sd">                Region of interest defined by a vector data (e.g. GeoJSON) for</span>
+<span class="sd">                cropping the raster.</span>
+<span class="sd">            create_maskband (bool, optional, default=True):</span>
+<span class="sd">                Whether to create the VRT product with a maskband that is a composition</span>
+<span class="sd">                of all the given masks.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Raster path (either a path to a regular image or</span>
+<span class="sd">                 a memory path such as /vsimem/...)&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_archive</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="c1"># general case: product is a regular raster image</span>
+            <span class="n">rasterfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">selected_bands</span><span class="p">,</span> <span class="n">band_descriptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_bands</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span>
+            <span class="n">selected_masks</span><span class="p">,</span> <span class="n">mask_descriptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_masks</span><span class="p">(</span><span class="n">masks</span><span class="p">)</span>
+            <span class="n">in_memory</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vrt_outputdir</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">in_memory</span><span class="p">:</span>
+                <span class="n">uuid</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uuid4</span><span class="p">()</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">uuid</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+            <span class="c1"># create the raster</span>
+            <span class="n">rasterfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__create_vrt</span><span class="p">(</span><span class="n">selected_bands</span><span class="p">,</span> <span class="n">selected_masks</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">in_memory</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_in_memory_vrts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rasterfile</span><span class="p">)</span>
+
+            <span class="c1"># add band descriptions to the vrt</span>
+            <span class="n">descr</span> <span class="o">=</span> <span class="n">band_descriptions</span> <span class="o">+</span> <span class="n">mask_descriptions</span>
+            <span class="n">set_band_descriptions</span><span class="p">(</span><span class="n">rasterfile</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
+
+            <span class="c1"># clip the vrt to the ROI</span>
+            <span class="k">if</span> <span class="n">roi</span><span class="p">:</span>
+                <span class="n">wrapped_vrt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__wrap</span><span class="p">(</span><span class="n">rasterfile</span><span class="p">,</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="n">roi</span><span class="p">),</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">in_memory</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_in_memory_vrts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">wrapped_vrt</span><span class="p">)</span>
+
+                <span class="c1"># add band descriptions</span>
+                <span class="n">set_band_descriptions</span><span class="p">(</span><span class="n">wrapped_vrt</span><span class="p">,</span> <span class="n">descr</span><span class="p">)</span>
+
+                <span class="n">rasterfile</span> <span class="o">=</span> <span class="n">wrapped_vrt</span>
+
+            <span class="c1"># apply masks bands</span>
+            <span class="k">if</span> <span class="n">create_maskband</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_masks</span><span class="p">):</span>
+                <span class="c1"># get the number of bands and masks to separate them in the generated VRT</span>
+                <span class="n">nb_bands</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_bands</span><span class="p">)</span>
+                <span class="n">nb_masks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_masks</span><span class="p">)</span>
+                <span class="n">masked_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__apply_masks</span><span class="p">(</span><span class="n">rasterfile</span><span class="p">,</span> <span class="n">nb_bands</span><span class="p">,</span> <span class="n">nb_masks</span><span class="p">,</span> <span class="n">uuid</span><span class="o">=</span><span class="n">uuid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">in_memory</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_in_memory_vrts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">masked_image</span><span class="p">)</span>
+
+                <span class="c1"># add band descriptions only</span>
+                <span class="n">set_band_descriptions</span><span class="p">(</span><span class="n">masked_image</span><span class="p">,</span> <span class="n">band_descriptions</span><span class="p">)</span>
+
+                <span class="n">rasterfile</span> <span class="o">=</span> <span class="n">masked_image</span>
+        <span class="k">return</span> <span class="n">rasterfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__get_bands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bands</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the bands files and descriptions corresponding to the given bands ids.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bands (str or [str], default=&quot;all&quot;):</span>
+<span class="sd">                List of bands ids to get in the generated raster. If &quot;all&quot;, all bands</span>
+<span class="sd">                defined in the rastertype will be present in the raster.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of bands files and descriptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># select the bands to include in the raster</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bands</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">band</span> <span class="ow">in</span> <span class="n">bands</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">band</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid band id </span><span class="si">{</span><span class="n">band</span><span class="si">}</span><span class="s2">: it does not exist in raster product&quot;</span><span class="p">)</span>
+            <span class="n">selected_bands</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_files</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">bands</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">bands</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="n">selected_bands</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bands_files</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid bands list: must be &#39;all&#39; or a valid no &quot;</span>
+                             <span class="s2">&quot;empty list of band ids&quot;</span><span class="p">)</span>
+
+        <span class="n">bl</span> <span class="o">=</span> <span class="n">bands</span> <span class="k">if</span> <span class="n">bands</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_band_ids</span><span class="p">()</span>
+        <span class="n">band_descriptions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_band_description</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+                             <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channels</span>
+                             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_band_id</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="ow">in</span> <span class="n">bl</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">selected_bands</span><span class="p">,</span> <span class="n">band_descriptions</span>
+
+    <span class="k">def</span> <span class="nf">__get_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">masks</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="s2">&quot;all&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Gets the masks files and descriptions corresponding to the given bands ids.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            masks (str or [str], default=&quot;all&quot;):</span>
+<span class="sd">                List of bands ids to get in the generated raster. If &quot;all&quot;, all bands</span>
+<span class="sd">                defined in the rastertype will be present in the raster.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of masks files and descriptions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># select the masks to include in the raster</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">masks</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">mask</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mask</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks_files</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Invalid mask id </span><span class="si">{</span><span class="n">mask</span><span class="si">}</span><span class="s2">: it does not exist in raster product&quot;</span><span class="p">)</span>
+            <span class="n">selected_masks</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks_files</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">masks</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">masks</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
+            <span class="c1"># all masks</span>
+            <span class="n">selected_masks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">masks_files</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># no mask</span>
+            <span class="n">selected_masks</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># generate the descriptions of the bands and masks</span>
+        <span class="c1"># need to get bands descriptions in the order of channels</span>
+        <span class="k">if</span> <span class="n">masks</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ml</span> <span class="o">=</span> <span class="n">masks</span> <span class="k">if</span> <span class="n">masks</span> <span class="o">!=</span> <span class="s2">&quot;all&quot;</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_mask_ids</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ml</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">mask_descriptions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_mask</span><span class="p">(</span><span class="n">mask_id</span><span class="p">)</span><span class="o">.</span><span class="n">description</span>
+                             <span class="k">for</span> <span class="n">mask_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_mask_ids</span><span class="p">()</span>
+                             <span class="k">if</span> <span class="n">mask_id</span> <span class="ow">in</span> <span class="n">ml</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">selected_masks</span><span class="p">,</span> <span class="n">mask_descriptions</span>
+
+    <span class="k">def</span> <span class="nf">__create_vrt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                     <span class="n">bands_files</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+                     <span class="n">masks_files</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+                     <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a VRT for the product archive.</span>
+
+<span class="sd">        If the product is a regular raster image then the raster file is simply the product file.</span>
+
+<span class="sd">        If the product is an archive (tar, zip, dir, ...), a VRT is created using GDAL BuildVRT. It</span>
+<span class="sd">        contains the given bands and masks.</span>
+
+<span class="sd">        TODO: add arguments to select the resolution and resampling algorithm</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            bands_files (Dict[str, str]):</span>
+<span class="sd">                Bands files indexed by the bands ids</span>
+<span class="sd">            masks_files (Dict[str, str]):</span>
+<span class="sd">                Masks files indexed by the bands ids</span>
+<span class="sd">            uuid (str):</span>
+<span class="sd">                Unique identifier when the VRT is created in memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Path: path to the raster file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># convert parameters defined as str to Path</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vrt_outputdir</span><span class="p">,</span> <span class="s2">&quot;/vsimem/&quot;</span><span class="p">)</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating a VRT that handles the bands of the archive product&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s1">&#39;all&#39;</span> <span class="ow">in</span> <span class="n">bands_files</span><span class="p">:</span>
+            <span class="c1"># one file contains all channels</span>
+            <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="n">bands_files</span><span class="p">[</span><span class="s1">&#39;all&#39;</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># create the list of bands in the same order as rastertype&#39;s channels</span>
+            <span class="n">bands</span> <span class="o">=</span> <span class="p">[</span><span class="n">bands_files</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span>
+                     <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_band_ids</span><span class="p">()</span>
+                     <span class="k">if</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">bands_files</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+
+        <span class="c1"># create the list of nodata values for every bands</span>
+        <span class="n">nodatavals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">nodata</span><span class="p">)]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">bands</span><span class="p">)</span>
+
+        <span class="c1"># when band masks exist, add them to the lists</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">masks_files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># add the list of masks in the same order as masks&#39; ids</span>
+            <span class="n">bands</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">masks_files</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">get_mask_ids</span><span class="p">()])</span>
+            <span class="n">nodatavals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">masknodata</span><span class="p">))</span>
+
+        <span class="c1"># Create a VRT image with GDAL</span>
+        <span class="n">rasterfile</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uuid</span><span class="si">}{</span><span class="n">basename</span><span class="si">}</span><span class="s2">.vrt&quot;</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">BuildVRT</span><span class="p">(</span><span class="n">rasterfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+                           <span class="n">bands</span><span class="p">,</span>
+                           <span class="n">VRTNodata</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">nodatavals</span><span class="p">),</span>
+                           <span class="n">resolution</span><span class="o">=</span><span class="s1">&#39;highest&#39;</span><span class="p">,</span>
+                           <span class="c1"># resampleAlg=&#39;nearest&#39;,</span>
+                           <span class="n">separate</span><span class="o">=</span><span class="s1">&#39;all&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bands_files</span><span class="p">)</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated VRT has </span><span class="si">{</span><span class="n">ds</span><span class="o">.</span><span class="n">RasterCount</span><span class="si">}</span><span class="s2"> bands&quot;</span><span class="p">)</span>
+        <span class="c1"># free resource from GDAL</span>
+        <span class="k">del</span> <span class="n">ds</span>
+
+        <span class="k">return</span> <span class="n">rasterfile</span>
+
+    <span class="k">def</span> <span class="nf">__wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_vrt</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">roi</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clip the image to the given ROI.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_vrt (Path):</span>
+<span class="sd">                The input VRT to crop</span>
+<span class="sd">            roi (Path):</span>
+<span class="sd">                Region of interest defined by a vector data (e.g. GeoJSON) for</span>
+<span class="sd">                cropping the raster.</span>
+<span class="sd">            uuid (str):</span>
+<span class="sd">                Unique identifier when the VRT is created in memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Path: The generated VRT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># convert parameters defined as str to Path</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vrt_outputdir</span><span class="p">,</span> <span class="s2">&quot;/vsimem/&quot;</span><span class="p">)</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="c1"># Clip image to the ROI</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Cropping the raster to fit the region of interest&quot;</span><span class="p">)</span>
+        <span class="n">clipped_image</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uuid</span><span class="si">}{</span><span class="n">basename</span><span class="si">}</span><span class="s2">-clipped.vrt&quot;</span><span class="p">)</span>
+        <span class="n">crop</span><span class="p">(</span><span class="n">input_vrt</span><span class="p">,</span> <span class="n">roi</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">clipped_image</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">clipped_image</span>
+
+    <span class="k">def</span> <span class="nf">__apply_masks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_vrt</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">nb_bands</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">nb_masks</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uuid</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Use the masks files to mask the raster data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_vrt (Path):</span>
+<span class="sd">                The input VRT to mask</span>
+<span class="sd">            nb_bands (int):</span>
+<span class="sd">                Number of bands in the input vrt</span>
+<span class="sd">            nb_masks (int):</span>
+<span class="sd">                Number of masks in the input vrt</span>
+<span class="sd">            uuid (str):</span>
+<span class="sd">                Unique identifier when the VRT is created in memory</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Path: The generated VRT</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># convert parameters defined as str to Path</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">to_path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_vrt_outputdir</span><span class="p">,</span> <span class="s2">&quot;/vsimem/&quot;</span><span class="p">)</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+
+        <span class="c1"># create a tempdir for generated temporary files</span>
+        <span class="n">tempdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span>
+
+        <span class="c1"># create a new vrt with only bands_files</span>
+        <span class="c1"># it must be written to disk so that we can read it and add a maskband</span>
+        <span class="n">temp_image</span> <span class="o">=</span> <span class="n">tempdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uuid</span><span class="si">}{</span><span class="n">basename</span><span class="si">}</span><span class="s2">-temp.vrt&quot;</span><span class="p">)</span>
+        <span class="n">ds</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">BuildVRT</span><span class="p">(</span><span class="n">temp_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">input_vrt</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+                           <span class="n">bandList</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">nb_bands</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="c1"># free resource from GDAL</span>
+        <span class="k">del</span> <span class="n">ds</span>
+
+        <span class="c1"># Add mask band</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Adding band masks&quot;</span><span class="p">)</span>
+        <span class="n">masks_index</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nb_bands</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nb_bands</span> <span class="o">+</span> <span class="n">nb_masks</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="n">vrt_new_content</span> <span class="o">=</span> <span class="n">add_masks_to_vrt</span><span class="p">(</span><span class="n">temp_image</span><span class="p">,</span> <span class="n">input_vrt</span><span class="p">,</span> <span class="n">masks_index</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">rastertype</span><span class="o">.</span><span class="n">maskfunc</span><span class="p">)</span>
+        <span class="n">driver</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">GetDriverByName</span><span class="p">(</span><span class="s1">&#39;VRT&#39;</span><span class="p">)</span>
+        <span class="n">vrt</span> <span class="o">=</span> <span class="n">gdal</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">vrt_new_content</span><span class="p">)</span>
+        <span class="n">masked_image</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uuid</span><span class="si">}{</span><span class="n">basename</span><span class="si">}</span><span class="s2">-mask.vrt&quot;</span><span class="p">)</span>
+        <span class="n">copy_ds</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">CreateCopy</span><span class="p">(</span><span class="n">masked_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">vrt</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">del</span> <span class="n">copy_ds</span>
+        <span class="c1"># delete temp image</span>
+        <span class="n">temp_image</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+        <span class="c1"># free resource from GDAL</span>
+        <span class="k">del</span> <span class="n">vrt</span>
+
+        <span class="k">return</span> <span class="n">masked_image</span></div>
+
+
+<span class="k">def</span> <span class="nf">_extract_bands</span><span class="p">(</span><span class="n">inputfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+                   <span class="n">bands_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                   <span class="n">masks_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="n">outputdir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts the bands from an archive</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inputfile (Path):</span>
+<span class="sd">            Archive product that contains the raster bands</span>
+<span class="sd">        bands_pattern (str):</span>
+<span class="sd">            Pattern to identify the bands files in the product.</span>
+<span class="sd">        masks_pattern (str), optional, default=None):</span>
+<span class="sd">            Pattern to identify the masks files in the product if any.</span>
+<span class="sd">        outputdir (Path, optional, default=None):</span>
+<span class="sd">            Dir where to extract images if inputfile is an archive that can&#39;t be accessed with</span>
+<span class="sd">            a path like /vsizip or /vsitar.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (dict, dict): List of the bands and masks files indexed by their identifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bands_masks</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">inputfile</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting band files from dir resulting from the uncompressed archive&quot;</span><span class="p">)</span>
+        <span class="n">bands_masks</span> <span class="o">=</span> <span class="n">_extract_bands_from_dir</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">bands_pattern</span><span class="p">,</span>
+                                              <span class="n">masks_pattern</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting band files from archive (zip, gz, tar or targz)&quot;</span><span class="p">)</span>
+        <span class="n">bands_masks</span> <span class="o">=</span> <span class="n">_extract_bands_from_archive</span><span class="p">(</span><span class="n">inputfile</span><span class="p">,</span> <span class="n">bands_pattern</span><span class="p">,</span>
+                                                  <span class="n">masks_pattern</span><span class="p">)</span>
+
+    <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Identified bands </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bands_masks</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot; and masks </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">bands_masks</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">bands_masks</span>
+
+
+<span class="k">def</span> <span class="nf">_extract_bands_from_archive</span><span class="p">(</span><span class="n">inputfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+                                <span class="n">bands_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                                <span class="n">masks_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts the bands from an archive (zip, gz, tar or targz)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inputfile (Path):</span>
+<span class="sd">            Archive product that contains the raster bands</span>
+<span class="sd">        bands_pattern (str):</span>
+<span class="sd">            Pattern to identify the bands files in the product.</span>
+<span class="sd">        masks_pattern (str):</span>
+<span class="sd">            Pattern to identify the masks files in the product if any.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (dict, dict): List of the bands and masks files indexed by their identifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bands_files</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">masks_files</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">band_regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">bands_pattern</span><span class="p">)</span>
+    <span class="n">has_mask</span> <span class="o">=</span> <span class="n">masks_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">mask_regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">masks_pattern</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_mask</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_suffixes</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">suffix</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.zip&quot;</span><span class="p">,</span> <span class="s2">&quot;.gz&quot;</span><span class="p">]:</span>
+        <span class="c1"># zip or gzip</span>
+        <span class="n">rootpath</span> <span class="o">=</span> <span class="s2">&quot;/vsizip/&quot;</span>
+        <span class="k">with</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">inputfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span> <span class="k">as</span> <span class="n">myzip</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">myzip</span><span class="o">.</span><span class="n">namelist</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># tar or tar.gz</span>
+        <span class="n">rootpath</span> <span class="o">=</span> <span class="s2">&quot;/vsitar/&quot;</span>
+        <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">inputfile</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span>
+                          <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;r:gz&#39;</span> <span class="k">if</span> <span class="n">inputfile</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;gz&quot;</span> <span class="k">else</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">mytar</span><span class="p">:</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">tarinfo</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">tarinfo</span> <span class="ow">in</span> <span class="n">mytar</span><span class="o">.</span><span class="n">getmembers</span><span class="p">()]</span>
+
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">band_regexp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="c1"># if no catching group, store the band files with the key &#39;all&#39;</span>
+            <span class="c1"># which means that all bands are in the file.</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;bands&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;bands&quot;</span> <span class="ow">in</span> <span class="n">band_regexp</span><span class="o">.</span><span class="n">groupindex</span> <span class="k">else</span> <span class="s1">&#39;all&#39;</span>
+            <span class="n">bands_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rootpath</span><span class="si">}{</span><span class="n">inputfile</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">elif</span> <span class="n">has_mask</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">mask_regexp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;bands&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;bands&quot;</span> <span class="ow">in</span> <span class="n">mask_regexp</span><span class="o">.</span><span class="n">groupindex</span> <span class="k">else</span> <span class="s1">&#39;all&#39;</span>
+                <span class="n">masks_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rootpath</span><span class="si">}{</span><span class="n">inputfile</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">bands_files</span><span class="p">,</span> <span class="n">masks_files</span>
+
+
+<span class="k">def</span> <span class="nf">_extract_bands_from_dir</span><span class="p">(</span><span class="n">inputfile</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+                            <span class="n">bands_pattern</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                            <span class="n">masks_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extracts the bands from an uncompressed archive (i.e. a dir)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        inputfile (Path):</span>
+<span class="sd">            Archive product that contains the raster bands</span>
+<span class="sd">        bands_pattern (str):</span>
+<span class="sd">            Pattern to identify the bands files in the product.</span>
+<span class="sd">        mask_pattern (str):</span>
+<span class="sd">            Pattern to identify the masks files in the product if any.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (dict, dict): List of the bands and masks files indexed by their identifier</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bands_files</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">masks_files</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">band_regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">bands_pattern</span><span class="p">)</span>
+    <span class="n">has_mask</span> <span class="o">=</span> <span class="n">masks_pattern</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="n">mask_regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">masks_pattern</span><span class="p">)</span> <span class="k">if</span> <span class="n">has_mask</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="c1"># the archive may have been extracted, find files in it</span>
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">inputfile</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;**/*&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">band_regexp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;bands&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;bands&quot;</span> <span class="ow">in</span> <span class="n">band_regexp</span><span class="o">.</span><span class="n">groupindex</span> <span class="k">else</span> <span class="s1">&#39;all&#39;</span>
+                <span class="n">bands_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+            <span class="k">elif</span> <span class="n">has_mask</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">mask_regexp</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">key</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;bands&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;bands&quot;</span> <span class="ow">in</span> <span class="n">band_regexp</span><span class="o">.</span><span class="n">groupindex</span> <span class="k">else</span> <span class="s1">&#39;all&#39;</span>
+                    <span class="n">masks_files</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">bands_files</span><span class="p">,</span> <span class="n">masks_files</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

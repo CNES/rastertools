@@ -13,6 +13,7 @@ import xarray as xr
 from scipy import ndimage, signal
 
 
+<<<<<<< HEAD
 
 def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
@@ -71,6 +72,7 @@ def tndvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataA
             ratio = ratio.where(ratio >= 0, 0)
     print(ratio[:2])
     return np.sqrt(ratio)
+
 
 
 def rvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
@@ -402,7 +404,6 @@ def speed(data0 : Union[np.ndarray, xr.DataArray] , data1 : np.ndarray, interval
     return (data1 - data0) / interval
 
 
-
 def interpolated_timeseries(dates : numpy.ma.masked_array, series : List[numpy.ma.masked_array], output_dates : numpy.array, nodata) -> numpy.ndarray:
     """
     Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
@@ -529,7 +530,8 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
     return output_xr
 
 
-def _local_sum(data : Union[numpy.ndarray, xr.DataArray], kernel_width: int) -> Union[numpy.ndarray, xr.DataArray] :
+
+def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
     """
     Computes the local sums of the input data using a sliding window defined by the kernel size.
     Each element in the output is the sum of the pixels within the specified kernel size window.
@@ -623,6 +625,7 @@ def median(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int) -
     return output
 
 
+
 def local_sum(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int = 8) -> Union[numpy.ndarray, xr.DataArray] :
     """
     Computes the local sums of the input data using a sliding window defined by the kernel size.
@@ -676,6 +679,7 @@ def local_mean(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : in
         valid = kernel_size ** 2
     # compute mean for the band
     return np.divide(output, valid, out=np.zeros_like(output), where=valid != 0)
+
 
 
 def adaptive_gaussian(input_data : Union[numpy.ndarray, xr.DataArray], kernel_size : int = 8, sigma : int = 1) -> Union[numpy.ndarray, xr.DataArray] :
@@ -737,6 +741,7 @@ def _pad_dataset_xarray(dataset, pad: tuple, pad_mode: str):
     return pad_dataset
 
 def svf(input_data : Union[numpy.ndarray, xr.DataArray], pad_mode : str, radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> Union[numpy.ndarray, xr.DataArray]:
+
     """
     Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Height Model (DHM).
 

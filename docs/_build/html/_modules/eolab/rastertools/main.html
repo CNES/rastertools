@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.main &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.main</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the rastertools command line interface. The command line</span>
+<span class="sd">has several subcommands such as *radioindice* and *zonalstats*.</span>
+
+<span class="sd">Usage examples::</span>
+
+<span class="sd">  rastertools radioindice --help</span>
+<span class="sd">  rastertools zonalstats --help</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">click</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.filtering</span> <span class="kn">import</span> <span class="nb">filter</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.hillshade</span> <span class="kn">import</span> <span class="n">hillshade</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.speed</span> <span class="kn">import</span> <span class="n">speed</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.svf</span> <span class="kn">import</span> <span class="n">svf</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.tiling</span> <span class="kn">import</span> <span class="n">tiling</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.timeseries</span> <span class="kn">import</span> <span class="n">timeseries</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.radioindice</span> <span class="kn">import</span> <span class="n">radioindice</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.cli.zonalstats</span> <span class="kn">import</span> <span class="n">zonalstats</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">__version__</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.product</span> <span class="kn">import</span> <span class="n">RasterType</span>
+
+
+<div class="viewcode-block" id="add_custom_rastertypes"><a class="viewcode-back" href="../../../usage.html#eolab.rastertools.main.add_custom_rastertypes">[docs]</a><span class="k">def</span> <span class="nf">add_custom_rastertypes</span><span class="p">(</span><span class="n">rastertypes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add definition of new raster types. The json string shall have the following format:</span>
+
+<span class="sd">    .. code-block:: json</span>
+
+<span class="sd">      {</span>
+<span class="sd">        &quot;rastertypes&quot;: [</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;name&quot;: &quot;RGB_TIF&quot;,</span>
+<span class="sd">            &quot;product_pattern&quot;: &quot;^RGB_TIF_(?P&lt;date&gt;[0-9_]*)\\.(tif|TIF)$&quot;,</span>
+<span class="sd">            &quot;bands&quot;: [</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;red&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;red&quot;</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;green&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;green&quot;</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;blue&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;blue&quot;</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;nir&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;nir&quot;</span>
+<span class="sd">              }</span>
+<span class="sd">            ],</span>
+<span class="sd">            &quot;date_format&quot;: &quot;%Y%m%d_%H%M%S&quot;,</span>
+<span class="sd">            &quot;nodata&quot;: 0</span>
+<span class="sd">          },</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;name&quot;: &quot;RGB_TIF_ARCHIVE&quot;,</span>
+<span class="sd">            &quot;product_pattern&quot;: &quot;^RGB_TIF_(?P&lt;date&gt;[0-9\\_]*).*$&quot;,</span>
+<span class="sd">            &quot;bands_pattern&quot;: &quot;^TIF_(?P&lt;bands&gt;{}).*\\.(tif|TIF)$&quot;,</span>
+<span class="sd">            &quot;bands&quot;: [</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;red&quot;,</span>
+<span class="sd">                &quot;identifier&quot;: &quot;r&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;red&quot;</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;green&quot;,</span>
+<span class="sd">                &quot;identifier&quot;: &quot;g&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;green&quot;</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;blue&quot;,</span>
+<span class="sd">                &quot;identifier&quot;: &quot;b&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;blue&quot;</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;channel&quot;: &quot;nir&quot;,</span>
+<span class="sd">                &quot;identifier&quot;: &quot;n&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;nir&quot;</span>
+<span class="sd">              }</span>
+<span class="sd">            ],</span>
+<span class="sd">            &quot;date_format&quot;: &quot;%Y%m%d_%H%M%S&quot;,</span>
+<span class="sd">            &quot;nodata&quot;: 0</span>
+<span class="sd">          }</span>
+<span class="sd">        ]</span>
+<span class="sd">      }</span>
+
+<span class="sd">    - name : unique name of raster type</span>
+<span class="sd">    - product_pattern: regexp to identify raster product matching the raster type. Regexp can</span>
+<span class="sd">      contain catching groups that identifies metadata: date (groupe name=date), relative</span>
+<span class="sd">      orbit number (relorbit), tile number (tile), any other group (free name of the group).</span>
+<span class="sd">    - bands_pattern (optional) : when the raster product of this type is an archive</span>
+<span class="sd">      (zip, tar, tar.gz, etc.), the pattern enables to identify the files of the different</span>
+<span class="sd">      raster bands. The raster product can contain one raster file per band or one multi-bands</span>
+<span class="sd">      raster file. In the first case, the pattern must contain a group that identify</span>
+<span class="sd">      the band to which the file corresponds. This group must be defined as follows (?P&lt;bands&gt;{})</span>
+<span class="sd">      in which the variable part {} will be replaced by the identifier of the band (see below).</span>
+<span class="sd">    - date_format (optional): date format in the product name. By default: %Y%m%d-%H%M%S</span>
+<span class="sd">    - nodata (optional): no data value of raster bands. By default: -10000</span>
+<span class="sd">    - masknnodata (optional): nodata value in the mask band</span>
+<span class="sd">    - For every bands:</span>
+
+<span class="sd">      * channel: channel of the band. Must be one of: blue, green, red, nir, mir, swir,</span>
+<span class="sd">        red_edge1, red_edge2, red_edge3, red_edge4, blue_60m, nir_60m and mir_60m.</span>
+<span class="sd">      * identifier (optional): string that identifies the band in the filenames of a raster</span>
+<span class="sd">        product that it is an archive. This identifier is inserted in the group ``bands`` of</span>
+<span class="sd">        the bands_pattern.</span>
+<span class="sd">      * description (optional): band description that will be reused in the generated products.</span>
+
+<span class="sd">    - For every masks:</span>
+
+<span class="sd">      * identifier (optional): string that identifies the mask band in the filenames of a raster</span>
+<span class="sd">        product that it is an archive. This identifier is inserted in the group ``bands`` of</span>
+<span class="sd">        the bands_pattern.</span>
+<span class="sd">      * description (optional): mask band description that will be reused in the generated products.</span>
+<span class="sd">      * maskfunc (optional): fully qualified name of the python function that converts the mask</span>
+<span class="sd">        band values to a binary mask (0 = masked; 1 = unmasked)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rastertypes: JSON string that contains the new raster types definition</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">RasterType</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">rastertypes</span><span class="p">)</span></div>
+
+
+<span class="c1">#Rastertools CLI group</span>
+<span class="n">CONTEXT_SETTINGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">help_option_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-h&#39;</span><span class="p">,</span> <span class="s1">&#39;--help&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># @with_plugins(iter_entry_points(&#39;rasterio.plugins&#39;))</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">context_settings</span><span class="o">=</span><span class="n">CONTEXT_SETTINGS</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--rastertype&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;rastertype&#39;</span><span class="p">,</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="c1"># Click automatically uses the last argument as the variable name, so &quot;dest&quot; is this last parameter</span>
+    <span class="nb">type</span><span class="o">=</span><span class="n">click</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">exists</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;JSON file defining additional raster types of input files&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s1">&#39;--max_workers&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;max_workers&quot;</span><span class="p">,</span>
+    <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Maximum number of workers for parallel processing. If not given, it will default to &quot;</span>
+            <span class="s2">&quot;the number of processors on the machine. When all processors are not allocated to &quot;</span>
+            <span class="s2">&quot;run rastertools, it is thus recommended to set this option.&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s1">&#39;--debug&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;keep_vrt&quot;</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Store to disk the intermediate VRT images that are generated when handling &quot;</span>
+            <span class="s2">&quot;the input files which can be complex raster product composed of several band files.&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s1">&#39;-v&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;--verbose&#39;</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set loglevel to INFO&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">option</span><span class="p">(</span>
+    <span class="s1">&#39;-vv&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;--very-verbose&#39;</span><span class="p">,</span>
+    <span class="n">is_flag</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set loglevel to DEBUG&quot;</span><span class="p">)</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">version_option</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="s1">&#39;rastertools </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">__version__</span><span class="p">))</span>  <span class="c1"># Ensure __version__ is defined</span>
+<span class="nd">@click</span><span class="o">.</span><span class="n">pass_context</span>
+
+<span class="k">def</span> <span class="nf">rastertools</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">rastertype</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_workers</span> <span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">keep_vrt</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">verbose</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">very_verbose</span> <span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main entry point for the `rastertools` Command Line Interface.</span>
+
+<span class="sd">    The `rastertools` CLI provides tools for raster processing and analysis and allows configurable data handling, parallel processing,</span>
+<span class="sd">    and debugging support.</span>
+
+<span class="sd">    Logging:</span>
+
+<span class="sd">        - INFO level (`-v`) gives detailed step information.</span>
+
+<span class="sd">        - DEBUG level (`-vv`) offers full debug-level tracing.</span>
+
+<span class="sd">    Environment Variables:</span>
+
+<span class="sd">        - `RASTERTOOLS_NOTQDM`: If the log level is above INFO, sets this to disable progress bars.</span>
+
+<span class="sd">        - `RASTERTOOLS_MAXWORKERS`: If `max_workers` is set, it defines the max workers for rastertools.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#Saving keep_vrt to use it in the subcommands</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">ensure_object</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">ctx</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;keep_vrt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">keep_vrt</span>
+
+    <span class="c1"># Setup logging</span>
+    <span class="k">if</span> <span class="n">very_verbose</span><span class="p">:</span>
+        <span class="n">loglevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+    <span class="k">elif</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">loglevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">loglevel</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+
+    <span class="n">logformat</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">%(asctime)s</span><span class="s2">] </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">loglevel</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">logformat</span><span class="p">,</span> <span class="n">datefmt</span><span class="o">=</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s2">&quot;RASTERTOOLS_NOTQDM&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RASTERTOOLS_NOTQDM&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;True&quot;</span> <span class="k">if</span> <span class="n">loglevel</span> <span class="o">&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span> <span class="k">else</span> <span class="s2">&quot;False&quot;</span>
+
+    <span class="k">if</span> <span class="s2">&quot;RASTERTOOLS_MAXWORKERS&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span> <span class="ow">and</span> <span class="n">max_workers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;RASTERTOOLS_MAXWORKERS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">max_workers</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Handle rastertype option</span>
+    <span class="k">if</span> <span class="n">rastertype</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">rastertype</span><span class="p">)</span> <span class="k">as</span> <span class="n">json_content</span><span class="p">:</span>
+            <span class="n">RasterType</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">json_content</span><span class="p">))</span>
+
+
+<span class="c1"># Register subcommands from other modules</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;fi&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="nb">filter</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;filter&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">hillshade</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;hs&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">hillshade</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;hillshade&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">radioindice</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ri&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">radioindice</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;radioindice&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">speed</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sp&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">speed</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;speed&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">svf</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;svf&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">tiling</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ti&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">tiling</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;tiling&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;ts&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;timeseries&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">zonalstats</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;zs&quot;</span><span class="p">)</span>
+<span class="n">rastertools</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">zonalstats</span><span class="p">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;zonalstats&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="run"><a class="viewcode-back" href="../../../api/eolab.rastertools.html#eolab.rastertools.main.run">[docs]</a><span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Entry point for console_scripts</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rastertools</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">run</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

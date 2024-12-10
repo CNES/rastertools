@@ -7,11 +7,12 @@ from pathlib import Path
 from datetime import datetime
 from eolab.rastertools import add_custom_rastertypes
 from eolab.rastertools.product import RasterType, BandChannel
-from . import utils4test
 
 __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
 __license__ = "Apache v2.0"
+
+from .utils4test import RastertoolsTestsData
 
 
 def test_rastertype_valid_parameters():
@@ -352,7 +353,7 @@ def test_rastertype_SPOT67():
 
 
 def test_rastertype_additional():
-    file = utils4test.indir + "additional_rastertypes.json"
+    file = RastertoolsTestsData.tests_input_data_dir + "/" + "additional_rastertypes.json"
 
     with open(file) as json_content:
         RasterType.add(json.load(json_content))

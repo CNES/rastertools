@@ -1,0 +1,230 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Line Interface &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="_static/style.css" type="text/css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="filter" href="cli/filtering.html" />
+    <link rel="prev" title="Conda" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html">
+            
+              <img src="_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rastertools">rastertools</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="cli/filtering.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/hillshade.html">hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/radioindice.html">radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/speed.html">speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/svf.html">svf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/tiling.html">tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/timeseries.html">timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="cli/zonalstats.html">zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-singularity">Docker/Singularity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Command Line Interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="command-line-interface">
+<span id="cli"></span><h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this heading"></a></h1>
+<section id="rastertools">
+<h2>rastertools<a class="headerlink" href="#rastertools" title="Permalink to this heading"></a></h2>
+<p>The CLI <strong>rastertools</strong> enable to activate several subcommands, one per raster tool:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>--help
+<span class="go">usage: rastertools [-h] [-t RASTERTYPE] [--version] [--max_workers MAX_WORKERS] [--debug] [-v] [-vv]</span>
+<span class="go">                   {filter,fi,hillshade,hs,radioindice,ri,speed,sp,svf,tiling,ti,timeseries,ts,zonalstats,zs} ...</span>
+
+<span class="go">Collection of tools on raster data</span>
+
+<span class="go">optional arguments:</span>
+<span class="go">  -h, --help            show this help message and exit</span>
+<span class="go">  -t RASTERTYPE, --rastertype RASTERTYPE</span>
+<span class="go">                        JSON file defining additional raster types of input files</span>
+<span class="go">  --version             show program&#39;s version number and exit</span>
+<span class="go">  --max_workers MAX_WORKERS</span>
+<span class="go">                        Maximum number of workers for parallel processing. If not given, it will default</span>
+<span class="go">                        to the number of processors on the machine. When all processors are not allocated</span>
+<span class="go">                        to run rastertools, it is thus recommended to set this option.</span>
+<span class="go">  --debug               Store to disk the intermediate VRT images that are generated when handling the</span>
+<span class="go">                        input files which can be complex raster product composed of several band files.</span>
+<span class="go">  -v, --verbose         set loglevel to INFO</span>
+<span class="go">  -vv, --very-verbose   set loglevel to DEBUG</span>
+
+<span class="go">Commands:</span>
+<span class="go">  {filter,fi,hillshade,hs,radioindice,ri,speed,sp,svf,tiling,ti,timeseries,ts,zonalstats,zs}</span>
+<span class="go">    filter (fi)         Apply a filter to a set of images</span>
+<span class="go">    hillshade (hs)      Compute hillshades of a Digital Elevation / Surface / Height Model (a raster</span>
+<span class="go">                        containing the height of the point as pixel values)</span>
+<span class="go">    radioindice (ri)    Compute radiometric indices</span>
+<span class="go">    speed (sp)          Compute speed of rasters</span>
+<span class="go">    svf                 Compute Sky View Factor of a Digital Height Model</span>
+<span class="go">    tiling (ti)         Generate image tiles</span>
+<span class="go">    timeseries (ts)     Temporal gap filling of an image time series</span>
+<span class="go">    zonalstats (zs)     Compute zonal statistics</span>
+</pre></div>
+</div>
+<p>The <strong>rastertools</strong> CLI generates the following sys.exit values:</p>
+<ul class="simple">
+<li><p>0: everything runs fine</p></li>
+<li><p>1: processing error</p></li>
+<li><p>2: wrong configuration of the raster tool (e.g. invalid parameter value given in the command line)</p></li>
+</ul>
+<p><strong>rastertools</strong> is thus the entry point for all the following tools:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli/filtering.html">filter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/hillshade.html">hillshade</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/radioindice.html">radioindice</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/speed.html">speed</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/svf.html">svf</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/tiling.html">tiling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/timeseries.html">timeseries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli/zonalstats.html">zonalstats</a></li>
+</ul>
+</div>
+<p><strong>rastertools</strong> enables to configure additional custom rastertypes (cf. Usage) and to set-up logging
+level. Most of the rastertools display their progression using a progress bar. The progress bar is
+displayed when the logging level is set to INFO or DEBUG. It can also be disabled / enabled
+independently to the logging level by setting an environment variable named RASTERTOOLS_NOTQDM. For
+instance, setting the environment variable to 1 (resp. 0) will disable (resp. enable) the display
+of the progress bar:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">RASTERTOOLS_NOTQDM</span><span class="o">=</span><span class="m">1</span>
+<span class="gp">$ </span>rastertools<span class="w"> </span>-v<span class="w"> </span>ri<span class="w"> </span><span class="o">[</span>...<span class="o">]</span>
+</pre></div>
+</div>
+<p>Most of the <strong>rastertools</strong> are designed to split down rasters into small chunks of data so that
+the processing can be run in parallel using several processors. The command line of the tools
+defines an argument called <cite>window_size</cite> which corresponds to the size of the chunks. It is also
+possible to specify the number of workers (i.e. processors) to use for parallel processing. The
+number of workers shall not exceed the number of processors of the machine. It is necessary to
+specify this option (<cite>–max_workers</cite>) when running rastertools on a machine where all cpus are
+not allocated to the job, e.g. if you submit the processing to a job scheduler such as PBSPro.
+Alternatively, you can set an environment variable like this and keep the argument
+<cite>–max_workers</cite> unset:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">export</span><span class="w"> </span><span class="nv">RASTERTOOLS_MAXWORKERS</span><span class="o">=</span><span class="m">12</span>
+<span class="gp">$ </span>rastertools<span class="w"> </span>-v<span class="w"> </span>hillshade<span class="w"> </span><span class="o">[</span>...<span class="o">]</span><span class="w"> </span><span class="c1"># it will use 12 processors</span>
+</pre></div>
+</div>
+</section>
+<section id="docker-singularity">
+<h2>Docker/Singularity<a class="headerlink" href="#docker-singularity" title="Permalink to this heading"></a></h2>
+<p>By default the Docker / Singularity container executes: <code class="docutils literal notranslate"><span class="pre">rastertools</span> <span class="pre">--help</span></code>. To run another command, type a command like:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>-u<span class="w"> </span><span class="m">1000</span><span class="w"> </span>-v<span class="w"> </span><span class="nv">$PWD</span>/tests/tests_data:/usr/data<span class="w"> </span>rastertools:latest<span class="w"> </span>rastertools<span class="w"> </span>ri<span class="w"> </span>-r<span class="w"> </span>/usr/data/COMMUNE_32001.shp<span class="w"> </span>--ndvi<span class="w"> </span>/usr/data/SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
+
+<span class="gp">$ </span>singularity<span class="w"> </span>run<span class="w"> </span>rastertools_latest.sif<span class="w"> </span>rastertools<span class="w"> </span>ri<span class="w"> </span>-r<span class="w"> </span>tests/tests_data/COMMUNE_32001.shp<span class="w"> </span>--ndvi<span class="w"> </span>tests/tests_data/SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-left" title="Conda" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="cli/filtering.html" class="btn btn-neutral float-right" title="filter" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

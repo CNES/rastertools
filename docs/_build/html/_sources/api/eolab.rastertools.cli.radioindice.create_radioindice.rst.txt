@@ -1,0 +1,6 @@
+create\_radioindice
+===================
+
+.. currentmodule:: eolab.rastertools.cli.radioindice
+
+.. autofunction:: create_radioindice

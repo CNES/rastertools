@@ -1,0 +1,213 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RasterProduct &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RasterProduct.bands_files" href="eolab.rastertools.product.rasterproduct.RasterProduct.bands_files.html" />
+    <link rel="prev" title="eolab.rastertools.product.rasterproduct" href="eolab.rastertools.product.rasterproduct.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../private_api.html">Private API</a></li>
+          <li class="breadcrumb-item"><a href="eolab.rastertools.product.html">eolab.rastertools.product</a></li>
+          <li class="breadcrumb-item"><a href="eolab.rastertools.product.rasterproduct.html">eolab.rastertools.product.rasterproduct</a></li>
+      <li class="breadcrumb-item active">RasterProduct</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eolab.rastertools.product.rasterproduct.RasterProduct.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rasterproduct">
+<h1>RasterProduct<a class="headerlink" href="#rasterproduct" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="eolab.rastertools.product.rasterproduct.RasterProduct">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eolab.rastertools.product.rasterproduct.</span></span><span class="sig-name descname"><span class="pre">RasterProduct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vrt_outputdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/stdtypes.html#str" title="(in Python v3.8)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/pathlib.html#pathlib.Path" title="(in Python v3.8)"><span class="pre">Path</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.8/library/constants.html#None" title="(in Python v3.8)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eolab/rastertools/product/rasterproduct.html#RasterProduct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eolab.rastertools.product.rasterproduct.RasterProduct" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.8/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Data model for a raster product that handles :</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>a raster type</p></li>
+<li><p>the list of available bands</p></li>
+<li><p>the path to the product</p></li>
+</ul>
+</div></blockquote>
+<p>A raster product can be easily like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">RasterProduct</span><span class="p">(</span><span class="s2">&quot;my_product_filename.zip&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">product</span><span class="p">:</span>
+    <span class="n">rastertype</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">rastertype</span><span class="p">()</span>
+    <span class="n">raster</span> <span class="o">=</span> <span class="n">product</span><span class="o">.</span><span class="n">get_raster</span><span class="p">()</span>  <span class="c1"># raster is an in-memory VRT that can</span>
+                                   <span class="c1"># be opened using rasterio</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">raster</span><span class="p">)</span> <span class="k">as</span> <span class="n">rst</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">rst</span><span class="o">.</span><span class="n">count</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">rst</span><span class="o">.</span><span class="n">read</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">masked</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># data is a numpy masked array</span>
+</pre></div>
+</div>
+<p>A raster product handles several in-memory VRTs that must be properly released. The
+with statement enables this. If you want to control the clean-up of the in-memory VRTs
+you have to call <code class="docutils literal notranslate"><span class="pre">free_in_memory_vrts()</span></code>.</p>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.bands_files.html#eolab.rastertools.product.rasterproduct.RasterProduct.bands_files" title="eolab.rastertools.product.rasterproduct.RasterProduct.bands_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.bands_files</span></code></a></p></td>
+<td><p>Dictionary of available bands.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.channels.html#eolab.rastertools.product.rasterproduct.RasterProduct.channels" title="eolab.rastertools.product.rasterproduct.RasterProduct.channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.channels</span></code></a></p></td>
+<td><p>List of available channels in the product</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.file.html#eolab.rastertools.product.rasterproduct.RasterProduct.file" title="eolab.rastertools.product.rasterproduct.RasterProduct.file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.file</span></code></a></p></td>
+<td><p>Product path</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.is_archive.html#eolab.rastertools.product.rasterproduct.RasterProduct.is_archive" title="eolab.rastertools.product.rasterproduct.RasterProduct.is_archive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.is_archive</span></code></a></p></td>
+<td><p>Whether the raster product is an archive (zip, tar, dir, ...) or a regular raster image</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.masks_files.html#eolab.rastertools.product.rasterproduct.RasterProduct.masks_files" title="eolab.rastertools.product.rasterproduct.RasterProduct.masks_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.masks_files</span></code></a></p></td>
+<td><p>Dictionary of available mask bands.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.rastertype.html#eolab.rastertools.product.rasterproduct.RasterProduct.rastertype" title="eolab.rastertools.product.rasterproduct.RasterProduct.rastertype"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.rastertype</span></code></a></p></td>
+<td><p>Type of the raster</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.__init__.html#eolab.rastertools.product.rasterproduct.RasterProduct.__init__" title="eolab.rastertools.product.rasterproduct.RasterProduct.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.__init__</span></code></a>(file[, vrt_outputdir])</p></td>
+<td><p>Constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.free_in_memory_vrts.html#eolab.rastertools.product.rasterproduct.RasterProduct.free_in_memory_vrts" title="eolab.rastertools.product.rasterproduct.RasterProduct.free_in_memory_vrts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.free_in_memory_vrts</span></code></a>()</p></td>
+<td><p>Free in-memory VRTs by closing all MemoryFile objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.get_date.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_date" title="eolab.rastertools.product.rasterproduct.RasterProduct.get_date"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.get_date</span></code></a>()</p></td>
+<td><p>Extracts the timestamp of the raster</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.get_date_string.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_date_string" title="eolab.rastertools.product.rasterproduct.RasterProduct.get_date_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.get_date_string</span></code></a>([strformat])</p></td>
+<td><p>Extracts the timestamp of the raster and returns it as a formatted string</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.get_raster.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_raster" title="eolab.rastertools.product.rasterproduct.RasterProduct.get_raster"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.get_raster</span></code></a>([bands, masks, ...])</p></td>
+<td><p>Gets the path to the raster corresponding to this product.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.get_relative_orbit.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_relative_orbit" title="eolab.rastertools.product.rasterproduct.RasterProduct.get_relative_orbit"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.get_relative_orbit</span></code></a>()</p></td>
+<td><p>Extracts the relative orbit number of the raster</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.get_satellite.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_satellite" title="eolab.rastertools.product.rasterproduct.RasterProduct.get_satellite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.get_satellite</span></code></a>()</p></td>
+<td><p>Extracts the satellite's name of the raster</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.get_tile.html#eolab.rastertools.product.rasterproduct.RasterProduct.get_tile" title="eolab.rastertools.product.rasterproduct.RasterProduct.get_tile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.get_tile</span></code></a>()</p></td>
+<td><p>Extracts the tile identifier of the raster</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.product.rasterproduct.RasterProduct.open.html#eolab.rastertools.product.rasterproduct.RasterProduct.open" title="eolab.rastertools.product.rasterproduct.RasterProduct.open"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RasterProduct.open</span></code></a>([bands, masks, roi])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eolab.rastertools.product.rasterproduct.html" class="btn btn-neutral float-left" title="eolab.rastertools.product.rasterproduct" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eolab.rastertools.product.rasterproduct.RasterProduct.bands_files.html" class="btn btn-neutral float-right" title="RasterProduct.bands_files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

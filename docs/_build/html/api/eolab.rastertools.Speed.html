@@ -1,0 +1,208 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speed &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Speed.bands" href="eolab.rastertools.Speed.bands.html" />
+    <link rel="prev" title="Radioindice.with_windows" href="eolab.rastertools.Radioindice.with_windows.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../usage.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../usage.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Filtering.html">Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Hillshade.html">Hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Radioindice.html">Radioindice</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Speed</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#eolab.rastertools.Speed"><code class="docutils literal notranslate"><span class="pre">Speed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.bands.html">Speed.bands</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.keep_vrt.html">Speed.keep_vrt</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.outputdir.html">Speed.outputdir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.vrt_dir.html">Speed.vrt_dir</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.__init__.html">Speed.__init__</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.postprocess_files.html">Speed.postprocess_files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.process_file.html">Speed.process_file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.process_files.html">Speed.process_files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.with_output.html">Speed.with_output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.Speed.with_vrt_stored.html">Speed.with_vrt_stored</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.SVF.html">SVF</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Tiling.html">Tiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Timeseries.html">Timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.Zonalstats.html">Zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#raster-products">Raster products</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#adding-custom-raster-types">Adding custom raster types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage.html#design-rules-of-raster-tools">Design rules of raster tools</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../usage.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Speed</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eolab.rastertools.Speed.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="speed">
+<h1>Speed<a class="headerlink" href="#speed" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="eolab.rastertools.Speed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">eolab.rastertools.</span></span><span class="sig-name descname"><span class="pre">Speed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bands</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.8/library/typing.html#typing.List" title="(in Python v3.8)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.8/library/functions.html#int" title="(in Python v3.8)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[1]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/eolab/rastertools/speed.html#Speed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#eolab.rastertools.Speed" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool" title="eolab.rastertools.rastertools.Rastertool"><code class="xref py py-class docutils literal notranslate"><span class="pre">Rastertool</span></code></a></p>
+<p>Raster tool that computes the time derivative (speed) of raster images.</p>
+<p>For images of the same and known type, the tool extract the timestamp metadata
+from the names of the images. It can then compute the time derivatives of every
+bands.</p>
+<p class="rubric">Attributes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.Speed.bands.html#eolab.rastertools.Speed.bands" title="eolab.rastertools.Speed.bands"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.bands</span></code></a></p></td>
+<td><p>List of bands to process</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.Speed.keep_vrt.html#eolab.rastertools.Speed.keep_vrt" title="eolab.rastertools.Speed.keep_vrt"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.keep_vrt</span></code></a></p></td>
+<td><p>Whether intermediate VRT images shall be kept</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.Speed.outputdir.html#eolab.rastertools.Speed.outputdir" title="eolab.rastertools.Speed.outputdir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.outputdir</span></code></a></p></td>
+<td><p>Path of the output directory where are stored the results</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.Speed.vrt_dir.html#eolab.rastertools.Speed.vrt_dir" title="eolab.rastertools.Speed.vrt_dir"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.vrt_dir</span></code></a></p></td>
+<td><p>Dir where to store intermediate VRT images</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.Speed.__init__.html#eolab.rastertools.Speed.__init__" title="eolab.rastertools.Speed.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.__init__</span></code></a>([bands])</p></td>
+<td><p>Constructor</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.Speed.postprocess_files.html#eolab.rastertools.Speed.postprocess_files" title="eolab.rastertools.Speed.postprocess_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.postprocess_files</span></code></a>(inputfiles, outputfiles)</p></td>
+<td><p>Compute the temporal derivative of input files' radiometry</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.Speed.process_file.html#eolab.rastertools.Speed.process_file" title="eolab.rastertools.Speed.process_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.process_file</span></code></a>(inputfile)</p></td>
+<td><p>Run the rastertool to a single input file.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.Speed.process_files.html#eolab.rastertools.Speed.process_files" title="eolab.rastertools.Speed.process_files"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.process_files</span></code></a>(inputfiles)</p></td>
+<td><p>Run the rastertool to a set of input files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="eolab.rastertools.Speed.with_output.html#eolab.rastertools.Speed.with_output" title="eolab.rastertools.Speed.with_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.with_output</span></code></a>([outputdir])</p></td>
+<td><p>Set up the output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="eolab.rastertools.Speed.with_vrt_stored.html#eolab.rastertools.Speed.with_vrt_stored" title="eolab.rastertools.Speed.with_vrt_stored"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Speed.with_vrt_stored</span></code></a>(keep_vrt)</p></td>
+<td><p>Configure if the intermediate VRT images that are generated when handling the input files (which can be complex raster product composed of several band files) shall be stored to disk or not - for debug purpose for instance.</p></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="eolab.rastertools.Radioindice.with_windows.html" class="btn btn-neutral float-left" title="Radioindice.with_windows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="eolab.rastertools.Speed.bands.html" class="btn btn-neutral float-right" title="Speed.bands" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

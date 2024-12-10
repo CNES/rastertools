@@ -1,0 +1,193 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rastertools &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="_static/style.css" type="text/css" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=2389946f"></script>
+      <script src="_static/doctools.js?v=888ff710"></script>
+      <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Conda" href="install.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#">
+            
+              <img src="_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Rastertools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="rastertools">
+<h1>Rastertools<a class="headerlink" href="#rastertools" title="Permalink to this heading"></a></h1>
+<p>This project consists in a command line named <strong>rastertools</strong> that enables to run several processing on raster files, typically
+Sentinel2 raster images:</p>
+<ul class="simple">
+<li><p>compute radiometric indices (e.g. ndvi).</p></li>
+<li><p>compute the time derivative of the radiometry of two raster images.</p></li>
+<li><p>generate a timeseries of rasters from a set of input rasters; a linear interpolation and a gap
+filling are performed.</p></li>
+<li><p>compute statistics such as min, max, mean, etc. Statistics can be computed on the whole raster image
+or can be computed on several geometries defined with a vector file - e.g. geojson or shapefile.</p></li>
+<li><p>split input image raster in tiles following the geometries defined in a vector file.</p></li>
+<li><p>apply a filter (median, local sum, local mean, adaptive gaussian)</p></li>
+<li><p>compute the Sky View Factor and the Hillshades of input rasters that represent a Digital Surface/Elevation/Height Model.</p></li>
+</ul>
+<p>The aim of <strong>rastertools</strong> is also to make the use of the following raster products transparent:</p>
+<ul class="simple">
+<li><p>Sentinel-2 L1C PEPS (available here: <a class="reference external" href="https://peps.cnes.fr/rocket/#/search">https://peps.cnes.fr/rocket/#/search</a>)</p></li>
+<li><p>Sentinel-2 L2A PEPS (available here: <a class="reference external" href="https://peps.cnes.fr/rocket/#/search">https://peps.cnes.fr/rocket/#/search</a>)</p></li>
+<li><p>Sentinel-2 L2A THEIA (available here: <a class="reference external" href="https://theia.cnes.fr/atdistrib/rocket/#/search">https://theia.cnes.fr/atdistrib/rocket/#/search</a>?collection=SENTINEL2)</p></li>
+<li><p>Sentinel-2 L3A THEIA (available here: <a class="reference external" href="https://theia.cnes.fr/atdistrib/rocket/#/search">https://theia.cnes.fr/atdistrib/rocket/#/search</a>?collection=SENTINEL2)</p></li>
+<li><p>SPOT 6/7 Ortho GEOSUD (available here: <a class="reference external" href="http://ids.equipex-geosud.fr/web/guest/catalog">http://ids.equipex-geosud.fr/web/guest/catalog</a>)</p></li>
+</ul>
+<p><strong>rastertools</strong> accept any of this raster product as input files. No need to unpack the archive to get
+the raster files containing the different bands, to merge the bands, extract the region of interest and
+so on: <strong>rastertools</strong> does it.</p>
+<p><strong>rastertools</strong> also accepts additional custom raster types. The new raster types shall be defined in a
+JSON file and provided as an argument of the rastertools CLI (cf. Usage)</p>
+<p><strong>rastertools</strong> has a public API that enables to activate all the tools and extend their capabilities (e.g.
+add a new radiometric indice).</p>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this heading"></a></h2>
+<p><strong>Install</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="install.html"><span class="doc">Conda</span></a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+<p><strong>Usage</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="cli.html"><span class="doc">Command Line Interface</span></a></p></li>
+<li><p><a class="reference internal" href="usage.html"><span class="doc">API Reference</span></a></p></li>
+<li><p><a class="reference internal" href="rasterproduct.html"><span class="doc">Raster types</span></a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+<p><strong>Development</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="private_api.html"><span class="doc">Private API</span></a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+<p><strong>About</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="license.html"><span class="doc">License</span></a></p></li>
+<li><p><a class="reference internal" href="authors.html"><span class="doc">Contributors</span></a></p></li>
+<li><p><a class="reference internal" href="changelog.html"><span class="doc">Changelog</span></a></p></li>
+</ul>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="indices-and-tables">
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="install.html" class="btn btn-neutral float-right" title="Conda" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab.rastertools.svf &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../../../_static/style.css" type="text/css" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html">
+            
+              <img src="../../../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">eolab.rastertools.svf</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for eolab.rastertools.svf</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines a rastertool named SVF (Sky View Factor) which computes the SVF</span>
+<span class="sd">of a Digital Height Model.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools</span> <span class="kn">import</span> <span class="n">Rastertool</span><span class="p">,</span> <span class="n">Windowable</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">algo</span>
+<span class="kn">from</span> <span class="nn">eolab.rastertools.processing</span> <span class="kn">import</span> <span class="n">RasterProcessing</span><span class="p">,</span> <span class="n">compute_sliding</span>
+
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SVF"><a class="viewcode-back" href="../../../api/eolab.rastertools.SVF.html#eolab.rastertools.svf.SVF">[docs]</a><span class="k">class</span> <span class="nc">SVF</span><span class="p">(</span><span class="n">Rastertool</span><span class="p">,</span> <span class="n">Windowable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raster tool that computes the Sky View Factor (SVF) of a</span>
+<span class="sd">    Digital Elevation / Surface / Height Model.</span>
+
+<span class="sd">    Kokalj, Žiga &amp; all 2013:</span>
+
+<span class="sd">    SVF is a geophysical parameter that measures the portion of the sky visible from a certain</span>
+<span class="sd">    point. The portion of the sky visible above the surface is especially relevant in energy balance</span>
+<span class="sd">    studies and computation of diffuse solar insolation.</span>
+
+<span class="sd">    Sky-view factor is defined as the proportion of visible sky (:math:`\\Omega`) above a certain</span>
+<span class="sd">    observation point as seen from a two-dimensional representation.</span>
+
+<span class="sd">    The light that falls from the sky onto a certain part of the surface is reduced by the obstacles</span>
+<span class="sd">    that form the horizon. These obstacles can be described in all directions by the vertical</span>
+<span class="sd">    elevation angle above the horizontal plane.</span>
+
+<span class="sd">    A good SVF approximation can therefore be performed with the estimate of this angle</span>
+<span class="sd">    in several directions. After the vertical elevation angle is determined in the chosen</span>
+<span class="sd">    number of directions n, the SVF is determined as a sum of all portions of the sky within</span>
+<span class="sd">    each direction: :math:`\\sum \\frac {\\cos \\gamma_i}{n}`, where :math:`\\gamma_i` is the</span>
+<span class="sd">    vertical angle of the horizon in the`direction i.</span>
+
+<span class="sd">    The angle :math:`\\gamma` is extracted from the Digital Model:</span>
+<span class="sd">    :math:`\\tan \\frac{Height}{Distance}`::</span>
+
+<span class="sd">                          _____</span>
+<span class="sd">                        x|     |  ^</span>
+<span class="sd">                    x    |     |  | Height (from Digital Model)</span>
+<span class="sd">               x   __    |     |  |</span>
+<span class="sd">      ____p_______|  |___|     |__v____________</span>
+<span class="sd">          &lt;--------------&gt;</span>
+<span class="sd">              Distance</span>
+
+<span class="sd">    Where p is the current pixel where the SVF is computed.</span>
+
+<span class="sd">    In a direction, the algorithm computes all angles and keeps the largest one. To avoid testing</span>
+<span class="sd">    too many points, the &quot;radius&quot; parameter defines the max distance of the pixel to test.</span>
+
+<span class="sd">    The output image of SVF rastertool is a raster image with the SVF value computed at every pixels</span>
+<span class="sd">    of the input Digital Height Model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SVF.__init__"><a class="viewcode-back" href="../../../api/eolab.rastertools.SVF.__init__.html#eolab.rastertools.svf.SVF.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nb_directions</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">resolution</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Constructor</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            nb_directions (int):</span>
+<span class="sd">                Number of directions to compute the SVF</span>
+<span class="sd">            radius (int):</span>
+<span class="sd">                Max distance from current point (in pixels) to consider</span>
+<span class="sd">                for evaluating the max elevation angle</span>
+<span class="sd">            resolution (float):</span>
+<span class="sd">                Resolution of the input Digital Height Model (in meter)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">with_windows</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span> <span class="o">=</span> <span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nb_directions</span> <span class="o">=</span> <span class="n">nb_directions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span> <span class="o">=</span> <span class="n">resolution</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_altitude</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Max distance from current point (in pixels) to consider</span>
+<span class="sd">        for evaluating the max elevation angle&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_radius</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">nb_directions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of directions to compute the SVF&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nb_directions</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">resolution</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolution of the input Digital Height Model (in meter)&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolution</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">altitude</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The altitude at which SVF is computed. If None, the SVF is computed</span>
+<span class="sd">        at the altitude of the point.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_altitude</span>
+
+<div class="viewcode-block" id="SVF.with_altitude"><a class="viewcode-back" href="../../../api/eolab.rastertools.SVF.with_altitude.html#eolab.rastertools.svf.SVF.with_altitude">[docs]</a>    <span class="k">def</span> <span class="nf">with_altitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">altitude</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configure the altitude at which the Sky View Factor shall be computed.</span>
+<span class="sd">        If not set, the SVF is computed for each pixel at the pixel altitude.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            altitude (float):</span>
+<span class="sd">                Altitude at which SVF shall be computed</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The current instance so that it is possible to chain the with... calls (fluent API)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_altitude</span> <span class="o">=</span> <span class="n">altitude</span></div>
+
+<div class="viewcode-block" id="SVF.process_file"><a class="viewcode-back" href="../../../api/eolab.rastertools.SVF.process_file.html#eolab.rastertools.svf.SVF.process_file">[docs]</a>    <span class="k">def</span> <span class="nf">process_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputfile</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute SVF for the input file</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputfile (str):</span>
+<span class="sd">                Input image to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            [str]: A list containing a single element: the generated Sky View Factor image.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing file </span><span class="si">{</span><span class="n">inputfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">outdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+        <span class="n">output_image</span> <span class="o">=</span> <span class="n">outdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">utils</span><span class="o">.</span><span class="n">get_basename</span><span class="p">(</span><span class="n">inputfile</span><span class="p">)</span><span class="si">}</span><span class="s2">-svf.tif&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">&gt;=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The radius (option --radius, value=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="si">}</span><span class="s2">) must be strictly &quot;</span>
+                             <span class="s2">&quot;less than half the size of the window (option --window_size, &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;value=</span><span class="si">{</span><span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Configure the processing</span>
+        <span class="n">svf</span> <span class="o">=</span> <span class="n">RasterProcessing</span><span class="p">(</span><span class="s2">&quot;svf&quot;</span><span class="p">,</span> <span class="n">algo</span><span class="o">=</span><span class="n">algo</span><span class="o">.</span><span class="n">svf</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">per_band_algo</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">svf</span><span class="o">.</span><span class="n">with_arguments</span><span class="p">({</span>
+            <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;directions&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;resolution&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;altitude&quot;</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="p">})</span>
+        <span class="c1"># set the configuration of the raster processing</span>
+        <span class="n">svf</span><span class="o">.</span><span class="n">configure</span><span class="p">({</span>
+            <span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
+            <span class="s2">&quot;directions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_directions</span><span class="p">,</span>
+            <span class="s2">&quot;resolution&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolution</span><span class="p">,</span>
+            <span class="s2">&quot;altitude&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">altitude</span>
+        <span class="p">})</span>
+
+        <span class="c1"># Run the SVF processing</span>
+        <span class="n">compute_sliding</span><span class="p">(</span>
+            <span class="n">inputfile</span><span class="p">,</span> <span class="n">output_image</span><span class="p">,</span> <span class="n">svf</span><span class="p">,</span>
+            <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">window_size</span><span class="p">,</span>
+            <span class="n">window_overlap</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">,</span>
+            <span class="n">pad_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pad_mode</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span><span class="n">output_image</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()]</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

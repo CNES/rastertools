@@ -1,0 +1,6 @@
+create\_filter
+==============
+
+.. currentmodule:: eolab.rastertools.cli.filtering_dyn
+
+.. autofunction:: create_filter

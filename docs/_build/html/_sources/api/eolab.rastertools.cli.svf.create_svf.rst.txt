@@ -1,0 +1,6 @@
+create\_svf
+===========
+
+.. currentmodule:: eolab.rastertools.cli.svf
+
+.. autofunction:: create_svf

@@ -114,7 +114,9 @@ class RasterProduct:
         self.free_in_memory_vrts()
 
     def free_in_memory_vrts(self):
-        """Free in memory vrts"""
+        """
+        Free in-memory VRTs by closing all MemoryFile objects.
+        """
         for vrt in self._in_memory_vrts:
             gdal.Unlink(vrt.as_posix())
         self._in_memory_vrts = []
@@ -209,7 +211,6 @@ class RasterProduct:
              bands: Union[str, List[str]] = "all",
              masks: Union[str, List[str]] = "all",
              roi: Union[Path, str] = None):
-        """Proxy method to rasterio.open(rasterproduct.get_raster(...))"""
         return rasterio.open(self.get_raster(bands=bands, masks=masks, roi=roi))
 
     def open_xarray(self,
@@ -300,7 +301,6 @@ class RasterProduct:
                 set_band_descriptions(masked_image, band_descriptions)
 
                 rasterfile = masked_image
-
         return rasterfile.as_posix()
 
     def __get_bands(self, bands: Union[str, List[str]] = "all"):

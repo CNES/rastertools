@@ -1,0 +1,6 @@
+create\_argparser
+=================
+
+.. currentmodule:: eolab.rastertools.cli.zonalstats
+
+.. autofunction:: create_argparser

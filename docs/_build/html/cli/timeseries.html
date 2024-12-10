@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>timeseries &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="zonalstats" href="zonalstats.html" />
+    <link rel="prev" title="tiling" href="tiling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../cli.html">Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../cli.html#rastertools">rastertools</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="filtering.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="hillshade.html">hillshade</a></li>
+<li class="toctree-l3"><a class="reference internal" href="radioindice.html">radioindice</a></li>
+<li class="toctree-l3"><a class="reference internal" href="speed.html">speed</a></li>
+<li class="toctree-l3"><a class="reference internal" href="svf.html">svf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tiling.html">tiling</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">timeseries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="zonalstats.html">zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#docker-singularity">Docker/Singularity</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../cli.html">Command Line Interface</a></li>
+      <li class="breadcrumb-item active">timeseries</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cli/timeseries.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="timeseries">
+<h1>timeseries<a class="headerlink" href="#timeseries" title="Permalink to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">timeseries</span></code> (or <code class="docutils literal notranslate"><span class="pre">ts</span></code>) generates a series of rasters at given dates from a set of input rasters
+of the same type. When input rasters contain gaps (due for instance to clouds), gaps are filled in
+the generated rasters.</p>
+<p>To generate the timeseries, this tool uses linear interpolation of every pixels in the input rasters.</p>
+<p>If some of the requested dates are before (resp. after) the dates of the input rasters, the
+corresponding generated raster will contain the raster values of the first (resp. last) input raster
+and may thus contain the same gaps as the input raster.</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>timeseries<span class="w"> </span>--help
+
+<span class="go">usage: rastertools timeseries [-h] [-b BANDS [BANDS ...]] [-a] [-o OUTPUT]</span>
+<span class="go">                              [-s START_DATE] [-e END_DATE] [-p TIME_PERIOD]</span>
+<span class="go">                              [-ws WINDOW_SIZE]</span>
+<span class="go">                              inputs [inputs ...]</span>
+
+<span class="go">Generate a timeseries of images (without gaps) from a set of input images.</span>
+<span class="go">Data not present in the input images (e.g., missing images for specific</span>
+<span class="go">dates or masked data) are interpolated (with linear interpolation) so that</span>
+<span class="go">all gaps in the timeseries are filled.</span>
+
+<span class="go">This command is useful for generating continuous timeseries data, even when</span>
+<span class="go">some input images are missing or contain masked values.</span>
+
+<span class="go">Arguments:</span>
+
+<span class="go">    inputs TEXT</span>
+
+<span class="go">        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). You can</span>
+<span class="go">        provide a single file with extension &quot;.lst&quot; (e.g. &quot;speed.lst&quot;) that</span>
+<span class="go">        lists the input files to process (one input file per line in .lst).</span>
+
+<span class="go">Options:</span>
+<span class="go">    -b, --bands LIST            List of bands to process</span>
+<span class="go">    -a, --all                   Process all bands</span>
+<span class="go">    -o, --output TEXT           Output directory to store results (by default</span>
+<span class="go">                                current directory)</span>
+<span class="go">    -s, --start_date TEXT       Start date of the timeseries to generate in the</span>
+<span class="go">                                following format: yyyy-MM-dd</span>
+<span class="go">    -e, --end_date TEXT         End date of the timeseries to generate in the</span>
+<span class="go">                                following format: yyyy-MM-dd</span>
+<span class="go">    -p, --time_period INTEGER   Time period (number of days) between two</span>
+<span class="go">                                consecutive images in the timeseries to generate</span>
+<span class="go">                                e.g. 10 = generate one image every 10 days</span>
+<span class="go">    -ws, --window_size INTEGER  Size of tiles to distribute processing, default:</span>
+<span class="go">                                1024</span>
+<span class="go">    -h, --help                  Show this message and exit.</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>At least two input rasters must be given. The rasters must match one of the configured raster types,
+either a built-in raster type or a custom raster type defined with option -t of <code class="docutils literal notranslate"><span class="pre">rastertools</span></code>.
+See section “Raster types”. The raster type must define where to get the date of the product
+in the filename.</p>
+</div>
+<p>Example:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>rastertools<span class="w"> </span>timeseries<span class="w"> </span>./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D-ndvi.zip<span class="w"> </span>./SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif<span class="w"> </span>-s<span class="w"> </span><span class="m">2018</span>-05-21<span class="w"> </span>-e<span class="w"> </span><span class="m">2018</span>-10-25<span class="w"> </span>-p<span class="w"> </span><span class="m">10</span><span class="w"> </span>-ws<span class="w"> </span><span class="m">512</span>
+</pre></div>
+</div>
+<p>This command generates rasters from 2018-05-21 until 2018-10-25 with a timeperiod between
+two consecutive images of 10 days (2018-05-21, 2018-05-31, 2018-06-10, …).</p>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tiling.html" class="btn btn-neutral float-left" title="tiling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="zonalstats.html" class="btn btn-neutral float-right" title="zonalstats" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

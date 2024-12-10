@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eolab namespace &mdash; rastertools 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=2389946f"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+              <img src="../_static/Logo-Eolab-Anglais.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Conda</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../install.html#docker-et-singularity">Docker et Singularity</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Usage</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rasterproduct.html">Raster types</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../private_api.html">Private API</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">About</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">rastertools</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">eolab namespace</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/eolab.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-eolab">
+<span id="eolab-namespace"></span><h1>eolab namespace<a class="headerlink" href="#module-eolab" title="Permalink to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="eolab.rastertools.html">eolab.rastertools package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.cli.html">eolab.rastertools.cli</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.with_bands_arguments.html">with_bands_arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.with_outputdir_arguments.html">with_outputdir_arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.with_window_arguments.html">with_window_arguments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.filtering.html">eolab.rastertools.cli.filtering</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.hillshade.html">eolab.rastertools.cli.hillshade</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.radioindice.html">eolab.rastertools.cli.radioindice</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.speed.html">eolab.rastertools.cli.speed</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.svf.html">eolab.rastertools.cli.svf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.tiling.html">eolab.rastertools.cli.tiling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.timeseries.html">eolab.rastertools.cli.timeseries</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.utils_cli.html">eolab.rastertools.cli.utils_cli</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.cli.zonalstats.html">eolab.rastertools.cli.zonalstats</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.processing.html">eolab.rastertools.processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.processing.algo.html">eolab.rastertools.processing.algo</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.processing.rasterproc.html">eolab.rastertools.processing.rasterproc</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.processing.sliding.html">eolab.rastertools.processing.sliding</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.processing.stats.html">eolab.rastertools.processing.stats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.processing.vector.html">eolab.rastertools.processing.vector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.product.html">eolab.rastertools.product</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.product.s2_maja_mask.html">s2_maja_mask</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.product.rasterproduct.html">eolab.rastertools.product.rasterproduct</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.product.rastertype.html">eolab.rastertools.product.rastertype</a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.product.vrt.html">eolab.rastertools.product.vrt</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.filtering">eolab.rastertools.filtering module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering"><code class="docutils literal notranslate"><span class="pre">Filtering</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.adaptive_gaussian"><code class="docutils literal notranslate"><span class="pre">Filtering.adaptive_gaussian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.bands"><code class="docutils literal notranslate"><span class="pre">Filtering.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.get_default_filters"><code class="docutils literal notranslate"><span class="pre">Filtering.get_default_filters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.local_mean"><code class="docutils literal notranslate"><span class="pre">Filtering.local_mean</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.local_sum"><code class="docutils literal notranslate"><span class="pre">Filtering.local_sum</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.median_filter"><code class="docutils literal notranslate"><span class="pre">Filtering.median_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.process_file"><code class="docutils literal notranslate"><span class="pre">Filtering.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.raster_filter"><code class="docutils literal notranslate"><span class="pre">Filtering.raster_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.filtering.Filtering.with_filter_configuration"><code class="docutils literal notranslate"><span class="pre">Filtering.with_filter_configuration()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.hillshade">eolab.rastertools.hillshade module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.hillshade.Hillshade"><code class="docutils literal notranslate"><span class="pre">Hillshade</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.hillshade.Hillshade.azimuth"><code class="docutils literal notranslate"><span class="pre">Hillshade.azimuth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.hillshade.Hillshade.elevation"><code class="docutils literal notranslate"><span class="pre">Hillshade.elevation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.hillshade.Hillshade.process_file"><code class="docutils literal notranslate"><span class="pre">Hillshade.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.hillshade.Hillshade.radius"><code class="docutils literal notranslate"><span class="pre">Hillshade.radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.hillshade.Hillshade.resolution"><code class="docutils literal notranslate"><span class="pre">Hillshade.resolution</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.main">eolab.rastertools.main module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.main.add_custom_rastertypes"><code class="docutils literal notranslate"><span class="pre">add_custom_rastertypes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.main.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.radioindice">eolab.rastertools.radioindice module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice"><code class="docutils literal notranslate"><span class="pre">Radioindice</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.bi"><code class="docutils literal notranslate"><span class="pre">Radioindice.bi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.bi2"><code class="docutils literal notranslate"><span class="pre">Radioindice.bi2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.evi"><code class="docutils literal notranslate"><span class="pre">Radioindice.evi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.get_default_indices"><code class="docutils literal notranslate"><span class="pre">Radioindice.get_default_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.indices"><code class="docutils literal notranslate"><span class="pre">Radioindice.indices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ipvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ipvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.merge"><code class="docutils literal notranslate"><span class="pre">Radioindice.merge</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.mndwi"><code class="docutils literal notranslate"><span class="pre">Radioindice.mndwi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.msavi"><code class="docutils literal notranslate"><span class="pre">Radioindice.msavi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.msavi2"><code class="docutils literal notranslate"><span class="pre">Radioindice.msavi2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ndbi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndbi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ndpi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndpi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ndti"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndti</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ndvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ndwi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndwi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ndwi2"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndwi2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.process_file"><code class="docutils literal notranslate"><span class="pre">Radioindice.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.pvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.pvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.ri"><code class="docutils literal notranslate"><span class="pre">Radioindice.ri</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.roi"><code class="docutils literal notranslate"><span class="pre">Radioindice.roi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.rvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.rvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.savi"><code class="docutils literal notranslate"><span class="pre">Radioindice.savi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.tndvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.tndvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.tsavi"><code class="docutils literal notranslate"><span class="pre">Radioindice.tsavi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.with_output"><code class="docutils literal notranslate"><span class="pre">Radioindice.with_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.Radioindice.with_roi"><code class="docutils literal notranslate"><span class="pre">Radioindice.with_roi()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.radioindice.compute_indices"><code class="docutils literal notranslate"><span class="pre">compute_indices()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.rastertools">eolab.rastertools.rastertools module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool"><code class="docutils literal notranslate"><span class="pre">Rastertool</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.keep_vrt"><code class="docutils literal notranslate"><span class="pre">Rastertool.keep_vrt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.outputdir"><code class="docutils literal notranslate"><span class="pre">Rastertool.outputdir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Rastertool.postprocess_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.process_file"><code class="docutils literal notranslate"><span class="pre">Rastertool.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.process_files"><code class="docutils literal notranslate"><span class="pre">Rastertool.process_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.vrt_dir"><code class="docutils literal notranslate"><span class="pre">Rastertool.vrt_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.with_output"><code class="docutils literal notranslate"><span class="pre">Rastertool.with_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Rastertool.with_vrt_stored"><code class="docutils literal notranslate"><span class="pre">Rastertool.with_vrt_stored()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.RastertoolConfigurationException"><code class="docutils literal notranslate"><span class="pre">RastertoolConfigurationException</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Windowable"><code class="docutils literal notranslate"><span class="pre">Windowable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Windowable.pad_mode"><code class="docutils literal notranslate"><span class="pre">Windowable.pad_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Windowable.window_size"><code class="docutils literal notranslate"><span class="pre">Windowable.window_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.rastertools.Windowable.with_windows"><code class="docutils literal notranslate"><span class="pre">Windowable.with_windows()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.speed">eolab.rastertools.speed module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.speed.Speed"><code class="docutils literal notranslate"><span class="pre">Speed</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.speed.Speed.bands"><code class="docutils literal notranslate"><span class="pre">Speed.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.speed.Speed.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Speed.postprocess_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.speed.compute_speed"><code class="docutils literal notranslate"><span class="pre">compute_speed()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.svf">eolab.rastertools.svf module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF"><code class="docutils literal notranslate"><span class="pre">SVF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF.altitude"><code class="docutils literal notranslate"><span class="pre">SVF.altitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF.nb_directions"><code class="docutils literal notranslate"><span class="pre">SVF.nb_directions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF.process_file"><code class="docutils literal notranslate"><span class="pre">SVF.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF.radius"><code class="docutils literal notranslate"><span class="pre">SVF.radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF.resolution"><code class="docutils literal notranslate"><span class="pre">SVF.resolution</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.svf.SVF.with_altitude"><code class="docutils literal notranslate"><span class="pre">SVF.with_altitude()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.tiling">eolab.rastertools.tiling module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling"><code class="docutils literal notranslate"><span class="pre">Tiling</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling.grid"><code class="docutils literal notranslate"><span class="pre">Tiling.grid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling.output_basename"><code class="docutils literal notranslate"><span class="pre">Tiling.output_basename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling.output_subdir"><code class="docutils literal notranslate"><span class="pre">Tiling.output_subdir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling.process_file"><code class="docutils literal notranslate"><span class="pre">Tiling.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling.with_id_column"><code class="docutils literal notranslate"><span class="pre">Tiling.with_id_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.tiling.Tiling.with_output"><code class="docutils literal notranslate"><span class="pre">Tiling.with_output()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.timeseries">eolab.rastertools.timeseries module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.Timeseries.bands"><code class="docutils literal notranslate"><span class="pre">Timeseries.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.Timeseries.end_date"><code class="docutils literal notranslate"><span class="pre">Timeseries.end_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.Timeseries.period"><code class="docutils literal notranslate"><span class="pre">Timeseries.period</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.Timeseries.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Timeseries.postprocess_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.Timeseries.start_date"><code class="docutils literal notranslate"><span class="pre">Timeseries.start_date</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.timeseries.compute_timeseries"><code class="docutils literal notranslate"><span class="pre">compute_timeseries()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.utils">eolab.rastertools.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.get_basename"><code class="docutils literal notranslate"><span class="pre">get_basename()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.get_metadata_name"><code class="docutils literal notranslate"><span class="pre">get_metadata_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.get_suffixes"><code class="docutils literal notranslate"><span class="pre">get_suffixes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.highest_power_of_2"><code class="docutils literal notranslate"><span class="pre">highest_power_of_2()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.is_dir"><code class="docutils literal notranslate"><span class="pre">is_dir()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.slices_1d"><code class="docutils literal notranslate"><span class="pre">slices_1d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.slices_2d"><code class="docutils literal notranslate"><span class="pre">slices_2d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.to_path"><code class="docutils literal notranslate"><span class="pre">to_path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.utils.to_tuple"><code class="docutils literal notranslate"><span class="pre">to_tuple()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools.zonalstats">eolab.rastertools.zonalstats module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats"><code class="docutils literal notranslate"><span class="pre">Zonalstats</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.area"><code class="docutils literal notranslate"><span class="pre">Zonalstats.area</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.bands"><code class="docutils literal notranslate"><span class="pre">Zonalstats.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.categorical"><code class="docutils literal notranslate"><span class="pre">Zonalstats.categorical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.category_file"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.category_file_type"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_file_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.category_index"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.category_labels"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.chart_file"><code class="docutils literal notranslate"><span class="pre">Zonalstats.chart_file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.compute_stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.display_chart"><code class="docutils literal notranslate"><span class="pre">Zonalstats.display_chart</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.generated_stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.generated_stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.generated_stats_dates"><code class="docutils literal notranslate"><span class="pre">Zonalstats.generated_stats_dates</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.generated_stats_per_date"><code class="docutils literal notranslate"><span class="pre">Zonalstats.generated_stats_per_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.geometries"><code class="docutils literal notranslate"><span class="pre">Zonalstats.geometries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.geometry_index"><code class="docutils literal notranslate"><span class="pre">Zonalstats.geometry_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.output_format"><code class="docutils literal notranslate"><span class="pre">Zonalstats.output_format</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Zonalstats.postprocess_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.prefix"><code class="docutils literal notranslate"><span class="pre">Zonalstats.prefix</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.process_file"><code class="docutils literal notranslate"><span class="pre">Zonalstats.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.sigma"><code class="docutils literal notranslate"><span class="pre">Zonalstats.sigma</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.supported_output_formats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.supported_output_formats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.valid_stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.valid_stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.valid_threshold"><code class="docutils literal notranslate"><span class="pre">Zonalstats.valid_threshold</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.with_chart"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_chart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.with_geometries"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_geometries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.with_outliers"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_outliers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.with_output"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.with_per_category"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_per_category()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.zonalstats.Zonalstats.within"><code class="docutils literal notranslate"><span class="pre">Zonalstats.within</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="eolab.rastertools.html#module-eolab.rastertools">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering"><code class="docutils literal notranslate"><span class="pre">Filtering</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.adaptive_gaussian"><code class="docutils literal notranslate"><span class="pre">Filtering.adaptive_gaussian</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.bands"><code class="docutils literal notranslate"><span class="pre">Filtering.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.get_default_filters"><code class="docutils literal notranslate"><span class="pre">Filtering.get_default_filters()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.local_mean"><code class="docutils literal notranslate"><span class="pre">Filtering.local_mean</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.local_sum"><code class="docutils literal notranslate"><span class="pre">Filtering.local_sum</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.median_filter"><code class="docutils literal notranslate"><span class="pre">Filtering.median_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.process_file"><code class="docutils literal notranslate"><span class="pre">Filtering.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.raster_filter"><code class="docutils literal notranslate"><span class="pre">Filtering.raster_filter</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Filtering.with_filter_configuration"><code class="docutils literal notranslate"><span class="pre">Filtering.with_filter_configuration()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Hillshade"><code class="docutils literal notranslate"><span class="pre">Hillshade</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Hillshade.azimuth"><code class="docutils literal notranslate"><span class="pre">Hillshade.azimuth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Hillshade.elevation"><code class="docutils literal notranslate"><span class="pre">Hillshade.elevation</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Hillshade.process_file"><code class="docutils literal notranslate"><span class="pre">Hillshade.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Hillshade.radius"><code class="docutils literal notranslate"><span class="pre">Hillshade.radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Hillshade.resolution"><code class="docutils literal notranslate"><span class="pre">Hillshade.resolution</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice"><code class="docutils literal notranslate"><span class="pre">Radioindice</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.bi"><code class="docutils literal notranslate"><span class="pre">Radioindice.bi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.bi2"><code class="docutils literal notranslate"><span class="pre">Radioindice.bi2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.evi"><code class="docutils literal notranslate"><span class="pre">Radioindice.evi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.get_default_indices"><code class="docutils literal notranslate"><span class="pre">Radioindice.get_default_indices()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.indices"><code class="docutils literal notranslate"><span class="pre">Radioindice.indices</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ipvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ipvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.merge"><code class="docutils literal notranslate"><span class="pre">Radioindice.merge</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.mndwi"><code class="docutils literal notranslate"><span class="pre">Radioindice.mndwi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.msavi"><code class="docutils literal notranslate"><span class="pre">Radioindice.msavi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.msavi2"><code class="docutils literal notranslate"><span class="pre">Radioindice.msavi2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ndbi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndbi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ndpi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndpi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ndti"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndti</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ndvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ndwi"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndwi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ndwi2"><code class="docutils literal notranslate"><span class="pre">Radioindice.ndwi2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.process_file"><code class="docutils literal notranslate"><span class="pre">Radioindice.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.pvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.pvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.ri"><code class="docutils literal notranslate"><span class="pre">Radioindice.ri</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.roi"><code class="docutils literal notranslate"><span class="pre">Radioindice.roi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.rvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.rvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.savi"><code class="docutils literal notranslate"><span class="pre">Radioindice.savi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.tndvi"><code class="docutils literal notranslate"><span class="pre">Radioindice.tndvi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.tsavi"><code class="docutils literal notranslate"><span class="pre">Radioindice.tsavi</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.with_output"><code class="docutils literal notranslate"><span class="pre">Radioindice.with_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Radioindice.with_roi"><code class="docutils literal notranslate"><span class="pre">Radioindice.with_roi()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool"><code class="docutils literal notranslate"><span class="pre">Rastertool</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.keep_vrt"><code class="docutils literal notranslate"><span class="pre">Rastertool.keep_vrt</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.outputdir"><code class="docutils literal notranslate"><span class="pre">Rastertool.outputdir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Rastertool.postprocess_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.process_file"><code class="docutils literal notranslate"><span class="pre">Rastertool.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.process_files"><code class="docutils literal notranslate"><span class="pre">Rastertool.process_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.vrt_dir"><code class="docutils literal notranslate"><span class="pre">Rastertool.vrt_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.with_output"><code class="docutils literal notranslate"><span class="pre">Rastertool.with_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Rastertool.with_vrt_stored"><code class="docutils literal notranslate"><span class="pre">Rastertool.with_vrt_stored()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.RastertoolConfigurationException"><code class="docutils literal notranslate"><span class="pre">RastertoolConfigurationException</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF"><code class="docutils literal notranslate"><span class="pre">SVF</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF.altitude"><code class="docutils literal notranslate"><span class="pre">SVF.altitude</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF.nb_directions"><code class="docutils literal notranslate"><span class="pre">SVF.nb_directions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF.process_file"><code class="docutils literal notranslate"><span class="pre">SVF.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF.radius"><code class="docutils literal notranslate"><span class="pre">SVF.radius</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF.resolution"><code class="docutils literal notranslate"><span class="pre">SVF.resolution</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.SVF.with_altitude"><code class="docutils literal notranslate"><span class="pre">SVF.with_altitude()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Speed"><code class="docutils literal notranslate"><span class="pre">Speed</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Speed.bands"><code class="docutils literal notranslate"><span class="pre">Speed.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Speed.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Speed.postprocess_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling"><code class="docutils literal notranslate"><span class="pre">Tiling</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling.grid"><code class="docutils literal notranslate"><span class="pre">Tiling.grid</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling.output_basename"><code class="docutils literal notranslate"><span class="pre">Tiling.output_basename</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling.output_subdir"><code class="docutils literal notranslate"><span class="pre">Tiling.output_subdir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling.process_file"><code class="docutils literal notranslate"><span class="pre">Tiling.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling.with_id_column"><code class="docutils literal notranslate"><span class="pre">Tiling.with_id_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Tiling.with_output"><code class="docutils literal notranslate"><span class="pre">Tiling.with_output()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Timeseries"><code class="docutils literal notranslate"><span class="pre">Timeseries</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Timeseries.bands"><code class="docutils literal notranslate"><span class="pre">Timeseries.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Timeseries.end_date"><code class="docutils literal notranslate"><span class="pre">Timeseries.end_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Timeseries.period"><code class="docutils literal notranslate"><span class="pre">Timeseries.period</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Timeseries.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Timeseries.postprocess_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Timeseries.start_date"><code class="docutils literal notranslate"><span class="pre">Timeseries.start_date</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Windowable"><code class="docutils literal notranslate"><span class="pre">Windowable</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Windowable.pad_mode"><code class="docutils literal notranslate"><span class="pre">Windowable.pad_mode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Windowable.window_size"><code class="docutils literal notranslate"><span class="pre">Windowable.window_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Windowable.with_windows"><code class="docutils literal notranslate"><span class="pre">Windowable.with_windows()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats"><code class="docutils literal notranslate"><span class="pre">Zonalstats</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.area"><code class="docutils literal notranslate"><span class="pre">Zonalstats.area</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.bands"><code class="docutils literal notranslate"><span class="pre">Zonalstats.bands</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.categorical"><code class="docutils literal notranslate"><span class="pre">Zonalstats.categorical</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.category_file"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.category_file_type"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_file_type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.category_index"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.category_labels"><code class="docutils literal notranslate"><span class="pre">Zonalstats.category_labels</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.chart_file"><code class="docutils literal notranslate"><span class="pre">Zonalstats.chart_file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.compute_stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.compute_stats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.display_chart"><code class="docutils literal notranslate"><span class="pre">Zonalstats.display_chart</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.generated_stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.generated_stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.generated_stats_dates"><code class="docutils literal notranslate"><span class="pre">Zonalstats.generated_stats_dates</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.generated_stats_per_date"><code class="docutils literal notranslate"><span class="pre">Zonalstats.generated_stats_per_date</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.geometries"><code class="docutils literal notranslate"><span class="pre">Zonalstats.geometries</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.geometry_index"><code class="docutils literal notranslate"><span class="pre">Zonalstats.geometry_index</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.output_format"><code class="docutils literal notranslate"><span class="pre">Zonalstats.output_format</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.postprocess_files"><code class="docutils literal notranslate"><span class="pre">Zonalstats.postprocess_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.prefix"><code class="docutils literal notranslate"><span class="pre">Zonalstats.prefix</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.process_file"><code class="docutils literal notranslate"><span class="pre">Zonalstats.process_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.sigma"><code class="docutils literal notranslate"><span class="pre">Zonalstats.sigma</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.supported_output_formats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.supported_output_formats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.valid_stats"><code class="docutils literal notranslate"><span class="pre">Zonalstats.valid_stats</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.valid_threshold"><code class="docutils literal notranslate"><span class="pre">Zonalstats.valid_threshold</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.with_chart"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_chart()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.with_geometries"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_geometries()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.with_outliers"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_outliers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.with_output"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_output()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.with_per_category"><code class="docutils literal notranslate"><span class="pre">Zonalstats.with_per_category()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.Zonalstats.within"><code class="docutils literal notranslate"><span class="pre">Zonalstats.within</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="eolab.rastertools.html#eolab.rastertools.add_custom_rastertypes"><code class="docutils literal notranslate"><span class="pre">add_custom_rastertypes()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, CNES.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
