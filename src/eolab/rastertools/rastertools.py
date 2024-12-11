@@ -72,6 +72,7 @@ class Rastertool(ABC):
             _logger.exception(
                 RastertoolConfigurationException(f"Output directory \"{str(outputdir)}\" does not exist."))
             sys.exit(2)
+
         self._outputdir = outputdir
         return self
 

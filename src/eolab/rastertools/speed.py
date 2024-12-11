@@ -147,6 +147,7 @@ def compute_speed(date0: datetime, date1: datetime,
             src1 = src1.isel(band=slice(0, len(bands))).astype(dtype)
 
             result = algo.speed(src0, src1, interval).astype(dtype)
+            result = result.where(~result.isnull(), other=-2)
 
             ##Create the file and compute
             result.rio.write_nodata(-2, inplace=True)

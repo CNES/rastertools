@@ -13,6 +13,7 @@ import tempfile
 from pathlib import Path
 
 import rasterio
+import xarray
 from osgeo import gdal
 
 
@@ -113,3 +114,29 @@ def slices_2d(window_size, shift, stop, start=0):
     return ((r_min, r_max, c_min, c_max)
             for r_min, r_max in window_r
             for c_min, c_max in window_c)
+
+def xarray_crop(raster : xarray.DataArray, shape):
+    '''
+    Replacing the crop = True option that is not supported by raster.rio.clip()
+    '''
+    resolution_x, resolution_y = raster.rio.resolution()
+    bbox = shape.bounds
+
+    # Compute the target number of rows and columns
+    num_cols = math.ceil((bbox[2] - bbox[0]) / resolution_x)
+    num_rows = math.ceil((bbox[3] - bbox[1]) / abs(resolution_y))
+
+    # Adjust the bounds to align with the resolution
+    aligned_bbox = (
+        bbox[0],  # MinX
+        bbox[1],  # MinY
+        bbox[0] + num_cols * resolution_x,  # MaxX
+        bbox[1] + num_rows * abs(resolution_y)  # MaxY
+    )
+
+    # Slice the raster using the adjusted bounding box
+    masked_raster = raster.sel(
+        x=slice(aligned_bbox[0], aligned_bbox[2]),  # Adjusted X range
+        y=slice(aligned_bbox[3], aligned_bbox[1])  # Adjusted Y range
+    )
+    return masked_raster

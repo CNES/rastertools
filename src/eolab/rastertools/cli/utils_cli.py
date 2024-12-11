@@ -101,4 +101,5 @@ def apply_process(ctx, tool, inputs : list):
     except Exception as err:
         _logger.exception(err)
         sys.exit(1)
+
     sys.exit(0)

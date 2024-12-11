@@ -217,16 +217,11 @@ class RasterProduct:
                     bands: Union[str, List[str]] = "all",
                     masks: Union[str, List[str]] = "all",
                     roi: Union[Path, str] = None,
-                    chunks: Union[int, Dict[str, int], Tuple[int]] = None):
+                    chunks: Union[int, Dict[str, int], Tuple[int]] = True):
         """Proxy method to xarray.open_rasterio(rasterproduct.get_raster(...))"""
         raster = self.get_raster(bands=bands, masks=masks, roi=roi, create_maskband=True)
-        ds = rioxarray.open_rasterio(raster, masked=True, chunks=True)
-        print(ds)
-        # ds = xa.to_dataset(dim="band")
-
-        # self.channels = list(range(len(ds.band.values)))
-        # ds = ds.rename({b + 1: self.rastertype.get_band_id(self.channels[b])
-        #                 for b in range(len(ds.band.values))})
+        ds = rioxarray.open_rasterio(raster, masked=True, chunks=chunks)
+        # input('uigdiu')
         return ds
 
     def get_raster(self,

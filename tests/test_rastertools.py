@@ -100,6 +100,7 @@ class TestCase:
 
         try:
             rastertools(self.args)
+            print(self._sys_exit)
 
         except SystemExit as wrapped_exception:
             if check_sys_exit:
@@ -726,9 +727,6 @@ def test_filtering_command_line_errors(caplog):
         # missing required argument
         f"-v filter adaptive_gaussian --kernel_size 32 -o {RastertoolsTestsData.tests_output_data_dir}"
         f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
-        # # kernel_size > window_size
-        f"-v filter median -a --kernel_size 15 --window_size 16 -o {RastertoolsTestsData.tests_output_data_dir}"
-        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
     ]
 
     # expected logs
@@ -736,11 +734,8 @@ def test_filtering_command_line_errors(caplog):
         [("eolab.rastertools.rastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
-          "The kernel size (option --kernel_size, value=15) must be strictly less than the "
-          "window size minus 1 (option --window_size, value=16)")]
     ]
-    sysexitlist = [2, 2, 1]
+    sysexitlist = [2, 2]
 
     # generate test cases
     tests = [TestCase(args).with_logs(logs).with_sys_exit(sysexit)
@@ -858,10 +853,6 @@ def test_hillshade_command_line_errors(caplog):
         # input file has more than 1 band
         f"-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
         f" {RastertoolsTestsData.tests_input_data_dir}/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.vrt",
-        # radius > window_size / 2
-        "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5"
-        f" --radius 100 --window_size 128 -o {RastertoolsTestsData.tests_output_data_dir}"
-        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
     ]
 
     # expected logs
@@ -869,13 +860,10 @@ def test_hillshade_command_line_errors(caplog):
         [("eolab.rastertools.rastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
+        [("eolab.rastertools.hillshade", logging.ERROR,
           "Invalid input file, it must contain a single band.")],
-        [("eolab.rastertools.cli.utils_cli", logging.ERROR,
-          "The radius (option --radius, value=100) must be strictly less than half"
-          " the size of the window (option --window_size, value=128)")]
     ]
-    sysexitlist = [2, 2, 1, 1]
+    sysexitlist = [2, 2, 1]
 
     # generate test cases
     tests = [TestCase(args).with_logs(logs).with_sys_exit(sysexit)

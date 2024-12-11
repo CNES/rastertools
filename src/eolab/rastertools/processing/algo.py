@@ -7,13 +7,12 @@ import math
 from typing import Union, List
 
 import numpy
+import time
 import numpy as np
 import numpy.ma as ma
 import xarray as xr
 from scipy import ndimage, signal
 
-
-<<<<<<< HEAD
 
 def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataArray] :
     """
@@ -486,8 +485,7 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
 
     # Flatten the stacked data: shape is pixel x time
     pixel_series = stack.transpose((1, 2, 3, 0)).reshape(
-        stack_shape[1] * stack_shape[2] * stack_shape[3], -1
-    )
+        stack_shape[1] * stack_shape[2] * stack_shape[3], -1)
 
     output = []
     for serie in pixel_series:
@@ -498,8 +496,7 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
                 ma.masked_array(dates, serie.mask).compressed(),
                 compressed,
                 compressed[0],
-                compressed[-1]
-            ))
+                compressed[-1]))
         else:
             default_val = serie.sum() if serie.count() > 0 else nodata
             output.append([default_val] * len(output_dates))
@@ -513,9 +510,12 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
     # Create a list of xr.DataArray, one for each output date
     output_xr = []
     coords = series[0].coords
-    for time, date in enumerate(output_dates):
+    for tim, date in enumerate(output_dates):
+        print('iciiiiiiiiiiiii')
+        print(output[tim][0, 0, 0])
+        print(output[tim][0,500, 400])
         da = xr.DataArray(
-            output[time],
+            output[tim],
             dims=["band", "y", "x"],
             coords={
                 "band": coords["band"],
@@ -523,8 +523,7 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
                 "x": coords["x"],
                 "time": date
             },
-            attrs=series[0].attrs
-        )
+            attrs=series[0].attrs)
         output_xr.append(da)
 
     return output_xr
@@ -556,8 +555,6 @@ def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
     """
     if kernel_width == 1:
         output = data.copy()
-        if isinstance(data, xr.DataArray):
-            output = xr.DataArray(output, dims = ['bands', 'y', 'x'])
     else:
         # special case: size = 1 ==> returns data
         if np.issubdtype(data.dtype, np.floating):

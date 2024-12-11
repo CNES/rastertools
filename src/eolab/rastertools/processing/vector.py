@@ -69,26 +69,25 @@ def filter(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
     geoms_crs = _get_geoms_crs(geometries)
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
+    with rasterio.open(file) as dataset:
+        l, b, r, t = dataset.bounds
+        px, py = ([l, l, r, r], [b, t, t, b])
 
-    dataset = rasterio.open(file)
-    l, b, r, t = dataset.bounds
-    px, py = ([l, l, r, r], [b, t, t, b])
+        if (geoms_crs != dataset.crs):
+            px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
 
-    if(geoms_crs != dataset.crs):
-        px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
+        polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
+        if within:
+            # convert geometries into GeoPandasBaseExtended to use the new cix property
+            filtered_geoms = geometries[geometries.within(polygon)]
+        else:
+            filtered_geoms = geometries[geometries.intersects(polygon)]
 
-    polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
-    if within:
-        # convert geometries into GeoPandasBaseExtended to use the new cix property
-        filtered_geoms = geometries[geometries.within(polygon)]
-    else:
-        filtered_geoms = geometries[geometries.intersects(polygon)]
+        if output:
+            outfile = output.as_posix() if isinstance(output, Path) else output
+            filtered_geoms.to_file(outfile, driver=driver)
 
-    if output:
-        outfile = output.as_posix() if isinstance(output, Path) else output
-        filtered_geoms.to_file(outfile, driver=driver)
-    dataset.close()
-    return filtered_geoms
+        return filtered_geoms
 
 
 def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
@@ -158,20 +157,17 @@ def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str
     geoms_crs = _get_geoms_crs(geometries)
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
+    with rasterio.open(file) as dataset:
+        if (geoms_crs != dataset.crs):
+            reprojected_geoms = geometries.to_crs(dataset.crs)
+        else:
+            reprojected_geoms = geometries
 
-    dataset = rasterio.open(file)
+        if output:
+            outfile = output.as_posix() if isinstance(output, Path) else output
+            reprojected_geoms.to_file(outfile, driver=driver)
 
-    if (geoms_crs != dataset.crs):
-        reprojected_geoms = geometries.to_crs(dataset.crs)
-    else:
-        reprojected_geoms = geometries
-
-    if output:
-        outfile = output.as_posix() if isinstance(output, Path) else output
-        reprojected_geoms.to_file(outfile, driver=driver)
-
-    dataset.close()
-    return reprojected_geoms
+        return reprojected_geoms
 
 
 def dissolve(geoms: Union[gpd.GeoDataFrame, Path, str],
@@ -319,7 +315,7 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
         output_image (pathlib.Path or str):
             Filename of the generated raster image
     """
-
+    ### FAIRE AVEC RIOXARRAY
     pinput = input_image.as_posix() if isinstance(input_image, Path) else input_image
     poutput = output_image.as_posix() if isinstance(output_image, Path) else output_image
 

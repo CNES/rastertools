@@ -87,6 +87,7 @@ def test_radioindice_process_file_separate(compare : bool, save_gen_as_ref : boo
     gen_files = [inputfile + "-ndvi.tif", inputfile + "-ndwi.tif"]
     if compare:
         match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir , __refdir, gen_files)
+        print(mismatch)
         assert len(match) == 2
         assert len(mismatch) == 0
         assert len(err) == 0

@@ -5,6 +5,7 @@ This module defines a rastertool named Hillshade which computes the hillshade
 of a Digital Height Model corresponding to a given solar position (elevation and azimuth).
 """
 import logging.config
+import sys
 from typing import List
 from pathlib import Path
 import numpy as np
@@ -117,7 +118,8 @@ class Hillshade(Rastertool, Windowable):
 
         with rioxarray.open_rasterio(inputfile, chunks=True) as src:
             if src.shape[0] != 1:
-                raise ValueError("Invalid input file, it must contain a single band.")
+                _logger.exception(ValueError("Invalid input file, it must contain a single band."))
+                sys.exit(1)
             data = src[0]
             if data.size and not np.isnan(data).all():
                 wmax = np.nanmax(data)
@@ -133,7 +135,6 @@ class Hillshade(Rastertool, Windowable):
             _logger.warning(f"The optimal radius value is {optimal_radius} exceeding {self.radius} threshold. "
                             f"Oversized radius affects computation time and so radius is set to {self.radius}. "
                             "Result may miss some shadow pixels.")
-
 
         # Configure the processing
         hillshade = RasterProcessing("hillshade", algo=algo.hillshade, dtype=np.int8, in_dtype=np.float32,

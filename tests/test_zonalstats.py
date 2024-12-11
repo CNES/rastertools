@@ -151,59 +151,59 @@ def test_zonalstats_process_files(compare, save_gen_as_ref):
     utils4test.clear_outdir()
 
 
-# def test_zonalstats_category(compare, save_gen_as_ref):
-#     # create output dir and clear its content if any
-#     utils4test.create_outdir()
-#
-#     # cas 1 - classif shapefile sur une ROI composée de plusieurs géométries
-#     inputfile = utils4test.indir + "DSM_PHR_Dunkerque.tif"
-#     outformat = "GeoJSON"
-#     statistics = "min max mean std count range sum".split()
-#     # Category inputs
-#     categoryfile = utils4test.indir + "OSO_2017_classification_dep59.shp"
-#     categorydic = utils4test.indir + "OSO_nomenclature_2017.json"
-#
-#     tool = Zonalstats(statistics, area=True)
-#     tool.with_output(utils4test.outdir, output_format=outformat)
-#     tool.with_geometries(geometries=utils4test.indir + "COMMUNE_59xxx.geojson")
-#     tool.with_per_category(category_file=categoryfile, category_index="Classe",
-#                            category_labels_json=categorydic)
-#     tool.process_file(inputfile)
-#
-#     gen_files = ["DSM_PHR_Dunkerque-stats.geojson"]
-#     if compare:
-#         match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
-#         assert len(match) == 1
-#         assert len(mismatch) == 0
-#         assert len(err) == 0
-#     elif save_gen_as_ref:
-#         # save the generated files in the refdir => make them the new refs.
-#         utils4test.copy_to_ref(gen_files, __refdir)
-#
-#     # cas 2 - classif raster sur l'emprise globale du DSM
-#     inputfile = utils4test.indir + "DSM_PHR_Dunkerque.tif"
-#     outformat = "GeoJSON"
-#     categoryfile = utils4test.indir + "OCS_2017_CESBIO_extract.tif"
-#     categorydic = utils4test.indir + "OSO_nomenclature_2017.json"
-#
-#     tool = Zonalstats(statistics, area=True)
-#     tool.with_output(utils4test.outdir, output_format=outformat)
-#     tool.with_per_category(category_file=categoryfile, category_index="Classe",
-#                            category_labels_json=categorydic)
-#     tool.process_file(inputfile)
-#
-#     # gen_files = ["DSM_PHR_Dunkerque-stats.geojson"]
-#     # do not compare, order of features can change in output
-#     # if compare:
-#     #     match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
-#     #     assert len(match) == 1
-#     #     assert len(mismatch) == 0
-#     #     assert len(err) == 0
-#     # elif save_gen_as_ref:
-#     #     # save the generated files in the refdir => make them the new refs.
-#     #     utils4test.copy_to_ref(gen_files, __refdir)
-#
-#     utils4test.clear_outdir()
+def test_zonalstats_category(compare, save_gen_as_ref):
+    # create output dir and clear its content if any
+    utils4test.create_outdir()
+
+    # cas 1 - classif shapefile sur une ROI composée de plusieurs géométries
+    inputfile = utils4test.indir + "DSM_PHR_Dunkerque.tif"
+    outformat = "GeoJSON"
+    statistics = "min max mean std count range sum".split()
+    # Category inputs
+    categoryfile = utils4test.indir + "OSO_2017_classification_dep59.shp"
+    categorydic = utils4test.indir + "OSO_nomenclature_2017.json"
+
+    tool = Zonalstats(statistics, area=True)
+    tool.with_output(utils4test.outdir, output_format=outformat)
+    tool.with_geometries(geometries=utils4test.indir + "COMMUNE_59xxx.geojson")
+    tool.with_per_category(category_file=categoryfile, category_index="Classe",
+                           category_labels_json=categorydic)
+    tool.process_file(inputfile)
+
+    gen_files = ["DSM_PHR_Dunkerque-stats.geojson"]
+    if compare:
+        match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files, tolerance= 1e-8)
+        assert len(match) == 1
+        assert len(mismatch) == 0
+        assert len(err) == 0
+    elif save_gen_as_ref:
+        # save the generated files in the refdir => make them the new refs.
+        utils4test.copy_to_ref(gen_files, __refdir)
+
+    # cas 2 - classif raster sur l'emprise globale du DSM
+    inputfile = utils4test.indir + "DSM_PHR_Dunkerque.tif"
+    outformat = "GeoJSON"
+    categoryfile = utils4test.indir + "OCS_2017_CESBIO_extract.tif"
+    categorydic = utils4test.indir + "OSO_nomenclature_2017.json"
+
+    tool = Zonalstats(statistics, area=True)
+    tool.with_output(utils4test.outdir, output_format=outformat)
+    tool.with_per_category(category_file=categoryfile, category_index="Classe",
+                           category_labels_json=categorydic)
+    tool.process_file(inputfile)
+
+    # gen_files = ["DSM_PHR_Dunkerque-stats.geojson"]
+    # do not compare, order of features can change in output
+    # if compare:
+    #     match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, __refdir, gen_files)
+    #     assert len(match) == 1
+    #     assert len(mismatch) == 0
+    #     assert len(err) == 0
+    # elif save_gen_as_ref:
+    #     # save the generated files in the refdir => make them the new refs.
+    #     utils4test.copy_to_ref(gen_files, __refdir)
+
+    utils4test.clear_outdir()
 
 
 

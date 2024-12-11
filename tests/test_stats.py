@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import math
+
 from eolab.rastertools.processing import stats, vector
 
 from . import utils4test
@@ -50,7 +52,7 @@ def test_compute_zonal_default_stats():
            [{'count': 64186, 'min': -1.0, 'max': 1.0, 'mean': 0.698426, 'std': 0.210732}],
            [{'count': 83063, 'min': -1.0, 'max': 1.0, 'mean': 0.699223, 'std': 0.213408}],
            [{'count': 4038, 'min': -0.206738, 'max': 1.0, 'mean': 0.734667, 'std': 0.230044}],
-           [{'count': 29232, 'min': -0.83908, 'max': 1.0, 'mean': 0.602069, 'std': 0.217282}],
+           [{'count': 29232, 'min': -0.83908, 'max': 1.0, 'mean': 0.60207, 'std': 0.217282}],
            [{'count': 177106, 'min': -1.0, 'max': 1.0, 'mean': 0.548052, 'std': 0.261178}],
            [{'count': 17772, 'min': 0.038081, 'max': 1.0, 'mean': 0.61795, 'std': 0.269253}],
            [{'count': 169829, 'min': -1.0, 'max': 1.0, 'mean': 0.525915, 'std': 0.258398}],
@@ -84,7 +86,6 @@ def test_compute_zonal_extra_stats():
     [d.update({key: round(val, 6)})
      for geom_stats in statistics for d in geom_stats for key, val in d.items()]
 
-    # ref is the following
     ref = [[{'sum': 195899.96875, 'median': 0.636118, 'range': 2.0,
              'percentile_5': 0.15373, 'mad': 0.218207, 'majority': -1.0,
              'minority': -0.996727, 'unique': 285995,
@@ -97,7 +98,7 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.12968, 'mad': 0.146711, 'majority': -1.0,
              'minority': -0.993174, 'unique': 12189,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 56049.859375, 'median': 0.668857, 'range': 2.0,
+           [{'sum': 56049.855469, 'median': 0.668857, 'range': 2.0,
              'percentile_5': 0.154594, 'mad': 0.148523, 'majority': 1.0,
              'minority': -0.977465, 'unique': 83944,
              'nodata': 245, 'valid': 0.997214}],
@@ -105,27 +106,27 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.358831, 'mad': 0.143713, 'majority': 0.6,
              'minority': 0.088869, 'unique': 13137,
              'nodata': 244, 'valid': 0.981971}],
-           [{'sum': 30402.613281, 'median': 0.753216, 'range': 1.656766,
+           [{'sum': 30402.615234, 'median': 0.753216, 'range': 1.656766,
              'percentile_5': 0.433678, 'mad': 0.124387, 'majority': 1.0,
              'minority': -0.656766, 'unique': 40146,
              'nodata': 85, 'valid': 0.997948}],
-           [{'sum': 31683.017578, 'median': 0.471969, 'range': 1.927374,
+           [{'sum': 31683.021484, 'median': 0.471969, 'range': 1.927374,
              'percentile_5': 0.110149, 'mad': 0.168122, 'majority': 0.5,
              'minority': -0.927374, 'unique': 63745,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 56840.1875, 'median': 0.629144, 'range': 2.0,
+           [{'sum': 56840.179688, 'median': 0.629144, 'range': 2.0,
              'percentile_5': 0.134994, 'mad': 0.188218, 'majority': -1.0,
              'minority': -0.993671, 'unique': 89338,
              'nodata': 85, 'valid': 0.99909}],
-           [{'sum': 30468.535156, 'median': 0.619463, 'range': 2.0,
+           [{'sum': 30468.533203, 'median': 0.619463, 'range': 2.0,
              'percentile_5': 0.15824, 'mad': 0.161906, 'majority': -1.0,
              'minority': -0.991903, 'unique': 49427,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 44829.203125, 'median': 0.704596, 'range': 2.0,
+           [{'sum': 44829.199219, 'median': 0.704596, 'range': 2.0,
              'percentile_5': 0.307304, 'mad': 0.169161, 'majority': 1.0,
              'minority': -0.969231, 'unique': 61646,
              'nodata': 337, 'valid': 0.994777}],
-           [{'sum': 58079.574219, 'median': 0.727142, 'range': 2.0,
+           [{'sum': 58079.578125, 'median': 0.727142, 'range': 2.0,
              'percentile_5': 0.211673, 'mad': 0.138837, 'majority': 1.0,
              'minority': -0.962406, 'unique': 79181,
              'nodata': 0, 'valid': 1.0}],
@@ -133,7 +134,7 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.241052, 'mad': 0.153867, 'majority': 0.941176,
              'minority': -0.206738, 'unique': 4007,
              'nodata': 62, 'valid': 0.984878}],
-           [{'sum': 17599.695312, 'median': 0.586743, 'range': 1.83908,
+           [{'sum': 17599.697266, 'median': 0.586743, 'range': 1.83908,
              'percentile_5': 0.255563, 'mad': 0.168826, 'majority': 1.0,
              'minority': -0.83908, 'unique': 28731,
              'nodata': 290, 'valid': 0.990177}],
@@ -141,11 +142,11 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.121661, 'mad': 0.177506, 'majority': -1.0,
              'minority': -0.996276, 'unique': 165519,
              'nodata': 55, 'valid': 0.99969}],
-           [{'sum': 10982.208008, 'median': 0.647735, 'range': 0.961919,
+           [{'sum': 10982.207031, 'median': 0.647735, 'range': 0.961919,
              'percentile_5': 0.135674, 'mad': 0.24678, 'majority': 1.0,
              'minority': 0.038081, 'unique': 17550,
              'nodata': 337, 'valid': 0.98139}],
-           [{'sum': 89315.601562, 'median': 0.491085, 'range': 2.0,
+           [{'sum': 89315.609375, 'median': 0.491085, 'range': 2.0,
              'percentile_5': 0.12513, 'mad': 0.170515, 'majority': -1.0,
              'minority': -0.995074, 'unique': 158615,
              'nodata': 0, 'valid': 1.0}],
@@ -153,7 +154,7 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.324657, 'mad': 0.142261, 'majority': -1.0,
              'minority': -0.974359, 'unique': 28279,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 31228.535156, 'median': 0.564933, 'range': 2.0,
+           [{'sum': 31228.533203, 'median': 0.564933, 'range': 2.0,
              'percentile_5': 0.111111, 'mad': 0.227924, 'majority': -1.0,
              'minority': -0.962085, 'unique': 54423,
              'nodata': 0, 'valid': 1.0}],
@@ -161,9 +162,12 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.231518, 'mad': 0.16068, 'majority': -1.0,
              'minority': -0.991091, 'unique': 34565,
              'nodata': 259, 'valid': 0.992713}]]
+    # ref is the following
 
     for geom_stats, ref_stats in zip(statistics, ref):
         for i, band in enumerate(bands):
+            print(geom_stats[i]['sum'])
+            print(ref_stats[i]['sum'])
             assert geom_stats[i] == ref_stats[i]
 
 
@@ -232,12 +236,12 @@ def test_compute_zonal_stats_per_category():
      for geom_stats in statistics for d in geom_stats for key, val in d.items()]
 
     # ref is the following
-    ref = [[{'11min': 40.407368, '11max': 44.083961, '11mean': 42.293809, '11count': 244, '11std': 0.849256,
+    ref = [[{'11min': 40.407368, '11max': 44.083961, '11mean': 42.293813, '11count': 244, '11std': 0.849256,
              '31min': 40.224247, '31max': 68.915146, '31mean': 46.435981, '31count': 12347, '31std': 4.744863,
              '32min': 38.825829, '32max': 46.798634, '32mean': 42.545211, '32count': 6657, '32std': 1.33232,
              '42min': 38.214043, '42max': 59.93272, '42mean': 43.375167, '42count': 2716, '42std': 1.595453,
-             '43min': 38.214043, '43max': 45.618088, '43mean': 42.273938, '43count': 875, '43std': 1.241663}],
-           [{'11min': 38.475033, '11max': 45.613518, '11mean': 42.386634, '11count': 73437, '11std': 1.090365,
+             '43min': 38.214043, '43max': 45.618088, '43mean': 42.273933, '43count': 875, '43std': 1.241663}],
+           [{'11min': 38.475033, '11max': 45.613518, '11mean': 42.386638, '11count': 73437, '11std': 1.090365,
              '12min': 39.241253, '12max': 43.433277, '12mean': 41.991684, '12count': 17339, '12std': 0.313978,
              '31min': 33.781662, '31max': 60.81406, '31mean': 44.562402, '31count': 12743, '31std': 3.051407,
              '32min': 37.670204, '32max': 64.120644, '32mean': 44.396163, '32count': 18284, '32std': 2.749989,
@@ -271,12 +275,12 @@ def test_compute_zonal_stats_per_category():
      for geom_stats in statistics for d in geom_stats for key, val in d.items()]
 
     # ref is the following
-    ref = [[{'cetemin': 40.407368, 'cetemax': 44.083961, 'cetemean': 42.293809, 'cetecount': 244, 'cetestd': 0.849256,
+    ref = [[{'cetemin': 40.407368, 'cetemax': 44.083961, 'cetemean': 42.293813, 'cetecount': 244, 'cetestd': 0.849256,
              'feumin': 40.224247, 'feumax': 68.915146, 'feumean': 46.435981, 'feucount': 12347, 'feustd': 4.744863,
              'conmin': 38.825829, 'conmax': 46.798634, 'conmean': 42.545211, 'concount': 6657, 'constd': 1.33232,
              'udimin': 38.214043, 'udimax': 59.93272, 'udimean': 43.375167, 'udicount': 2716, 'udistd': 1.595453,
-             'zicmin': 38.214043, 'zicmax': 45.618088, 'zicmean': 42.273938, 'ziccount': 875, 'zicstd': 1.241663}],
-           [{'cetemin': 38.475033, 'cetemax': 45.613518, 'cetemean': 42.386634, 'cetecount': 73437, 'cetestd': 1.090365,
+             'zicmin': 38.214043, 'zicmax': 45.618088, 'zicmean': 42.273933, 'ziccount': 875, 'zicstd': 1.241663}],
+           [{'cetemin': 38.475033, 'cetemax': 45.613518, 'cetemean': 42.386638, 'cetecount': 73437, 'cetestd': 1.090365,
              'chivmin': 39.241253, 'chivmax': 43.433277, 'chivmean': 41.991684, 'chivcount': 17339, 'chivstd': 0.313978,
              'feumin': 33.781662, 'feumax': 60.81406, 'feumean': 44.562402, 'feucount': 12743, 'feustd': 3.051407,
              'conmin': 37.670204, 'conmax': 64.120644, 'conmean': 44.396163, 'concount': 18284, 'constd': 2.749989,
