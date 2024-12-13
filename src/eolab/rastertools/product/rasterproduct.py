@@ -217,11 +217,10 @@ class RasterProduct:
                     bands: Union[str, List[str]] = "all",
                     masks: Union[str, List[str]] = "all",
                     roi: Union[Path, str] = None,
-                    chunks: Union[int, Dict[str, int], Tuple[int]] = True):
+                    chunks: Union[int, Tuple, Dict] = True):
         """Proxy method to xarray.open_rasterio(rasterproduct.get_raster(...))"""
         raster = self.get_raster(bands=bands, masks=masks, roi=roi, create_maskband=True)
         ds = rioxarray.open_rasterio(raster, masked=True, chunks=chunks)
-        # input('uigdiu')
         return ds
 
     def get_raster(self,

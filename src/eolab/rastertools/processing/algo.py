@@ -511,7 +511,6 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
     output_xr = []
     coords = series[0].coords
     for tim, date in enumerate(output_dates):
-        print('iciiiiiiiiiiiii')
         print(output[tim][0, 0, 0])
         print(output[tim][0,500, 400])
         da = xr.DataArray(

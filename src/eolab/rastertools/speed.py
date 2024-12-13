@@ -125,7 +125,7 @@ def compute_speed(date0: datetime, date1: datetime,
         interval = (date1 - date0).total_seconds()
 
         # open input images
-        with product0.open_xarray() as src0, product1.open_xarray() as src1:
+        with product0.open_xarray(chunks = (1,400,400)) as src0, product1.open_xarray(chunks = (1,400,400)) as src1:
 
             if src1.shape[0] != src0.shape[0]:
                 raise ValueError(f"Number of bands in images {src1.shape[0]} and {src1.shape[0]}"

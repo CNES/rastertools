@@ -218,9 +218,7 @@ class Filtering(Rastertool, Windowable):
             rasterprocessing = self.raster_filter
 
             with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-                print(product)
-                with rioxarray.open_rasterio(input_image, chunks=True) as src:
-                    print(src)
+                with rioxarray.open_rasterio(input_image, chunks=(1,1000,1000)) as src:
                     # dtype and creation options of output data
                     dtype = rasterprocessing.dtype or rasterio.float32
 

@@ -164,7 +164,7 @@ class Tiling(Rastertool):
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
 
             # Load raster as xarray.DataArray
-            raster = product.open_xarray()
+            raster = product.open_xarray(chunks = (1,400,400))
             crs = raster.rio.crs
 
             with rasterio.open(product.get_raster()) as src:

@@ -166,7 +166,7 @@ class SVF(Rastertool, Windowable):
 
 
             with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
-                with product.open_xarray(chunks=True) as src:
+                with product.open_xarray(chunks= True) as src:
                     # dtype and creation options of output data
                     dtype = svf.dtype or rasterio.float32
                     src = src.astype(dtype)
