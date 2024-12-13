@@ -6,24 +6,15 @@ of rasters at different dates from a list of rasters that may contain gaps (due
 to clouds for instance). The timeseries is generated with a linear interpolation
 thus enabling to fill gaps.
 """
-import time
 from datetime import datetime, timedelta
-from idlelib.format import reformat_paragraph
-from itertools import repeat
 import logging.config
-import multiprocessing
-import os
 from pathlib import Path
 
 import rioxarray
-import xarray as xr
 from typing import Dict, List
 
 import numpy as np
 import rasterio
-from osgeo import gdal
-from tqdm.contrib.concurrent import process_map
-
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
@@ -209,24 +200,13 @@ def _interpolate_xarray(products_dates, products_per_date,
     datas = list()
     for date in products_dates:
         src = rioxarray.open_rasterio(products_per_date[date].get_raster(), masked=False, chunks=(1,500,500))
-        # src = src.where(src != -2, other=None)
         dtype = src.dtype or rasterio.float32
         band_data = src.isel(band=slice(0, len(bands)))  # Select the desired bands
-        print(band_data)
-        print(band_data.values[0, 0, 0])
-        print(band_data.values[0,500, 300:400])
         crs = src.rio.crs
         datas.append(band_data)
 
-    start = time.time()
 
     output = algo.interpolated_timeseries_xarray(products_dates, datas, timeseries_dates, nodata)
-    end = time.time()
-
-    print('time algoo')
-    print(start - end)
-
-    start = time.time()
 
     for i, img in enumerate(timeseries_images):
         output[i] = output[i].where(~datas[0].isnull(), other=-2)
@@ -234,25 +214,3 @@ def _interpolate_xarray(products_dates, products_per_date,
         output[i].rio.write_nodata(-2, inplace=True)
         output[i].rio.to_raster(img, nodata=-2, dtype=dtype)
 
-    end = time.time()
-    print('time write')
-    print(start - end)
-
-    ref_path = 'tests/tests_refs/test_timeseries/SENTINEL2A_20181016-000000-685_L2A_T30TYP_D-ndvi-timeseries.tif'
-    ref = gdal.Open(ref_path)
-    band_ref = ref.GetRasterBand(1)
-
-    # Read the band as a NumPy array
-    band_ref = band_ref.ReadAsArray()
-
-    out_path = 'tests/tests_out/SENTINEL2A_20181016-000000-685_L2A_T30TYP_D-ndvi-timeseries.tif'
-    out = gdal.Open(out_path)
-    band_out = out.GetRasterBand(1)
-
-    # Read the band as a NumPy array
-    band_out = band_out.ReadAsArray()
-
-    print('Obdfuivijsdfnujdsfvio')
-    print(band_out[500,300:400])
-    print(band_ref[500, 300:400])
-    print(np.allclose(band_out, band_ref, equal_nan = True))

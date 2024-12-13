@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-<<<<<<< HEAD
 """
     Setup file for rastertools.
     Use setup.cfg to configure your project.
@@ -8,8 +7,6 @@
     PyScaffold helps you to put up the scaffold of your new Python project.
     Learn more under: https://pyscaffold.org/
 """
-=======
->>>>>>> rasterio_plugin_vsimem
 from setuptools import setup, find_packages
 
 if __name__ == "__main__":
@@ -29,28 +26,6 @@ if __name__ == "__main__":
               setup_requires = ["setuptools_scm"],
               install_requires=[
                   'click',
-<<<<<<< HEAD
-                  'rasterio==1.3.0',
-                  'pytest>=3.6',
-                  'pytest-cov',
-                  'geopandas==0.13',
-                  'python-dateutil==2.9.0',
-                  'kiwisolver==1.4.5',
-                  'fonttools==4.53.1',
-                  'matplotlib==3.7.3',
-                  'packaging==24.1',
-                  'Shapely==1.8.5.post1',
-                  'tomli==2.0.2',
-                  'Rtree==1.3.0',
-                  'fiona==1.8.21',
-                  'Pillow==9.2.0',
-                  'sphinx_rtd_theme==3.0.1',
-                  'pip==24.2',
-                  'dask',
-                  # 'rioxarray',
-                  'xarray==2022.11.0',
-                  'pyproj==3.4.0',
-=======
                   'rasterio',
                   'pytest>=3.6',
                   'pytest-cov',
@@ -61,7 +36,6 @@ if __name__ == "__main__":
                   'fiona==1.8.21',
                   'sphinx_rtd_theme==3.0.1',
                   'pip==24.2',
->>>>>>> rasterio_plugin_vsimem
                   'sphinx==7.1.2',
                   'scipy==1.8',
                   'pyscaffold',
@@ -74,7 +48,7 @@ if __name__ == "__main__":
                 """,
               python_requires='==3.8.13',
               use_scm_version={"version_scheme": "no-guess-dev"})
-    except:  # noqa
+    except:
         print(
             "\n\nAn error occurred while building the project, "
             "please ensure you have the most updated version of setuptools, "

@@ -3,7 +3,6 @@
 """
 Functions to compute statistics on raster images.
 """
-import math
 import os
 from typing import List, Dict
 import re
@@ -11,10 +10,6 @@ import datetime
 
 import numpy as np
 import rioxarray
-import xarray
-from rasterio import features
-from rasterio.features import geometry_mask
-from rasterio.transform import from_origin
 from scipy.stats import median_abs_deviation
 import pandas as pd
 import geopandas as gpd
@@ -115,24 +110,8 @@ def _compute_stats(data, nodata : int, stats: List[str], categorical: bool = Fal
     else:
         mask = (data == nodata) | np.isnan(data)
 
-    # transform = from_origin(0, 0, 1, 1)
-    # # Save to a GeoTIFF
-    # output_tif = "mask.tif"
-    # with rasterio.open(
-    #         output_tif,
-    #         "w",
-    #         driver="GTiff",
-    #         height=mask.shape[0],
-    #         width=mask.shape[1],
-    #         count=1,  # Single band
-    #         dtype=np.uint8,
-    #         transform=transform,
-    # ) as dst:
-    #     dst.write(mask.astype(np.uint8), 1)
-
     # Create a masked array
     dataset = np.ma.MaskedArray(data, mask=mask)
-    print(np.unique(dataset))
     # Calculate the requested statistics
     for stat in stats:
         if stat in functions:
@@ -156,8 +135,6 @@ def _compute_stats(data, nodata : int, stats: List[str], categorical: bool = Fal
     if 'valid' in stats or 'nodata' in stats:
         all_count = np.count_nonzero(~mask)
         if 'nodata' in stats:
-            print(count)
-            print(all_count)
             feature_stats[f'{prefix_stats}nodata'] = all_count - count
         if 'valid' in stats:
             valid = 1.0 * count / (all_count + 1e-5)
@@ -245,9 +222,7 @@ def compute_zonal_stats_per_category(geoms: gpd.GeoDataFrame, image: str,
                     band_data = cat_raster.sel(band=band)
                     roi_statistics.update(_compute_stats(band_data.values, cat_raster.rio.nodata, stats, prefix_stats = prefix))
 
-
             statistics.append([roi_statistics])
-            print(statistics)
 
     return statistics
 

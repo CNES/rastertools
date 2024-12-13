@@ -9,12 +9,8 @@ This module defines several utility methods for:
 - ...
 """
 import math
-import tempfile
 from pathlib import Path
-
-import rasterio
 import xarray
-from osgeo import gdal
 
 
 def to_tuple(val):
@@ -116,9 +112,9 @@ def slices_2d(window_size, shift, stop, start=0):
             for c_min, c_max in window_c)
 
 def xarray_crop(raster : xarray.DataArray, shape):
-    '''
+    """
     Replacing the crop = True option that is not supported by raster.rio.clip()
-    '''
+    """
     resolution_x, resolution_y = raster.rio.resolution()
     bbox = shape.bounds
 

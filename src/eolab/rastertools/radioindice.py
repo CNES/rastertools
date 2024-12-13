@@ -4,20 +4,12 @@
 This module defines a command line named radioindice that computes radiometric
 indices on raster images: ndvi, ndwi, etc..
 """
-import logging
 import logging.config
-import os
 from pathlib import Path
 from typing import List
-import threading
-
-import numpy
 import numpy as np
 import rasterio
-import numpy.ma as ma
 import rioxarray
-from osgeo import gdal
-from tqdm import tqdm
 
 from eolab.rastertools import utils
 import xarray as xr
@@ -409,7 +401,6 @@ class Radioindice(Rastertool, Windowable):
 
         outdir = Path(self.outputdir)
 
-        print(inputfile)
         # Prepare the input image so that it can be processed
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
             _logger.debug(f"Raster product is : {product}")
@@ -518,7 +509,6 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
 
                 dataset.nodata = -2.0
                 for band_idx in range(1, dataset.count + 1):
-                    print(dataset.tags(band_idx))
 
                     band = dataset.read(band_idx, masked=True)
                     band = np.ma.masked_invalid(band)  # Handle NaN values
@@ -533,25 +523,5 @@ def compute_indices(input_image: str, image_channels: List[BandChannel],
 
                     # Write metadata to the band
                     dataset.update_tags(band_idx, **stats)
-
-    # ref_path = 'tests/tests_refs/test_radioindice/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif'
-    # ref = gdal.Open(ref_path)
-    # band_ref = ref.GetRasterBand(1)
-    #
-    # # Read the band as a NumPy array
-    # band_ref = band_ref.ReadAsArray()
-    #
-    # out_path = 'tests/tests_out/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif'
-    # out = gdal.Open(out_path)
-    # band_out = out.GetRasterBand(1)
-    #
-    # # Read the band as a NumPy array
-    # band_out = band_out.ReadAsArray()
-    #
-    # print('Obdfuivijsdfnujdsfvio')
-    # print(band_out.shape)
-    # print(band_out[0])
-    # print(band_ref[0])
-    # print(np.allclose(band_out, band_ref, equal_nan = True))
 
 

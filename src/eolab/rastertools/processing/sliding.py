@@ -13,7 +13,6 @@ import numpy as np
 import numpy.ma as ma
 import rasterio
 from rasterio.windows import Window
-from rioxarray import rioxarray
 from tqdm.contrib.concurrent import process_map
 
 from eolab.rastertools import utils
@@ -273,16 +272,3 @@ def _sliding_windows(image_size, window_size, overlap):
                                       (col_start + c_overlap, col_stop - c_overlap))
 
         yield(r_window, (padx, pady), w_window)
-
-
-def _pad_dataset_xarray(dataset, pad: tuple, pad_mode: str):
-    """
-    To do
-    """
-    # pad the dataset if necessary
-    padx, pady = pad
-    pad_width = {"band" : (0,0), "y": pady, "x": padx}
-    pad_dataset = dataset.pad(pad_width=pad_width, mode=pad_mode)
-
-    # dataset = xr.DataArray(dataset, dims=src.dims, coords=src.coords)
-    return pad_dataset

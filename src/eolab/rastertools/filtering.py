@@ -7,7 +7,6 @@ of filters on raster images.
 import logging.config
 from typing import List, Dict
 from pathlib import Path
-import multiprocessing
 
 import rasterio
 from rioxarray import rioxarray
@@ -15,7 +14,7 @@ from rioxarray import rioxarray
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
-from eolab.rastertools.processing import RasterFilter, compute_sliding
+from eolab.rastertools.processing import RasterFilter
 from eolab.rastertools.product import RasterProduct
 
 

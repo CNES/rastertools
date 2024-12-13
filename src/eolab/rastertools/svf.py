@@ -8,14 +8,11 @@ import logging.config
 from pathlib import Path
 import numpy as np
 import rasterio
-import rioxarray
-import xarray as xr
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
-from eolab.rastertools.processing import RasterProcessing, compute_sliding
-from eolab.rastertools.processing.sliding import _pad_dataset_xarray
+from eolab.rastertools.processing import RasterProcessing
 from eolab.rastertools.product import RasterProduct
 
 _logger = logging.getLogger(__name__)

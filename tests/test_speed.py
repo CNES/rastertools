@@ -47,4 +47,4 @@ def test_speed_process_files(compare : bool, save_gen_as_ref : bool):
         # save the generated files in the refdir => make them the new refs.
         utils4test.copy_to_ref(exp_outs, __refdir)
 
-    # utils4test.clear_outdir()
+    utils4test.clear_outdir()

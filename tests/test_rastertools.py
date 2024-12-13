@@ -100,7 +100,6 @@ class TestCase:
 
         try:
             rastertools(self.args)
-            print(self._sys_exit)
 
         except SystemExit as wrapped_exception:
             if check_sys_exit:
@@ -446,6 +445,7 @@ def test_zonalstats_command_line_default():
                       lst_file_path)
 
     # list of commands to test
+    # There is no more window_size, therefore the third test has been removed
     argslist = [
         # specify stats to compute and sigma, 1st band computed
         f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON"
@@ -843,6 +843,7 @@ def test_hillshade_command_line_errors(caplog):
     utils4test.create_outdir()
 
     # list of commands to test
+    # There is no more window_size, therefore the forth test has been removed
     argslist = [
         # output dir does not exist
         "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/truc"

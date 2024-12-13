@@ -11,8 +11,6 @@ __author = "Olivier Queyrut"
 __copyright = "Copyright 2019, CNES"
 __license = "Apache v2.0"
 
-indir = "tests/tests_data/"
-outdir = "tests/tests_out/"
 __root_refdir = "tests/tests_refs/"
 
 
@@ -86,7 +84,6 @@ def cmpfiles(a : str, b : str, common : list, tolerance : float =1e-9, **kwargs)
 
 def _cmp(gld, new, tolerance, **kwargs):
     """
-
     """
     ftype = os.path.splitext(gld)[-1].lower()
     cmp = cmptools.CMP_FUN[ftype]

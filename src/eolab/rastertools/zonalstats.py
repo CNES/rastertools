@@ -25,7 +25,6 @@ import geopandas as gpd
 import sys
 
 import rasterio
-import rioxarray
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, RastertoolConfigurationException
@@ -33,7 +32,6 @@ from eolab.rastertools.processing import compute_zonal_stats, compute_zonal_stat
 from eolab.rastertools.processing import extract_zonal_outliers, plot_stats
 from eolab.rastertools.processing import vector
 from eolab.rastertools.product import RasterProduct
-
 
 _logger = logging.getLogger(__name__)
 
@@ -549,7 +547,6 @@ class Zonalstats(Rastertool):
                 categorical=self.categorical)
 
 
-        # print(len(statistics))
         # apply area
         if self.area:
             [d.update({key: area_square_meter * val})

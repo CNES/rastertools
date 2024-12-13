@@ -7,7 +7,6 @@ import math
 from typing import Union, List
 
 import numpy
-import time
 import numpy as np
 import numpy.ma as ma
 import xarray as xr
@@ -34,7 +33,6 @@ def normalized_difference(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.n
     """
     np.seterr(divide='ignore')
     res = (bands[1] - bands[0]) / (bands[1] + bands[0])
-    print(res[:2])
     return res
 
 
@@ -69,7 +67,6 @@ def tndvi(bands : Union[np.ndarray, xr.DataArray]) -> Union[np.ndarray, xr.DataA
     else:
         if not ratio.isnull().all():
             ratio = ratio.where(ratio >= 0, 0)
-    print(ratio[:2])
     return np.sqrt(ratio)
 
 
@@ -403,56 +400,6 @@ def speed(data0 : Union[np.ndarray, xr.DataArray] , data1 : np.ndarray, interval
     return (data1 - data0) / interval
 
 
-def interpolated_timeseries(dates : numpy.ma.masked_array, series : List[numpy.ma.masked_array], output_dates : numpy.array, nodata) -> numpy.ndarray:
-    """
-    Interpolate a timeseries of data. Dates and series must be sorted in ascending order.
-
-    Args:
-        dates (numpy.ma.masked_array): A masked array of timestamps (dates) corresponding to
-                                        the input series. Should be in ascending order.
-
-        series (numpy.ma.masked_array): A list of 3D masked arrays, each with shape
-                                         (bands, height, width), containing the raster data
-                                         for each timestamp in `dates`.
-
-        output_dates (numpy.array): A 1D array of timestamps for which to generate the interpolated
-                                     rasters.
-
-        nodata (float): Value to use for pixels where input data is NaN or missing.
-
-    Returns:
-        numpy.ndarray: A 4D numpy array of shape (time, bands, height, width), containing
-                       the interpolated raster data for each output date. If there are no valid
-                       data points for a specific pixel, the corresponding pixel will be filled with `nodata`.
-
-    Raises:
-        ValueError: If `series` is empty, or if `dates` and `series` dimensions do not match.
-    """
-    #Create stack, an array of dimension time x band x height x width from a list of band x height x width arrays
-    stack = ma.stack(series)
-    stack_shape = stack.shape
-    # flatten the stacked data: shape is pixel x time
-    pixel_series = stack.transpose((1, 2, 3, 0)).reshape(
-        stack_shape[1] * stack_shape[2] * stack_shape[3], -1)
-
-    output = []
-    for serie in pixel_series:
-        compressed = serie.compressed()
-        if serie.count() > 1:
-            output.append(np.interp(
-                output_dates,
-                ma.masked_array(dates, serie.mask).compressed(),
-                compressed,
-                compressed[0],
-                compressed[-1]))
-        else:
-            default_val = serie.sum() if serie.count() > 0 else nodata
-            output.append([default_val] * len(output_dates))
-
-    output = np.array(output)
-    return output.transpose(1, 0).reshape(-1, stack_shape[1], stack_shape[2], stack_shape[3])
-
-
 def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArray], output_dates: numpy.array,
                                    nodata) -> List[xr.DataArray]:
     """
@@ -511,8 +458,6 @@ def interpolated_timeseries_xarray(dates: xr.DataArray, series: List[xr.DataArra
     output_xr = []
     coords = series[0].coords
     for tim, date in enumerate(output_dates):
-        print(output[tim][0, 0, 0])
-        print(output[tim][0,500, 400])
         da = xr.DataArray(
             output[tim],
             dims=["band", "y", "x"],
@@ -712,28 +657,41 @@ def adaptive_gaussian(input_data : Union[numpy.ndarray, xr.DataArray], kernel_si
     w_sum = signal.convolve2d(w, np.ones((3, 3), dtype=dtype), boundary='symm', mode='same')
     w_sum += np.finfo(dtype).eps
 
-    print(input_data.values[0, 1:-1, 1:-1].shape)
-    print(input_data.values.shape)
     out = np.copy(input_np)
 
     for i in range(kernel_size):
         prod = w * input_np[0, 1:-1, 1:-1]
         conv = signal.convolve2d(prod, np.ones((3, 3), dtype=dtype), boundary='symm', mode='same')
-
-        print((conv / w_sum).shape)
         out[0, 1:-1, 1:-1] = conv / w_sum
     return xr.DataArray(out, dims=input_data.dims, coords=input_data.coords)
 
-def _pad_dataset_xarray(dataset, pad: tuple, pad_mode: str):
+def _pad_dataset_xarray(dataset : xr.DataArray, pad: tuple, pad_mode: str):
     """
-    To do
+    Pads a xarray dataset along spatial dimensions (x and y) based on the specified padding values and mode.
+    Padding can be applied using various modes such as constant, edge, reflect, etc., as supported by xarray.
+
+    Args:
+        dataset (xarray.Dataset): The input xarray dataset to be padded.
+                                  It is expected to have dimensions "band", "y", and "x".
+
+        pad (tuple): A tuple of two integers specifying the number of pixels to pad in the x and y dimensions.
+
+        pad_mode (str): The padding mode to use. Options include "constant", "edge", "reflect", etc.,
+                        as supported by xarray's `pad` method.
+
+    Returns:
+        xarray.Dataset: A new xarray dataset with the specified padding applied to the "x" and "y" dimensions.
+                        The "band" dimension remains unchanged.
+
+    Raises:
+        ValueError: If the `pad` tuple does not contain exactly two elements or if the padding mode is invalid.
+
     """
     # pad the dataset if necessary
     padx, pady = pad
     pad_width = {"band" : (0,0), "y": pady, "x": padx}
     pad_dataset = dataset.pad(pad_width=pad_width, mode=pad_mode)
 
-    # dataset = xr.DataArray(dataset, dims=src.dims, coords=src.coords)
     return pad_dataset
 
 def svf(input_data : Union[numpy.ndarray, xr.DataArray], pad_mode : str, radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> Union[numpy.ndarray, xr.DataArray]:

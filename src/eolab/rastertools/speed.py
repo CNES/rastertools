@@ -9,7 +9,6 @@ import logging.config
 from pathlib import Path
 from typing import List
 
-import numpy
 import rasterio
 
 from eolab.rastertools import utils

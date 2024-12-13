@@ -12,12 +12,11 @@ import numpy as np
 
 import rasterio
 import rioxarray
-from rasterio.windows import Window
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, Windowable
 from eolab.rastertools.processing import algo
-from eolab.rastertools.processing import RasterProcessing, compute_sliding
+from eolab.rastertools.processing import RasterProcessing
 from eolab.rastertools.product import RasterProduct
 
 _logger = logging.getLogger(__name__)
@@ -173,7 +172,7 @@ class Hillshade(Rastertool, Windowable):
                     # Hillshade computing
                     output = hillshade.compute(src).astype(dtype)
 
-                    ##Create the file and compute
+                    #Create the file and compute
                     output.rio.to_raster(output_image)
 
         return [output_image.as_posix()]

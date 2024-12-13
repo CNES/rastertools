@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import math
-
 from eolab.rastertools.processing import stats, vector
 
 from . import utils4test
@@ -86,6 +84,7 @@ def test_compute_zonal_extra_stats():
     [d.update({key: round(val, 6)})
      for geom_stats in statistics for d in geom_stats for key, val in d.items()]
 
+    # ref is the following
     ref = [[{'sum': 195899.96875, 'median': 0.636118, 'range': 2.0,
              'percentile_5': 0.15373, 'mad': 0.218207, 'majority': -1.0,
              'minority': -0.996727, 'unique': 285995,
@@ -98,7 +97,7 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.12968, 'mad': 0.146711, 'majority': -1.0,
              'minority': -0.993174, 'unique': 12189,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 56049.855469, 'median': 0.668857, 'range': 2.0,
+           [{'sum': 56049.859375, 'median': 0.668857, 'range': 2.0,
              'percentile_5': 0.154594, 'mad': 0.148523, 'majority': 1.0,
              'minority': -0.977465, 'unique': 83944,
              'nodata': 245, 'valid': 0.997214}],
@@ -106,27 +105,27 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.358831, 'mad': 0.143713, 'majority': 0.6,
              'minority': 0.088869, 'unique': 13137,
              'nodata': 244, 'valid': 0.981971}],
-           [{'sum': 30402.615234, 'median': 0.753216, 'range': 1.656766,
+           [{'sum': 30402.613281, 'median': 0.753216, 'range': 1.656766,
              'percentile_5': 0.433678, 'mad': 0.124387, 'majority': 1.0,
              'minority': -0.656766, 'unique': 40146,
              'nodata': 85, 'valid': 0.997948}],
-           [{'sum': 31683.021484, 'median': 0.471969, 'range': 1.927374,
+           [{'sum': 31683.017578, 'median': 0.471969, 'range': 1.927374,
              'percentile_5': 0.110149, 'mad': 0.168122, 'majority': 0.5,
              'minority': -0.927374, 'unique': 63745,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 56840.179688, 'median': 0.629144, 'range': 2.0,
+           [{'sum': 56840.1875, 'median': 0.629144, 'range': 2.0,
              'percentile_5': 0.134994, 'mad': 0.188218, 'majority': -1.0,
              'minority': -0.993671, 'unique': 89338,
              'nodata': 85, 'valid': 0.99909}],
-           [{'sum': 30468.533203, 'median': 0.619463, 'range': 2.0,
+           [{'sum': 30468.535156, 'median': 0.619463, 'range': 2.0,
              'percentile_5': 0.15824, 'mad': 0.161906, 'majority': -1.0,
              'minority': -0.991903, 'unique': 49427,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 44829.199219, 'median': 0.704596, 'range': 2.0,
+           [{'sum': 44829.203125, 'median': 0.704596, 'range': 2.0,
              'percentile_5': 0.307304, 'mad': 0.169161, 'majority': 1.0,
              'minority': -0.969231, 'unique': 61646,
              'nodata': 337, 'valid': 0.994777}],
-           [{'sum': 58079.578125, 'median': 0.727142, 'range': 2.0,
+           [{'sum': 58079.574219, 'median': 0.727142, 'range': 2.0,
              'percentile_5': 0.211673, 'mad': 0.138837, 'majority': 1.0,
              'minority': -0.962406, 'unique': 79181,
              'nodata': 0, 'valid': 1.0}],
@@ -134,7 +133,7 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.241052, 'mad': 0.153867, 'majority': 0.941176,
              'minority': -0.206738, 'unique': 4007,
              'nodata': 62, 'valid': 0.984878}],
-           [{'sum': 17599.697266, 'median': 0.586743, 'range': 1.83908,
+           [{'sum': 17599.695312, 'median': 0.586743, 'range': 1.83908,
              'percentile_5': 0.255563, 'mad': 0.168826, 'majority': 1.0,
              'minority': -0.83908, 'unique': 28731,
              'nodata': 290, 'valid': 0.990177}],
@@ -142,11 +141,11 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.121661, 'mad': 0.177506, 'majority': -1.0,
              'minority': -0.996276, 'unique': 165519,
              'nodata': 55, 'valid': 0.99969}],
-           [{'sum': 10982.207031, 'median': 0.647735, 'range': 0.961919,
+           [{'sum': 10982.208008, 'median': 0.647735, 'range': 0.961919,
              'percentile_5': 0.135674, 'mad': 0.24678, 'majority': 1.0,
              'minority': 0.038081, 'unique': 17550,
              'nodata': 337, 'valid': 0.98139}],
-           [{'sum': 89315.609375, 'median': 0.491085, 'range': 2.0,
+           [{'sum': 89315.601562, 'median': 0.491085, 'range': 2.0,
              'percentile_5': 0.12513, 'mad': 0.170515, 'majority': -1.0,
              'minority': -0.995074, 'unique': 158615,
              'nodata': 0, 'valid': 1.0}],
@@ -154,7 +153,7 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.324657, 'mad': 0.142261, 'majority': -1.0,
              'minority': -0.974359, 'unique': 28279,
              'nodata': 0, 'valid': 1.0}],
-           [{'sum': 31228.533203, 'median': 0.564933, 'range': 2.0,
+           [{'sum': 31228.535156, 'median': 0.564933, 'range': 2.0,
              'percentile_5': 0.111111, 'mad': 0.227924, 'majority': -1.0,
              'minority': -0.962085, 'unique': 54423,
              'nodata': 0, 'valid': 1.0}],
@@ -162,12 +161,9 @@ def test_compute_zonal_extra_stats():
              'percentile_5': 0.231518, 'mad': 0.16068, 'majority': -1.0,
              'minority': -0.991091, 'unique': 34565,
              'nodata': 259, 'valid': 0.992713}]]
-    # ref is the following
 
     for geom_stats, ref_stats in zip(statistics, ref):
         for i, band in enumerate(bands):
-            print(geom_stats[i]['sum'])
-            print(ref_stats[i]['sum'])
             assert geom_stats[i] == ref_stats[i]
 
 

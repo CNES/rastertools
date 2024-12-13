@@ -5,7 +5,6 @@ This module defines a rastertool named Tiling that generates tiles a raster imag
 a reference grid.
 """
 import logging
-import math
 from typing import List
 from pathlib import Path
 
@@ -208,7 +207,7 @@ class Tiling(Rastertool):
                     output_paths.append(output.as_posix())
 
                     _logger.info("Tile " + str(i) + " exported to " + str(output_paths))
-                    print(output)
+
                 except NoDataInBounds:  # if no overlap
                     _logger.error("Input shape " + str(i) + " does not overlap raster")
 
