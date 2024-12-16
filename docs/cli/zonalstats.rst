@@ -28,77 +28,69 @@ cities using:
                                 [--category_index CATEGORY_INDEX]
                                 [--category_names CATEGORY_NAMES]
                                 inputs [inputs ...]
-  
-  Compute zonal statistics of a raster image. Available statistics are: min max
-  range mean std percentile_x (x in [0, 100]) median mad count valid nodata sum
-  majority minority unique
-  
-  positional arguments:
-    inputs                Raster files to process. You can provide a single file
-                          with extension ".lst" (e.g. "zonalstats.lst") that
-                          lists the input files to process (one input file per
-                          line in .lst)
-  
-  optional arguments:
-    -h, --help            show this help message and exit
-    -o OUTPUT, --output OUTPUT
-                          Output dir where to store results (by default current
-                          dir)
-    -f OUTPUT_FORMAT, --format OUTPUT_FORMAT
-                          Output format of the results when input geometries are
-                          provided (by default ESRI Shapefile). Possible values
-                          are ESRI Shapefile, GeoJSON, CSV, GPKG, GML
-    -g GEOMETRIES, --geometry GEOMETRIES
-                          List of geometries where to compute statistics (vector
-                          like a shapefile or geojson)
-    -w, --within          When activated, statistics are computed for the
-                          geometries that are within the raster shape. The
-                          default behaviour otherwise is to compute statistics
-                          for all geometries that intersect the raster shape.
-    --stats STATS [STATS ...]
-                          List of stats to compute. Possible stats are: min max
-                          range mean std percentile_x (x in [0, 100]) median mad
-                          count valid nodata sum majority minority unique
-    --categorical         If the input raster is categorical (i.e. raster values
-                          represent discrete classes) compute the counts of
-                          every unique pixel values.
-    --valid_threshold VALID_THRESHOLD
-                          Minimum percentage of valid pixels in a shape to
-                          compute its statistics.
-    --area                Whether to multiply all stats by the area of a cell of
-                          the input raster.
-    --prefix PREFIX       Add a prefix to the keys (default: None). One prefix
-                          per band (e.g. 'band1 band2')
-    -b BANDS [BANDS ...], --bands BANDS [BANDS ...]
-                          List of bands to compute
-    -a, --all             Compute all bands
-  
-  Options to output the outliers:
-    --sigma SIGMA         Distance to the mean value (in sigma) in order to
-                          produce a raster that highlights outliers.
-  
-  Options to plot the generated stats:
-    -c CHARTFILE, --chart CHARTFILE
-                          Generate a chart per stat and per geometry
-                          (x=timestamp of the input products / y=stat value) and
-                          store it in the file defined by this argument
-    -d, --display         Display the chart
-    -gi GEOM_INDEX, --geometry-index GEOM_INDEX
-                          Name of the geometry index used for the chart
-                          (default='ID')
-  
-  Options to compute stats per category in geometry. If activated, the generated geometries will contain stats for every categories present in the geometry:
-    --category_file CATEGORY_FILE
-                          File (raster or geometries) containing discrete
-                          classes classifying the ROI.
-    --category_index CATEGORY_INDEX
-                          Column name identifying categories in categroy_file
-                          (only if file format is geometries)
-    --category_names CATEGORY_NAMES
-                          JSON files containing a dict with classes index as
-                          keys and names to display classes as values.
-  
-  By default only first band is computed.
+
+  Compute zonal statistics of a raster image.
+
+  Available statistics are: min, max, range, mean, std, percentile_x (x in [0,
+  100]), median, mad, count, valid, nodata, sum, majority, minority, unique.
+
+  By default, only the first band is computed unless specified otherwise.
+
+  Arguments:
+
+    inputs TEXT
+
+    Raster files to process. You can provide a single filewith extension
+    ".lst" (e.g. "zonalstats.lst") that lists the input files to process
+    (one input file per line in .lst)
+
+  Options:
+    -o, --output TEXT           Output directory to store results (by default
+                                current directory)
+    -f, --format TEXT           Output format of the results when input
+                                geometries are provided (by default ESRI
+                                Shapefile). Possible values are ESRI Shapefile,
+                                GeoJSON, CSV, GPKG, GML
+    -g, --geometry TEXT         List of geometries where to compute statistics
+                                (vector like a shapefile or geojson)
+    -w, --within                When activated, statistics are computed for the
+                                geometries that are within the raster shape. The
+                                default behaviour otherwise is to compute
+                                statistics for all geometries that intersect the
+                                raster shape.
+    --stats TEXT                List of stats to compute. Possible stats are:
+                                min max range mean std percentile_x (x in [0,
+                                100]) median mad count valid nodata sum majority
+                                minority unique
+    --categorical               If the input raster is categorical (i.e. raster
+                                values represent discrete classes) compute the
+                                counts of every unique pixel values.
+    --valid_threshold FLOAT     Minimum percentage of valid pixels in a shape to
+                                compute its statistics.
+    --area                      Whether to multiply all stats by the area of a
+                                cell of the input raster.
+    --prefix TEXT               Add a prefix to the keys (default: None). One
+                                prefix per band (e.g. 'band1 band2')
+    -b, --bands INTEGER         List of bands to process
+    -a, --all                   Process all bands
+    --sigma TEXT                Distance to the mean value (in sigma) in order
+                                to produce a raster that highlights outliers.
+    -c, --chart TEXT            Generate a chart per stat and per geometry
+                                (x=timestamp of the input products / y=stat
+                                value) and store it in the file defined by this
+                                argument
+    -d, --display               Display the chart
+    -gi, --geometry-index TEXT  Name of the geometry index used for the chart
+                                (default='ID')
+    --category_file TEXT        File (raster or geometries) containing discrete
+                                classes classifying the ROI.
+    --category_index TEXT       Column name identifying categories in
+                                categroy_file (only if file format is
+                                geometries)
+    --category_names TEXT       JSON files containing a dict with classes index
+                                as keys and names to display classes as values.
+    -h, --help                  Show this message and exit.
+
 
 When -g option is set with a valid geometries file, ``zonalstats`` generate a new vector file with the following metadata:
 

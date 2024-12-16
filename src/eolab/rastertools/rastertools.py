@@ -13,9 +13,12 @@ parts in order to distribute the processing over several cpus).
 """
 from abc import ABC
 from typing import List
+import logging
+import sys
 
 from eolab.rastertools import utils
 
+_logger = logging.getLogger(__name__)
 
 class RastertoolConfigurationException(Exception):
     """This class defines an exception that is raised when the configuration of the raster tool
@@ -41,7 +44,7 @@ class Rastertool(ABC):
 
     @property
     def outputdir(self) -> str:
-        """Output dir where to store results"""
+        """Path of the output directory where are stored the results"""
         return self._outputdir
 
     @property
@@ -66,8 +69,9 @@ class Rastertool(ABC):
             possible to chain the with... calls (fluent API)
         """
         if outputdir and not utils.is_dir(outputdir):
-            raise RastertoolConfigurationException(
-                f"Output directory \"{str(outputdir)}\" does not exist.")
+            _logger.exception(
+                RastertoolConfigurationException(f"Output directory \"{str(outputdir)}\" does not exist."))
+            sys.exit(2)
         self._outputdir = outputdir
         return self
 
@@ -99,7 +103,7 @@ class Rastertool(ABC):
             inputfiles ([str]): Input images to process
 
         Returns:
-            [str]: List of generated files
+            ([str]) The list of the generated files
         """
         all_outputs = []
         for filename in inputfiles:
@@ -109,6 +113,7 @@ class Rastertool(ABC):
 
         # add a postprocessing call
         outputs = self.postprocess_files(inputfiles, all_outputs)
+
         if outputs:
             all_outputs.extend(outputs)
         return all_outputs
@@ -167,8 +172,10 @@ class Windowable:
 
     @property
     def pad_mode(self) -> str:
-        """Mode for padding the image when windows are on the edge of the image
-        (See https://numpy.org/doc/stable/reference/generated/numpy.pad.html)"""
+        """
+        Mode used to `pad <https://numpy.org/doc/stable/reference/generated/numpy.pad.html>`_ the image when the window is on the edge of the image
+        The mode can be self defined or among [constant (default), edge, linear_ramp, maximum, mean, median, minimum, reflect, symmetric, wrap, empty].
+        """
         return self._pad_mode
 
     def with_windows(self, window_size: int = 1024, pad_mode: str = "edge"):
