@@ -28,6 +28,8 @@ if __name__ == "__main__":
                   'click',
                   'rasterio',
                   'pytest>=3.6',
+                  'rioxarray',
+                  'dask',
                   'pytest-cov',
                   'geopandas==0.13',
                   'kiwisolver==1.4.5',
