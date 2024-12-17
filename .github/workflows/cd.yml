@@ -13,8 +13,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/georastertools
+      name: pypi
     steps:
       - uses: actions/checkout@v4
 
@@ -41,5 +40,4 @@ jobs:
         with:
           user: __token__
           verbose: true
-          password: ${{ secrets.TEST_PYPI_PASSWORD }}
-          repository-url: https://test.pypi.org/legacy/
+          password: ${{ secrets.PYPI_PASSWORD }}
