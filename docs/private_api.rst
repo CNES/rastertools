@@ -1,10 +1,10 @@
-.. currentmodule:: eolab.rastertools
+.. currentmodule:: eolab.georastertools
 
 ===========
 Private API
 ===========
 
-This section describes the private API of rastertools.
+This section describes the private API of georastertools.
 
 .. autosummary::
   :toctree: api/
