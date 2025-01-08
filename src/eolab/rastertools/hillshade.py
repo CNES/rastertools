@@ -143,7 +143,7 @@ class Hillshade(Rastertool, Windowable):
             "hillshade",
             algo=algo.hillshade,
             nodata=255,
-            dtype=np.int8,
+            dtype=np.uint8,
             in_dtype=np.float32,
             nbits=1,
             compress="lzw",
