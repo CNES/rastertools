@@ -110,7 +110,7 @@ class Hillshade(Rastertool, Windowable):
         # radius represents the max distance of buildings that can create a hillshade
         # considering the sun elevation.
         # Any valid DEM value should be between these boundaries
-        wmin, wmax = np.iinfo(np.int64).max, np.iinfo(np.int64).min
+        wmin, wmax = np.finfo(np.float64).max, np.finfo(np.float64).min
         with rasterio.open(inputfile) as src:
             if src.count != 1:
                 raise ValueError("Invalid input file, it must contain a single band.")
