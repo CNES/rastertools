@@ -32,15 +32,45 @@ that configure the filter. Type option --help to get the definition of the argum
                                               [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
                                               [-b BANDS [BANDS ...]] [-a]
                                               inputs [inputs ...]
-  
+
+  Execute the requested filter on the input files with the specified
+  parameters. The `inputs` argument can either be a single file or a `.lst`
+  file containing a list of input files.
+
+  Arguments:
+
+      inputs TEXT
+
+      Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). You can
+      provide a single file with extension ".lst" (e.g. "filtering.lst") that
+      lists the input files to process (one input file per line in .lst).
+
+  Options:
+      --sigma INTEGER                 Standard deviation of the Gaussian
+                                      distribution  [required]
+      -a, --all                       Process all bands
+      -b, --bands INTEGER             List of bands to process
+      -p, --pad [none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap]
+                                      Pad to use around the image, default : edge(see
+                                      https://numpy.org/doc/stable/reference/generated/numpy.pad.html
+                                      for more information)
+      -ws, --window_size INTEGER      Size of tiles to distribute processing,
+                                      default: 1024
+      -o, --output TEXT               Output directory to store results (by
+                                      default current directory)
+      --kernel_size INTEGER           Kernel size of the filter function, e.g. 3
+                                      means a square of 3x3 pixels on which the
+                                      filter function is computed (default: 8)
+      -h, --help                      Show this message and exit.
+
   Apply an adaptive (Local gaussian of 3x3) recursive filter on the input image
-  
+
   positional arguments:
     inputs                Input file to process (e.g. Sentinel2 L2A MAJA from
                           THEIA). You can provide a single file with extension
                           ".lst" (e.g. "filtering.lst") that lists the input
                           files to process (one input file per line in .lst)
-  
+
   optional arguments:
     -h, --help            show this help message and exit
     --kernel_size KERNEL_SIZE
@@ -61,7 +91,7 @@ that configure the filter. Type option --help to get the definition of the argum
     -b BANDS [BANDS ...], --bands BANDS [BANDS ...]
                           List of bands to compute
     -a, --all             Compute all bands
-  
+
   By default only first band is computed.
 
 Examples:
