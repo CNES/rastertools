@@ -26,7 +26,7 @@ from eolab.rastertools.timeseries import Timeseries
 # import rastertool Zonalstats
 from eolab.rastertools.zonalstats import Zonalstats
 # import the method to run a rastertool
-from eolab.rastertools.main import run_tool, add_custom_rastertypes
+from eolab.rastertools.main import rastertools, add_custom_rastertypes
 
 __all__ = [
     "RastertoolConfigurationException", "Rastertool", "Windowable",

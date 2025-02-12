@@ -5,99 +5,79 @@ CLI definition for the timeseries tool
 """
 from datetime import datetime
 
-import eolab.rastertools.cli as cli
-from eolab.rastertools import RastertoolConfigurationException, Timeseries
+from eolab.rastertools import Timeseries
+from eolab.rastertools.cli.utils_cli import apply_process, win_opt, all_opt, band_opt
+from eolab.rastertools import RastertoolConfigurationException
+import click
+import sys
+import os
+import logging
 
+_logger = logging.getLogger(__name__)
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
-def create_argparser(rastertools_parsers):
-    """Adds the timeseries subcommand to the given rastertools subparser
+#Timeseries command
+@click.command("timeseries",context_settings=CONTEXT_SETTINGS)
+@click.argument('inputs', type=str, nargs = -1, required = 1)
 
-    Args:
-        rastertools_parsers:
-            The rastertools subparsers to which this subcommand shall be added.
+@click.option('-o','--output', default = os.getcwd(), help="Output directory to store results (by default current directory)")
 
-            This argument provides from a code like this::
+@click.option("-s","--start_date", help="Start date of the timeseries to generate in the following format: yyyy-MM-dd")
 
-                import argparse
-                main_parser = argparse.ArgumentParser()
-                rastertools_parsers = main_parser.add_subparsers()
-                timeseries.create_argparser(rastertools_parsers)
+@click.option("-e", "--end_date", help="End date of the timeseries to generate in the following format: yyyy-MM-dd")
 
-    Returns:
-        The rastertools subparsers updated with this subcommand
-    """
-    parser = rastertools_parsers.add_parser(
-        "timeseries", aliases=["ts"],
-        help="Temporal gap filling of an image time series",
-        description="Generate a timeseries of images (without gaps) from a set of input images. "
-                    "Data not present in the input images (no image for the date or masked data) "
-                    "are interpolated (with linear interpolation) so that all gaps are filled.",
-        epilog="By default only first band is computed.")
-    parser.add_argument(
-        "inputs",
-        nargs='+',
-        help="Input files to process (e.g. Sentinel2 L2A MAJA from THEIA). "
-             "You can provide a single file with extension \".lst\" (e.g. \"speed.lst\") "
-             "that lists the input files to process (one input file per line in .lst)")
-    cli.with_bands_arguments(parser)
-    cli.with_outputdir_arguments(parser)
-    parser.add_argument(
-        "-s",
-        "--start_date",
-        help="Start date of the timeseries to generate in the following format: yyyy-MM-dd")
-    parser.add_argument(
-        "-e",
-        "--end_date",
-        help="End date of the timeseries to generate in the following format: yyyy-MM-dd")
-    parser.add_argument(
-        "-p",
-        "--time_period",
-        type=int,
-        help="Time period (number of days) between two consecutive images in the timeseries "
+@click.option("-p", "--time_period",type=int, help="Time period (number of days) between two consecutive images in the timeseries "
              "to generate e.g. 10 = generate one image every 10 days")
-    cli.with_window_arguments(parser, pad=False)
 
-    # set the function to call when this subcommand is called
-    parser.set_defaults(func=create_timeseries)
+@band_opt
+@all_opt
+@win_opt
+@click.pass_context
 
-    return rastertools_parsers
-
-
-def create_timeseries(args) -> Timeseries:
-    """Create and configure a new rastertool "Timeseries" according to argparse args
-
-    Args:
-        args: args extracted from command line
-
-    Returns:
-        :obj:`eolab.rastertools.Timeseries`: The configured rastertool to run
+def timeseries(ctx, inputs : list, bands : list, all_bands : bool, output : str, start_date : str, end_date : str, time_period : int, window_size : int) :
     """
+    Generate a timeseries of images (without gaps) from a set of input images.
+    Data not present in the input images (e.g., missing images for specific dates or masked data) are interpolated
+    (with linear interpolation) so that all gaps in the timeseries are filled.
 
+    This command is useful for generating continuous timeseries data, even when some input images are missing
+    or contain masked values.
+
+    Arguments:
+
+    inputs TEXT
+
+        Input file to process (e.g. Sentinel2 L2A MAJA from THEIA).
+    You can provide a single file with extension \".lst\" (e.g. \"speed.lst\") that lists
+    the input files to process (one input file per line in .lst).
+    """
     # get the bands to process
-    if args.all_bands:
+    if all_bands:
         bands = None
     else:
-        bands = list(map(int, args.bands)) if args.bands else [1]
+        bands = list(map(int, bands)) if bands else [1]
 
     # convert start/end dates to datetime
     try:
-        start_date = datetime.strptime(args.start_date, "%Y-%m-%d")
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
     except Exception:
-        raise RastertoolConfigurationException(
-            f"Invalid format for start date: {args.start_date} (must be %Y-%m-%d)")
+        _logger.exception(RastertoolConfigurationException(
+            f"Invalid format for start date: {start_date} (must be %Y-%m-%d)"))
+        sys.exit(2)
 
     # convert start/end dates to datetime
     try:
-        end_date = datetime.strptime(args.end_date, "%Y-%m-%d")
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
     except Exception:
-        raise RastertoolConfigurationException(
-            f"Invalid format for end date: {args.end_date} (must be %Y-%m-%d)")
+        _logger.exception(RastertoolConfigurationException(
+            f"Invalid format for end date: {end_date} (must be %Y-%m-%d)"))
+        sys.exit(2)
 
     # create the rastertool object
-    tool = Timeseries(start_date, end_date, args.time_period, bands)
+    tool = Timeseries(start_date, end_date, time_period, bands)
 
     # set up config with args values
-    tool.with_output(args.output)
-    tool.with_windows(args.window_size)
+    tool.with_output(output)
+    tool.with_windows(window_size)
 
-    return tool
+    apply_process(ctx, tool, inputs)

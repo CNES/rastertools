@@ -11,6 +11,7 @@ from pathlib import Path
 import rasterio
 import rasterio.mask
 import geopandas as gpd
+import sys
 
 from eolab.rastertools import utils
 from eolab.rastertools import Rastertool, RastertoolConfigurationException
@@ -119,21 +120,24 @@ class Tiling(Rastertool):
         # Test if id_column is defined when ids are set
         if id_column is not None:
             if id_column not in self._grid.columns:
-                raise RastertoolConfigurationException(
-                    f"Invalid id column named \"{id_column}\": it does not exist in the grid")
+                _logger.exception(RastertoolConfigurationException(
+                    f"Invalid id column named \"{id_column}\": it does not exist in the grid"))
+                sys.exit(2)
             self._grid = self._grid.set_index(id_column)
 
         if ids is not None:
             if id_column is None:
-                raise RastertoolConfigurationException(
-                    "Ids cannot be specified when id_col is not defined")
+                _logger.exception(RastertoolConfigurationException(
+                    "Ids cannot be specified when id_col is not defined"))
+                sys.exit(2)
 
             self._grid = self._grid[self._grid.index.isin(ids)]
             if self._grid.empty:
                 # if no id common between grid and given ids
-                raise RastertoolConfigurationException(
+                _logger.exception(RastertoolConfigurationException(
                     f"No value in the grid column \"{id_column}\" are matching "
-                    f"the given list of ids {str(ids)}")
+                    f"the given list of ids {str(ids)}"))
+                sys.exit(2)
             else:
                 invalid_ids = [i for i in ids if i not in self._grid.index]
                 if len(invalid_ids) > 0:
@@ -164,10 +168,16 @@ class Tiling(Rastertool):
             outputs = []
             with product.open() as dataset:
                 out_meta = dataset.meta
+                nodata = dataset.nodata
 
                 # Crop and export every tiles
                 for shape, i in zip(grid.geometry, grid.index):
                     _logger.info("Crop and export tile " + str(i) + "...")
+
+                    # Dictionary to store statistics for each band
+                    band_stats = {i: {"min": float('inf'), "max": float('-inf'), "mean": 0, "stddev": 0, "val_per": 0}
+                                  for i in range(1, dataset.meta["count"] + 1)}
+
                     try:
                         # generate crop image
                         image, transform = rasterio.mask.mask(dataset, [shape],
@@ -189,12 +199,37 @@ class Tiling(Rastertool):
                                          "width": image.shape[2],
                                          "transform": transform})
 
+
                         with rasterio.open(output, 'w', **out_meta) as dst:
                             dst.write(image)
+
+                            for bd in range(1, dataset.meta["count"] + 1):
+                                # Update statistics
+                                valid_pixels = image[bd-1][image[bd-1] != nodata]
+
+
+                                band_stats[bd]["min"] = valid_pixels.min()
+                                band_stats[bd]["max"] = valid_pixels.max()
+                                band_stats[bd]["mean"] = valid_pixels.sum() / valid_pixels.size
+                                variance = (((valid_pixels - band_stats[bd]["mean"])**2).sum()) / valid_pixels.size
+                                band_stats[bd]["stddev"] = variance ** 0.5 if variance > 0 else 0
+
+                                val_per = valid_pixels.size / image[bd-1].size * 100
+                                if int(val_per) == 100 :
+                                    band_stats[bd]["val_per"] = int(val_per)
+                                else:
+                                    band_stats[bd]["val_per"] = round(val_per,2)
+
+                                dst.update_tags(bd,
+                                                STATISTICS_MINIMUM=f"{band_stats[bd]['min']:.14g}",
+                                                STATISTICS_MAXIMUM=f"{band_stats[bd]['max']:.14g}",
+                                                STATISTICS_MEAN=f"{band_stats[bd]['mean']:.14g}",
+                                                STATISTICS_STDDEV=f"{band_stats[bd]['stddev']:.14g}",
+                                                STATISTICS_VALID_PERCENT= band_stats[bd]['val_per'])
 
                         outputs.append(output.as_posix())
                         _logger.info("Tile " + str(i) + " exported to " + str(output))
                     except ValueError:  # if no overlap
                         _logger.error("Input shape " + str(i) + " does not overlap raster")
 
-            return outputs
+        return outputs

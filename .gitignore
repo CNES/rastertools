@@ -5,7 +5,6 @@
 # Distribution / packaging 
 .Python build/ 
 develop-eggs/ 
-dist/ 
 downloads/ 
 eggs/ 
 .eggs/ 
@@ -15,10 +14,11 @@ parts/
 sdist/ 
 var/ 
 wheels/ 
-*.whl
+dist/
 *.egg-info/ 
 .installed.cfg 
 *.egg 
+*.whl
 *.manifest 
 *.spec 
 

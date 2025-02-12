@@ -9,7 +9,11 @@ This module defines several utility methods for:
 - ...
 """
 import math
+import tempfile
 from pathlib import Path
+
+import rasterio
+from osgeo import gdal
 
 
 def to_tuple(val):

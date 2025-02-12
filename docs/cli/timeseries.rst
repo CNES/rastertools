@@ -21,39 +21,39 @@ and may thus contain the same gaps as the input raster.
                                 [-s START_DATE] [-e END_DATE] [-p TIME_PERIOD]
                                 [-ws WINDOW_SIZE]
                                 inputs [inputs ...]
-  
+
   Generate a timeseries of images (without gaps) from a set of input images.
-  Data not present in the input images (no image for the date or masked data)
-  are interpolated (with linear interpolation) so that all gaps are filled.
-  
-  positional arguments:
-    inputs                Input files to process (e.g. Sentinel2 L2A MAJA from
-                          THEIA). You can provide a single file with extension
-                          ".lst" (e.g. "speed.lst") that lists the input files
-                          to process (one input file per line in .lst)
-  
-  optional arguments:
-    -h, --help            show this help message and exit
-    -b BANDS [BANDS ...], --bands BANDS [BANDS ...]
-                          List of bands to compute
-    -a, --all             Compute all bands
-    -o OUTPUT, --output OUTPUT
-                          Output dir where to store results (by default current
-                          dir)
-    -s START_DATE, --start_date START_DATE
-                          Start date of the timeseries to generate in the
-                          following format: yyyy-MM-dd
-    -e END_DATE, --end_date END_DATE
-                          End date of the timeseries to generate in the
-                          following format: yyyy-MM-dd
-    -p TIME_PERIOD, --time_period TIME_PERIOD
-                          Time period (number of days) between two consecutive
-                          images in the timeseries to generate e.g. 10 =
-                          generate one image every 10 days
-    -ws WINDOW_SIZE, --window_size WINDOW_SIZE
-                          Size of tiles to distribute processing, default: 1024
-  
-  By default only first band is computed.
+  Data not present in the input images (e.g., missing images for specific
+  dates or masked data) are interpolated (with linear interpolation) so that
+  all gaps in the timeseries are filled.
+
+  This command is useful for generating continuous timeseries data, even when
+  some input images are missing or contain masked values.
+
+  Arguments:
+
+      inputs TEXT
+
+          Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). You can
+          provide a single file with extension ".lst" (e.g. "speed.lst") that
+          lists the input files to process (one input file per line in .lst).
+
+  Options:
+      -b, --bands LIST            List of bands to process
+      -a, --all                   Process all bands
+      -o, --output TEXT           Output directory to store results (by default
+                                  current directory)
+      -s, --start_date TEXT       Start date of the timeseries to generate in the
+                                  following format: yyyy-MM-dd
+      -e, --end_date TEXT         End date of the timeseries to generate in the
+                                  following format: yyyy-MM-dd
+      -p, --time_period INTEGER   Time period (number of days) between two
+                                  consecutive images in the timeseries to generate
+                                  e.g. 10 = generate one image every 10 days
+      -ws, --window_size INTEGER  Size of tiles to distribute processing, default:
+                                  1024
+      -h, --help                  Show this message and exit.
+
 
 .. warning::
   At least two input rasters must be given. The rasters must match one of the configured raster types,

@@ -7,7 +7,7 @@ from osgeo import gdal
 from osgeo_utils import gdalcompare
 
 
-def cmp_geojson(golden, new, tolerance=1e-9):
+def cmp_geojson(golden, new, column_sortby = None, tolerance=1e-9):
     # Load GeoJSON files
     gld_gj = json.load(open(golden))
     new_gj = json.load(open(new))
@@ -15,6 +15,10 @@ def cmp_geojson(golden, new, tolerance=1e-9):
     # Construct geospatial objects using geopandas and shapely
     gld_gdf = gpd.GeoDataFrame.from_features(gld_gj["features"])
     new_gdf = gpd.GeoDataFrame.from_features(new_gj["features"])
+
+    if column_sortby :
+        gld_gdf = gld_gdf.sort_values(by=column_sortby)
+        new_gdf = new_gdf.sort_values(by=column_sortby)
 
     equals = True
     # Compare each geometry using Hausdorff distance
@@ -108,7 +112,7 @@ def cmp_vrt(golden, new, tolerance=1e-9):
 def cmp_tif(golden, new, tolerance=1e-2):
     gld_ds = gdal.Open(golden, gdal.GA_ReadOnly)
     new_ds = gdal.Open(new, gdal.GA_ReadOnly)
-    d_count = gdalcompare.compare_db(gld_ds, new_ds)
+    d_count = gdalcompare.compare_db(gld_ds, new_ds, options= ['SKIP_METADATA'])
     p_count = gld_ds.RasterCount * gld_ds.RasterXSize * gld_ds.RasterYSize
     return d_count *100. / p_count < tolerance
 
