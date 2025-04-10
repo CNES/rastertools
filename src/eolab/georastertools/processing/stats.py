@@ -71,20 +71,21 @@ def compute_zonal_stats(geoms: gpd.GeoDataFrame, image: str,
     """
     nb_geoms = len(geoms)
 
-    src = rasterio.open(image)
-    geom_gen = (geoms.iloc[i].geometry for i in range(nb_geoms))
-    geom_windows = ((geom, features.geometry_window(src, [geom])) for geom in geom_gen)
+    with rasterio.open(image) as src:
 
-    statistics = []
-    disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
-    for geom, window in tqdm(geom_windows, total=nb_geoms, disable=disable, desc="zonalstats"):
-        data = src.read(bands, window=window)
-        transform = src.window_transform(window)
+        geom_gen = (geoms.iloc[i].geometry for i in range(nb_geoms))
+        geom_windows = ((geom, features.geometry_window(src, [geom])) for geom in geom_gen)
 
-        s = _compute_stats((data, transform, [geom], window),
-                           src.nodata, stats, categorical)
-        statistics.append(s)
-    src.close()
+        statistics = []
+        disable = os.getenv("RASTERTOOLS_NOTQDM", 'False').lower() in ['true', '1']
+        for geom, window in tqdm(geom_windows, total=nb_geoms, disable=disable, desc="zonalstats"):
+            data = src.read(bands, window=window)
+            transform = src.window_transform(window)
+
+            s = _compute_stats((data, transform, [geom], window),
+                               src.nodata, stats, categorical)
+            statistics.append(s)
+
     return statistics
 
 

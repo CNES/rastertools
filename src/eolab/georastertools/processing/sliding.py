@@ -55,47 +55,46 @@ def compute_sliding(input_image: str, output_image: str, rasterprocessing: Raste
     """
     with rasterio.Env(GDAL_VRT_ENABLE_PYTHON=True):
 
-        src = rasterio.open(input_image)
-        profile = src.profile
+        with rasterio.open(input_image) as src:
+            profile = src.profile
 
-        # set block size
-        blockxsize, blockysize = window_size
-        if src.width < blockxsize:
-            blockxsize = utils.highest_power_of_2(src.width)
-        if src.height < blockysize:
-            blockysize = utils.highest_power_of_2(src.height)
+            # set block size
+            blockxsize, blockysize = window_size
+            if src.width < blockxsize:
+                blockxsize = utils.highest_power_of_2(src.width)
+            if src.height < blockysize:
+                blockysize = utils.highest_power_of_2(src.height)
 
-        # dtype and creation options of output data
-        dtype = rasterprocessing.dtype or rasterio.float32
-        in_dtype = rasterprocessing.in_dtype or dtype
-        nbits = rasterprocessing.nbits
-        compress = rasterprocessing.compress or src.compression or 'lzw'
-        nodata = rasterprocessing.nodata or src.nodata
+            # dtype and creation options of output data
+            dtype = rasterprocessing.dtype or rasterio.float32
+            in_dtype = rasterprocessing.in_dtype or dtype
+            nbits = rasterprocessing.nbits
+            compress = rasterprocessing.compress or src.compression or 'lzw'
+            nodata = rasterprocessing.nodata or src.nodata
 
-        # check band index and handle all bands options (when bands is an empty list)
-        if bands is None or len(bands) == 0:
-            bands = src.indexes
-        elif min(bands) < 1 or max(bands) > src.count:
-            raise ValueError(f"Invalid bands, all values are not in range [1, {src.count}]")
+            # check band index and handle all bands options (when bands is an empty list)
+            if bands is None or len(bands) == 0:
+                bands = src.indexes
+            elif min(bands) < 1 or max(bands) > src.count:
+                raise ValueError(f"Invalid bands, all values are not in range [1, {src.count}]")
 
-        # setup profile for output image
-        profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
-                       tiled=True, dtype=dtype, nbits=nbits, compress=compress,
-                       nodata=nodata, count=len(bands))
+            # setup profile for output image
+            profile.update(driver='GTiff', blockxsize=blockxsize, blockysize=blockysize,
+                           tiled=True, dtype=dtype, nbits=nbits, compress=compress,
+                           nodata=nodata, count=len(bands))
 
-        with rasterio.open(output_image, "w", **profile):
-            # file is created
-            pass
+            with rasterio.open(output_image, "w", **profile):
+                # file is created
+                pass
 
-        # create the generator of sliding windows
-        sliding_gen = _sliding_windows((src.width, src.height),
-                                       window_size, window_overlap)
+            # create the generator of sliding windows
+            sliding_gen = _sliding_windows((src.width, src.height),
+                                           window_size, window_overlap)
 
-        if rasterprocessing.per_band_algo:
-            sliding_windows_bands = [(w, [b]) for w in sliding_gen for b in bands]
-        else:
-            sliding_windows_bands = [(w, bands) for w in sliding_gen]
-        src.close()
+            if rasterprocessing.per_band_algo:
+                sliding_windows_bands = [(w, [b]) for w in sliding_gen for b in bands]
+            else:
+                sliding_windows_bands = [(w, bands) for w in sliding_gen]
 
     m = multiprocessing.Manager()
     write_lock = m.Lock()

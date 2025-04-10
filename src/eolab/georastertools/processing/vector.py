@@ -67,24 +67,24 @@ def filter(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
 
     file = raster.as_posix() if isinstance(raster, Path) else raster
 
-    dataset = rasterio.open(file)
-    l, b, r, t = dataset.bounds
-    px, py = ([l, l, r, r], [b, t, t, b])
+    with rasterio.open(file) as dataset:
+        l, b, r, t = dataset.bounds
+        px, py = ([l, l, r, r], [b, t, t, b])
 
-    if(geoms_crs != dataset.crs):
-        px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
+        if(geoms_crs != dataset.crs):
+            px, py = warp.transform(dataset.crs, geoms_crs, [l, l, r, r], [b, t, t, b])
 
-    polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
-    if within:
-        # convert geometries into GeoPandasBaseExtended to use the new cix property
-        filtered_geoms = geometries[geometries.within(polygon)]
-    else:
-        filtered_geoms = geometries[geometries.intersects(polygon)]
+        polygon = shapely.geometry.Polygon([(x, y) for x, y in zip(px, py)])
+        if within:
+            # convert geometries into GeoPandasBaseExtended to use the new cix property
+            filtered_geoms = geometries[geometries.within(polygon)]
+        else:
+            filtered_geoms = geometries[geometries.intersects(polygon)]
 
-    if output:
-        outfile = output.as_posix() if isinstance(output, Path) else output
-        filtered_geoms.to_file(outfile, driver=driver)
-    dataset.close()
+        if output:
+            outfile = output.as_posix() if isinstance(output, Path) else output
+            filtered_geoms.to_file(outfile, driver=driver)
+
     return filtered_geoms
 
 
@@ -133,7 +133,7 @@ def clip(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
             outfile = output.as_posix() if isinstance(output, Path) else output
             clipped_geoms.to_file(outfile, driver=driver)
 
-        return clipped_geoms
+    return clipped_geoms
 
 
 def reproject(geoms: Union[gpd.GeoDataFrame, Path, str], raster: Union[Path, str],
@@ -319,25 +319,24 @@ def crop(input_image: Union[Path, str], roi: Union[gpd.GeoDataFrame, Path, str],
     geometries = reproject(dissolve(roi), pinput)
     geom_bounds = geometries.total_bounds
 
-    raster = rasterio.open(pinput)
-    rst_bounds = raster.bounds
-    bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
-              math.floor(max(rst_bounds[1], geom_bounds[1])),
-              math.ceil(min(rst_bounds[2], geom_bounds[2])),
-              math.ceil(min(rst_bounds[3], geom_bounds[3])))
-    geotransform = raster.get_transform()
-    width = np.abs(geotransform[1])
-    height = np.abs(geotransform[5])
+    with rasterio.open(pinput) as raster:
+        rst_bounds = raster.bounds
+        bounds = (math.floor(max(rst_bounds[0], geom_bounds[0])),
+                  math.floor(max(rst_bounds[1], geom_bounds[1])),
+                  math.ceil(min(rst_bounds[2], geom_bounds[2])),
+                  math.ceil(min(rst_bounds[3], geom_bounds[3])))
+        geotransform = raster.get_transform()
+        width = np.abs(geotransform[1])
+        height = np.abs(geotransform[5])
 
-    ds = gdal.Warp(destNameOrDestDS=poutput,
-                   srcDSOrSrcDSTab=pinput,
-                   outputBounds=bounds, targetAlignedPixels=True,
-                   cutlineDSName=roi,
-                   cropToCutline=False,
-                   xRes=width, yRes=height,
-                   format="VRT")
-    del ds
-    raster.close()
+        ds = gdal.Warp(destNameOrDestDS=poutput,
+                       srcDSOrSrcDSTab=pinput,
+                       outputBounds=bounds, targetAlignedPixels=True,
+                       cutlineDSName=roi,
+                       cropToCutline=False,
+                       xRes=width, yRes=height,
+                       format="VRT")
+        del ds
 
 
 
