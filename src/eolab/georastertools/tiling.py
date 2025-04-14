@@ -174,10 +174,6 @@ class Tiling(Rastertool):
                 for shape, i in zip(grid.geometry, grid.index):
                     _logger.info("Crop and export tile " + str(i) + "...")
 
-                    # Dictionary to store statistics for each band
-                    band_stats = {i: {"min": float('inf'), "max": float('-inf'), "mean": 0, "stddev": 0, "val_per": 0}
-                                  for i in range(1, dataset.meta["count"] + 1)}
-
                     try:
                         # generate crop image
                         image, transform = rasterio.mask.mask(dataset, [shape],
@@ -202,30 +198,6 @@ class Tiling(Rastertool):
 
                         with rasterio.open(output, 'w', **out_meta) as dst:
                             dst.write(image)
-
-                            for bd in range(1, dataset.meta["count"] + 1):
-                                # Update statistics
-                                valid_pixels = image[bd-1][image[bd-1] != nodata]
-
-
-                                band_stats[bd]["min"] = valid_pixels.min()
-                                band_stats[bd]["max"] = valid_pixels.max()
-                                band_stats[bd]["mean"] = valid_pixels.sum() / valid_pixels.size
-                                variance = (((valid_pixels - band_stats[bd]["mean"])**2).sum()) / valid_pixels.size
-                                band_stats[bd]["stddev"] = variance ** 0.5 if variance > 0 else 0
-
-                                val_per = valid_pixels.size / image[bd-1].size * 100
-                                if int(val_per) == 100 :
-                                    band_stats[bd]["val_per"] = int(val_per)
-                                else:
-                                    band_stats[bd]["val_per"] = round(val_per,2)
-
-                                dst.update_tags(bd,
-                                                STATISTICS_MINIMUM=f"{band_stats[bd]['min']:.14g}",
-                                                STATISTICS_MAXIMUM=f"{band_stats[bd]['max']:.14g}",
-                                                STATISTICS_MEAN=f"{band_stats[bd]['mean']:.14g}",
-                                                STATISTICS_STDDEV=f"{band_stats[bd]['stddev']:.14g}",
-                                                STATISTICS_VALID_PERCENT= band_stats[bd]['val_per'])
 
                         outputs.append(output.as_posix())
                         _logger.info("Tile " + str(i) + " exported to " + str(output))
