@@ -61,17 +61,15 @@ def timeseries(ctx, inputs : list, bands : list, all_bands : bool, output : str,
     try:
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
     except Exception:
-        _logger.exception(RastertoolConfigurationException(
-            f"Invalid format for start date: {start_date} (must be %Y-%m-%d)"))
-        sys.exit(2)
+        raise RastertoolConfigurationException(
+            f"Invalid format for start date: {start_date} (must be %Y-%m-%d)")
 
     # convert start/end dates to datetime
     try:
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
     except Exception:
-        _logger.exception(RastertoolConfigurationException(
-            f"Invalid format for end date: {end_date} (must be %Y-%m-%d)"))
-        sys.exit(2)
+        raise RastertoolConfigurationException(
+            f"Invalid format for end date: {end_date} (must be %Y-%m-%d)")
 
     # create the rastertool object
     tool = Timeseries(start_date, end_date, time_period, bands)

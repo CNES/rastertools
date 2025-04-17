@@ -276,10 +276,9 @@ class Zonalstats(Rastertool):
         self._output_format = output_format or 'ESRI Shapefile'
         # check if output_format exists
         if self._output_format not in Zonalstats.supported_output_formats:
-            _logger.exception(RastertoolConfigurationException(
+            raise RastertoolConfigurationException(
                 f"Unrecognized output format {output_format}. "
-                f"Possible values are {', '.join(Zonalstats.supported_output_formats)}"))
-            sys.exit(2)
+                f"Possible values are {', '.join(Zonalstats.supported_output_formats)}")
         return self
 
     def with_geometries(self, geometries: str, within: bool = False):

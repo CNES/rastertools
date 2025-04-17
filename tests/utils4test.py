@@ -87,6 +87,7 @@ def _cmp(gld, new, tolerance, **kwargs):
     """
 
     """
+
     ftype = os.path.splitext(gld)[-1].lower()
     cmp = cmptools.CMP_FUN[ftype]
     try:

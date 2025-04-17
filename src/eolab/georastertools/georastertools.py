@@ -24,7 +24,10 @@ class RastertoolConfigurationException(Exception):
     """This class defines an exception that is raised when the configuration of the raster tool
     is invalid (wrong input parameter)
     """
-    pass
+    def __init__(self, message, exit_code=2):
+        super().__init__(message)
+        _logger.error(message)
+        self.code = exit_code
 
 
 class Rastertool(ABC):
@@ -71,7 +74,7 @@ class Rastertool(ABC):
         if outputdir and not utils.is_dir(outputdir):
             _logger.exception(
                 RastertoolConfigurationException(f"Output directory \"{str(outputdir)}\" does not exist."))
-            sys.exit(2)
+            raise RastertoolConfigurationException(f"Output directory \"{str(outputdir)}\" does not exist.")
         self._outputdir = outputdir
         return self
 

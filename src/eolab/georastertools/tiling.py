@@ -120,30 +120,26 @@ class Tiling(Rastertool):
         # Test if id_column is defined when ids are set
         if id_column is not None:
             if id_column not in self._grid.columns:
-                _logger.exception(RastertoolConfigurationException(
-                    f"Invalid id column named \"{id_column}\": it does not exist in the grid"))
-                sys.exit(2)
-            self._grid = self._grid.set_index(id_column)
+                raise RastertoolConfigurationException(f"Invalid id column named \"{id_column}\": it does not exist in the grid")
 
         if ids is not None:
             if id_column is None:
-                _logger.exception(RastertoolConfigurationException(
-                    "Ids cannot be specified when id_col is not defined"))
-                sys.exit(2)
+                raise RastertoolConfigurationException(
+                    "Ids cannot be specified when id_col is not defined")
 
             self._grid = self._grid[self._grid.index.isin(ids)]
             if self._grid.empty:
                 # if no id common between grid and given ids
-                _logger.exception(RastertoolConfigurationException(
+                raise RastertoolConfigurationException(
                     f"No value in the grid column \"{id_column}\" are matching "
-                    f"the given list of ids {str(ids)}"))
-                sys.exit(2)
+                    f"the given list of ids {str(ids)}")
             else:
                 invalid_ids = [i for i in ids if i not in self._grid.index]
                 if len(invalid_ids) > 0:
                     # log given ids which are not in the grid
-                    _logger.error(f"The grid column \"{id_column}\" does not contain "
-                                  f"the following values: {str(invalid_ids)}")
+                    raise RastertoolConfigurationException(
+                        f"The grid column \"{id_column}\" does not contain "
+                        f"the following values: {str(invalid_ids)}")
         return self
 
     def process_file(self, inputfile: str):
@@ -202,6 +198,7 @@ class Tiling(Rastertool):
                         outputs.append(output.as_posix())
                         _logger.info("Tile " + str(i) + " exported to " + str(output))
                     except ValueError:  # if no overlap
-                        _logger.error("Input shape " + str(i) + " does not overlap raster")
+                        raise ValueError(
+                            "Input shape " + str(i) + " does not overlap raster")
 
         return outputs

@@ -18,6 +18,7 @@ __license__ = "Apache v2.0"
 
 from .utils4test import RastertoolsTestsData
 
+_logger = logging.getLogger(__name__)
 
 class TestCase:
     __test__ = False
@@ -100,11 +101,14 @@ class TestCase:
 
         try:
             georastertools(self.args)
-
-        except SystemExit as wrapped_exception:
+        except Exception as wrapped_exception:
             if check_sys_exit:
                 # Check if the exit code matches the expected value
                 assert wrapped_exception.code == self._sys_exit, (f"Expected exit code {self._sys_exit}, but got {wrapped_exception.code}")
+        except SystemExit as sys_e:
+            if check_sys_exit:
+                # Check if the exit code matches the expected value
+                assert sys_e.code == self._sys_exit, (f"Expected exit code {self._sys_exit}, but got {sys_e.code}")
 
         # check list of outputs
         if check_outputs:
@@ -270,7 +274,7 @@ def test_radioindice_command_line_errors(caplog):
         test.run_test(caplog, check_outputs=False)
 
 
-def test_speed_command_line_default():
+def test_speed_command_line_default(compare):
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
