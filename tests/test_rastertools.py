@@ -253,14 +253,14 @@ def test_radioindice_command_line_errors(caplog):
     # expected logs
     logslist = [
         [],
-        [("eolab.georastertools.cli.radioindice", logging.ERROR, "Invalid indice name: strange")],
+        [("eolab.georastertools.georastertools", logging.ERROR, "Invalid indice name: strange")],
         [("eolab.georastertools.cli.utils_cli", logging.ERROR,
            "Unsupported input file, no matching raster type identified to handle the file")],
         [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           f"Unsupported input file {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.aaa")],
         [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.georastertools.cli.radioindice", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid band(s) in normalized difference: unknown and/or red")]
     ]
     sysexitlist = [2, 2, 1, 1, 2, 2]
@@ -421,9 +421,9 @@ def test_timeseries_command_line_errors(caplog):
           f"Unknown rastertype for input file {RastertoolsTestsData.tests_input_data_dir}/DSM_PHR_Dunkerque.tif")],
         [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Timeseries can only be computed with images of the same type")],
-        [("eolab.georastertools.cli.timeseries", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid format for start date: 20180926 (must be %Y-%m-%d)")],
-        [("eolab.georastertools.cli.timeseries", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid format for end date: 20181107 (must be %Y-%m-%d)")]
     ]
     sysexitlist = [2, 1, 1, 1, 2, 2]
@@ -666,13 +666,13 @@ def test_tiling_command_line_errors(caplog):
 
     # expected logs
     logslist = [
-        [("eolab.georastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Ids cannot be specified when id_col is not defined")],
-        [("eolab.georastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid id column named \"truc\": it does not exist in the grid")],
         [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
-        [("eolab.georastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "No value in the grid column \"id\" are matching the given list of ids [1, 2]")]
     ]
     sysexitlist = [2, 2, 2, 2]
