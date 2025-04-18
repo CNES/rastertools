@@ -198,7 +198,6 @@ class Tiling(Rastertool):
                         outputs.append(output.as_posix())
                         _logger.info("Tile " + str(i) + " exported to " + str(output))
                     except ValueError:  # if no overlap
-                        raise ValueError(
-                            "Input shape " + str(i) + " does not overlap raster")
+                        _logger.error("Input shape " + str(i) + " does not overlap raster")
 
         return outputs
