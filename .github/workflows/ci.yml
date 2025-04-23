@@ -23,9 +23,9 @@ jobs:
       - name: code quality
         shell: bash -l {0}
         run: |
-          pylint --disable=all --fail-under=10 --enable=too-many-statements src/eolab/georastertools/
-          pylint --disable=all --fail-under=10 --enable=too-many-nested-blocks src/eolab/georastertools/
-          ./continuous_integration/scripts/check_mccabe_complexity.sh 25 src/eolab/georastertools
+          pylint --disable=all --fail-under=10 --enable=too-many-statements src/eolab/rastertools/
+          pylint --disable=all --fail-under=10 --enable=too-many-nested-blocks src/eolab/rastertools/
+          ./continuous_integration/scripts/check_mccabe_complexity.sh 25 src/eolab/rastertools
   test:
     runs-on: ubuntu-latest
     steps:
