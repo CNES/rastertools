@@ -18,7 +18,6 @@ from eolab.georastertools import Rastertool, RastertoolConfigurationException
 from eolab.georastertools.processing import vector
 from eolab.georastertools.product import RasterProduct
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -120,7 +119,9 @@ class Tiling(Rastertool):
         # Test if id_column is defined when ids are set
         if id_column is not None:
             if id_column not in self._grid.columns:
-                raise RastertoolConfigurationException(f"Invalid id column named \"{id_column}\": it does not exist in the grid")
+                raise RastertoolConfigurationException(
+                    f"Invalid id column named \"{id_column}\": it does not exist in the grid")
+            self._grid = self._grid.set_index(id_column)
 
         if ids is not None:
             if id_column is None:
@@ -137,9 +138,8 @@ class Tiling(Rastertool):
                 invalid_ids = [i for i in ids if i not in self._grid.index]
                 if len(invalid_ids) > 0:
                     # log given ids which are not in the grid
-                    raise RastertoolConfigurationException(
-                        f"The grid column \"{id_column}\" does not contain "
-                        f"the following values: {str(invalid_ids)}")
+                    _logger.error(f"The grid column \"{id_column}\" does not contain "
+                                  f"the following values: {str(invalid_ids)}")
         return self
 
     def process_file(self, inputfile: str):
@@ -162,14 +162,13 @@ class Tiling(Rastertool):
 
             # STEP 3: apply tiling
             outputs = []
+
             with product.open() as dataset:
                 out_meta = dataset.meta
-                nodata = dataset.nodata
 
                 # Crop and export every tiles
                 for shape, i in zip(grid.geometry, grid.index):
                     _logger.info("Crop and export tile " + str(i) + "...")
-
                     try:
                         # generate crop image
                         image, transform = rasterio.mask.mask(dataset, [shape],
@@ -191,7 +190,6 @@ class Tiling(Rastertool):
                                          "width": image.shape[2],
                                          "transform": transform})
 
-
                         with rasterio.open(output, 'w', **out_meta) as dst:
                             dst.write(image)
 
@@ -200,4 +198,4 @@ class Tiling(Rastertool):
                     except ValueError:  # if no overlap
                         _logger.error("Input shape " + str(i) + " does not overlap raster")
 
-        return outputs
+            return outputs
