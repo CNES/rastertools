@@ -42,7 +42,7 @@ if __name__ == "__main__":
                 [rasterio.rio_plugins]
                 georastertools=eolab.georastertools.main:georastertools
                 """,
-              python_requires='==3.8.13',
+              python_requires='>=3.8.13',
               use_scm_version={"version_scheme": "no-guess-dev"})
     except:  # noqa
         print(
