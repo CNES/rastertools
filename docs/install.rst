@@ -5,8 +5,8 @@ First, create a conda environment via:
 
 .. code-block:: console
 
-  $ conda env create -f environment.yml
-  $ conda env update -f env_update.yml
+  $ conda create -n georastertools
+  $ conda activate georastertools
 
 The following libraries will be installed in the conda environment named ``georastertools`` :
 
@@ -22,8 +22,8 @@ Secondly, run commands:
 
 .. code-block:: console
 
-  $ conda activate georastertools
-  $ pip install -e .
+  $ conda install python=3.8.13 libgdal=3.5.2
+  $ pip install georastertools --no-binary rasterio
 
 ``georastertools`` will be installed in the conda environment. Then, the CLI ``georastertools`` can be used and the API :obj:`eolab.georastertools`
 can be called in a python script.

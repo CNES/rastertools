@@ -32,9 +32,9 @@ Create a conda environment by typing the following:
 
 .. code-block:: bash
 
-  conda env create -n rastertools
+  conda env create -n georastertools
   conda activate
-  conda install python=3.8.13 libgdal
+  conda install python=3.8.13 libgdal=3.5.2
   pip install georastertools --no-binary rasterio
 
 For more details, including installation as a Docker or Singularity image, please refer to the documentation. : docs/install.rst
