@@ -32,10 +32,10 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def svf(ctx, inputs : list, radius : int, directions : int, resolution : float, altitude : int, output : str, window_size : int, pad : str) :
     """
-    Compute the Sky View Factor (SVF) of a Digital Height Model (DHM).
+    Compute the Sky View Factor (SVF) of a Digital Elevation Model (DEM).
 
-    The Sky View Factor (SVF) is a measure of the visibility of the sky from a point in a Digital Height Model
-    (DHM). It is calculated by evaluating the horizontal elevation angle from a given point in multiple
+    The Sky View Factor (SVF) is a measure of the visibility of the sky from a point in a Digital Elevation Model
+    (DEM). It is calculated by evaluating the horizontal elevation angle from a given point in multiple
     directions (as specified by the user), and is influenced by the topography and surrounding terrain features.
 
     Arguments:
@@ -43,7 +43,7 @@ def svf(ctx, inputs : list, radius : int, directions : int, resolution : float, 
         inputs TEXT
 
         Input file to process (i.e. geotiff corresponding to a
-    Digital Height Model). You can provide a single file
+    Digital Elevation Model). You can provide a single file
     with extension ".lst" (e.g. "svf.lst") that
     lists the input files to process (one input file per line in .lst)
     """

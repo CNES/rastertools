@@ -3,7 +3,7 @@
 svf
 ---
 
-``svf`` computes the SVF of a Digital Height Model.
+``svf`` computes the SVF of a Digital Elevation Model.
 
 SVF stands for Sky View Factor. It is a geophysical parameter that measures the portion of the sky
 visible from a certain point. The portion of the sky visible above the surface is especially relevant
@@ -47,10 +47,10 @@ too many points, the "radius" parameter defines the max distance of the pixel to
                          [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
                          inputs [inputs ...]
 
-  Compute the Sky View Factor (SVF) of a Digital Height Model (DHM).
+  Compute the Sky View Factor (SVF) of a Digital Elevation Model (DEM).
 
   The Sky View Factor (SVF) is a measure of the visibility of the sky from a
-  point in a Digital Height Model (DHM). It is calculated by evaluating the
+  point in a Digital Elevation Model (DEM). It is calculated by evaluating the
   horizontal elevation angle from a given point in multiple directions (as
   specified by the user), and is influenced by the topography and surrounding
   terrain features.
@@ -59,7 +59,7 @@ too many points, the "radius" parameter defines the max distance of the pixel to
 
       inputs TEXT
 
-      Input file to process (i.e. geotiff corresponding to a Digital Height
+      Input file to process (i.e. geotiff corresponding to a Digital Elevation
       Model). You can provide a single file with extension ".lst" (e.g.
       "svf.lst") that lists the input files to process (one input file
       per line in .lst)
@@ -92,12 +92,12 @@ too many points, the "radius" parameter defines the max distance of the pixel to
 
 Example:
 
-Let's take as input a Digital Height Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):
+Let's take as input a Digital Elevation Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):
 
 .. image:: ../_static/dsm.jpg
 
 The first command line computes the Sky View Factor using 16 directions and a radius of 50 pixels (25 meters).
-The SVF is computed at the altitude of every point of the Digital Height Model, i.e. the SVF is computed on top
+The SVF is computed at the altitude of every point of the Digital Elevation Model, i.e. the SVF is computed on top
 of buildings (for the highest building, SVF is thus 1).
 
 .. code-block:: console
@@ -108,7 +108,7 @@ This command generates the following SVF:
 
 .. image:: ../_static/dsm-svf.jpg
 
-It is also possible to compute the SVF at a specified height, for instance on ground (0m altitude for a Digital Height Model).
+It is also possible to compute the SVF at a specified height, for instance on ground (0m altitude for a Digital Elevation Model).
 
 .. code-block:: console
 

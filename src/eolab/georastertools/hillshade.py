@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This module defines a rastertool named Hillshade which computes the hillshade
-of a Digital Height Model corresponding to a given solar position (elevation and azimuth).
+of a Digital Elevation Model corresponding to a given solar position (elevation and azimuth).
 """
 import logging.config
 from typing import List

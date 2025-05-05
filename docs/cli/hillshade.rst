@@ -3,7 +3,7 @@
 hillshade
 ---------
 
-``hillshade`` (or ``hs``) subcommand computes the hillshades of a Digital Height Model.
+``hillshade`` (or ``hs``) subcommand computes the hillshades of a Digital Elevation Model.
 The tool takes the sun position (elevation and azimuth) as input and
 computes the shadows of the ground surface (buildings, trees, etc.).
 
@@ -16,7 +16,7 @@ computes the shadows of the ground surface (buildings, trees, etc.).
                                [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
                                inputs [inputs ...]
 
-  Execute the hillshade subcommand on a Digital Height Model (DHM) using the
+  Execute the hillshade subcommand on a Digital Elevation Model (DEM) using the
   given solar parameters (elevation, azimuth), resolution, and optional
   parameters for processing the raster.
 
@@ -24,7 +24,7 @@ computes the shadows of the ground surface (buildings, trees, etc.).
 
       inputs TEXT
 
-      Input file to process (i.e. geotiff corresponding to a Digital Height
+      Input file to process (i.e. geotiff corresponding to a Digital Elevation
       Model). You can provide a single file with extension ".lst" (e.g.
       "hillshade.lst") that lists the input files to process (one input file
       per line in .lst)
@@ -57,11 +57,11 @@ computes the shadows of the ground surface (buildings, trees, etc.).
 
 Example:
 
-Let's take as input a Digital Height Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):
+Let's take as input a Digital Elevation Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):
 
 .. image:: ../_static/dsm.jpg
 
-The following commands will compute the hillshades of this Digital Height Model at 3 differents solar
+The following commands will compute the hillshades of this Digital Elevation Model at 3 differents solar
 hours (8:00AM, noon, 6:00PM) of 21st June:
 
 .. code-block:: console
@@ -72,7 +72,7 @@ hours (8:00AM, noon, 6:00PM) of 21st June:
 
 The generated images are rendered with QGis:
 - first layer contains the hillshade (value 0 is masked)
-- second layer contains the Digital Height Model rendered in grayscale (white to black)
+- second layer contains the Digital Elevation Model rendered in grayscale (white to black)
 
 Here are the captures:
 

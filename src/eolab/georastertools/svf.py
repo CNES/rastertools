@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This module defines a rastertool named SVF (Sky View Factor) which computes the SVF
-of a Digital Height Model.
+of a Digital Elevation Model.
 """
 import logging.config
 from pathlib import Path

@@ -450,7 +450,7 @@ def _local_sum(data : np.ndarray, kernel_width: int) -> numpy.ndarray :
 
     Args:
         input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)
-                                 containing the Digital Height Model (DHM).
+                                 containing the Digital Elevation Model (DEM).
                                  The function only accepts arrays with one band.
 
         kernel_size (int): The size of the sliding window used to compute the local sum.
@@ -511,7 +511,7 @@ def median(input_data : np.ndarray, kernel_size : int) -> numpy.ndarray :
 
     Args:
         input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)
-                                 containing the Digital Height Model (DHM). The function only accepts arrays with one band.
+                                 containing the Digital Elevation Model (DEM). The function only accepts arrays with one band.
 
         kernel_size (int): The size of the sliding window (kernel) used to compute the median.
 
@@ -537,7 +537,7 @@ def local_sum(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray :
 
     Args:
         input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)
-                                 containing the Digital Height Model (DHM).
+                                 containing the Digital Elevation Model (DEM).
                                  The function only accepts arrays with one band.
 
         kernel_size (int): The size of the sliding window used to compute the local sum.
@@ -562,7 +562,7 @@ def local_mean(input_data : np.ndarray, kernel_size : int = 8) -> numpy.ndarray 
 
     Args:
         input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)
-                                 containing the Digital Height Model (DHM).
+                                 containing the Digital Elevation Model (DEM).
                                  The function only accepts arrays with one band.
 
         kernel_size (int): The size of the sliding window used to compute the local mean.
@@ -592,7 +592,7 @@ def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : in
 
     Args:
         input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns)
-                                 containing the Digital Height Model (DHM).
+                                 containing the Digital Elevation Model (DEM).
                                  The function only accepts arrays with one band.
 
         kernel_size (int): The size of the kernel used for the adaptive filtering. Default is 8.
@@ -628,12 +628,12 @@ def adaptive_gaussian(input_data : np.ndarray, kernel_size : int = 8, sigma : in
 
 def svf(input_data : np.ndarray, radius : int = 8, directions : int = 12, resolution : float = 0.5, altitude = None) -> np.ndarray:
     """
-    Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Height Model (DHM).
+    Computes the Sky View Factor (SVF), which represents the fraction of the visible sky from each point in a Digital Elevation Model (DEM).
 
     More information about the Sky View Factor can be found `here <https://www.researchgate.net/publication/257315893_Application_of_sky-view_factor_for_the_visualization_of_historic_landscape_features_in_lidar-derived_relief_models>`_.
 
     Args:
-        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns) containing the Digital Height Model (DHM).
+        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns) containing the Digital Elevation Model (DEM).
                                   The function only accepts arrays with one band (the first dimension must be 1).
 
         radius (int): The maximum distance (in pixels) around each point to evaluate the horizontal elevation angle. Default is 8.
@@ -746,13 +746,13 @@ def _bresenham_line(theta : int, radius : int) -> tuple :
 
 def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float = 0.0, radius : int = 8, resolution : float = 0.5) -> numpy.ndarray :
     """
-    Computes a mask of cast shadows in a Digital Height Model (DHM).
+    Computes a mask of cast shadows in a Digital Elevation Model (DEM).
 
     This function calculates the shadows based on the specified elevation and azimuth angles,
     and returns a mask indicating where shadows are cast.
 
     Args:
-        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns) containing the Digital Height Model (DHM).
+        input_data (np.ndarray): A 3D numpy array of shape (1, number_of_lines, number_of_columns) containing the Digital Elevation Model (DEM).
                                   The function only accepts arrays with one band.
 
         elevation (float): The angle (in degrees) between the horizon and the line of sight from an observer to the satellite.

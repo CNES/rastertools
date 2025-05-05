@@ -11,7 +11,7 @@ Statistics inside a geometry can be computed for different categories also defin
 file. For instance, is is possible to compute the average height of buildings and vegetation of
 cities using:
 
-- a Digital Height Model (input raster file)
+- a Digital Elevation Model (input raster file)
 - a shapefile with the boundaries of cities (-g argument)
 - a shapefile with the buildings / vegetation classification (--category_file)
 

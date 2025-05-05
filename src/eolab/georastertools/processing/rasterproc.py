@@ -5,7 +5,6 @@ Definition of a radiometric indice and functions to compute it.
 """
 from typing import List, Callable, Union
 
-import numpy
 import numpy as np
 
 from eolab.georastertools.processing import algo

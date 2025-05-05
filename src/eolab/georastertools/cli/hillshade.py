@@ -35,7 +35,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 @click.pass_context
 def hillshade(ctx, inputs : list, elevation : float, azimuth : float, radius : int, resolution : float, output : str, window_size : int, pad : str) :
     """
-    Execute the hillshade subcommand on a Digital Height Model (DHM) using the given solar
+    Execute the hillshade subcommand on a Digital Elevation Model (DEM) using the given solar
     parameters (elevation, azimuth), resolution, and optional parameters for processing the raster.
 
     Arguments:
@@ -43,7 +43,7 @@ def hillshade(ctx, inputs : list, elevation : float, azimuth : float, radius : i
         inputs TEXT
 
         Input file to process (i.e. geotiff corresponding to a
-    Digital Height Model). You can provide a single file
+    Digital Elevation Model). You can provide a single file
     with extension ".lst" (e.g. "hillshade.lst") that
     lists the input files to process (one input file per line in .lst)
     """

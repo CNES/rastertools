@@ -38,7 +38,7 @@ The CLI **georastertools** enable to activate several subcommands, one per raste
                           containing the height of the point as pixel values)
       radioindice (ri)    Compute radiometric indices
       speed (sp)          Compute speed of rasters
-      svf                 Compute Sky View Factor of a Digital Height Model
+      svf                 Compute Sky View Factor of a Digital Elevation Model
       tiling (ti)         Generate image tiles
       timeseries (ts)     Temporal gap filling of an image time series
       zonalstats (zs)     Compute zonal statistics
