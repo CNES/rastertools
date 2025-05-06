@@ -1,0 +1,11 @@
+.wy-side-nav-search, .wy-nav-top {
+    background: #272525;
+}
+
+.wy-side-nav-search>div.version{
+    color: #D4F1F4;
+}
+
+.wy-nav-content {
+    max-width: 100% !important;
+}

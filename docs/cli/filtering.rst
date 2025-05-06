@@ -26,78 +26,7 @@ To see the definitions of these arguments, type the option --help.
 
 - **Median**
 
-<<<<<<< HEAD
     .. code-block:: console
-=======
-  $ rastertools filter adaptive_gaussian --help
-  usage: rastertools filter adaptive_gaussian [-h] --kernel_size KERNEL_SIZE
-                                              --sigma SIGMA [-o OUTPUT]
-                                              [-ws WINDOW_SIZE]
-                                              [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
-                                              [-b BANDS [BANDS ...]] [-a]
-                                              inputs [inputs ...]
-
-  Execute the requested filter on the input files with the specified
-  parameters. The `inputs` argument can either be a single file or a `.lst`
-  file containing a list of input files.
-
-  Arguments:
-
-      inputs TEXT
-
-      Input file to process (e.g. Sentinel2 L2A MAJA from THEIA). You can
-      provide a single file with extension ".lst" (e.g. "filtering.lst") that
-      lists the input files to process (one input file per line in .lst).
-
-  Options:
-      --sigma INTEGER                 Standard deviation of the Gaussian
-                                      distribution  [required]
-      -a, --all                       Process all bands
-      -b, --bands INTEGER             List of bands to process
-      -p, --pad [none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap]
-                                      Pad to use around the image, default : edge(see
-                                      https://numpy.org/doc/stable/reference/generated/numpy.pad.html
-                                      for more information)
-      -ws, --window_size INTEGER      Size of tiles to distribute processing,
-                                      default: 1024
-      -o, --output TEXT               Output directory to store results (by
-                                      default current directory)
-      --kernel_size INTEGER           Kernel size of the filter function, e.g. 3
-                                      means a square of 3x3 pixels on which the
-                                      filter function is computed (default: 8)
-      -h, --help                      Show this message and exit.
-
-  Apply an adaptive (Local gaussian of 3x3) recursive filter on the input image
-
-  positional arguments:
-    inputs                Input file to process (e.g. Sentinel2 L2A MAJA from
-                          THEIA). You can provide a single file with extension
-                          ".lst" (e.g. "filtering.lst") that lists the input
-                          files to process (one input file per line in .lst)
-
-  optional arguments:
-    -h, --help            show this help message and exit
-    --kernel_size KERNEL_SIZE
-                          Kernel size of the filter function, e.g. 3 means a
-                          square of 3x3 pixels on which the filter function is
-                          computed (default: 8)
-    --sigma SIGMA         Standard deviation of the Gaussian distribution
-                          (sigma)
-    -o OUTPUT, --output OUTPUT
-                          Output dir where to store results (by default current
-                          dir)
-    -ws WINDOW_SIZE, --window_size WINDOW_SIZE
-                          Size of tiles to distribute processing, default: 1024
-    -p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}, --pad {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}
-                          Pad to use around the image, default : edge (see https
-                          ://numpy.org/doc/stable/reference/generated/numpy.pad.
-                          html for more information)
-    -b BANDS [BANDS ...], --bands BANDS [BANDS ...]
-                          List of bands to compute
-    -a, --all             Compute all bands
-
-  By default only first band is computed.
->>>>>>> rasterio_plugin_vsimem
 
       $ rastertools filter median --help
         usage: rastertools filter median [-h] --kernel_size KERNEL_SIZE [-o OUTPUT]
@@ -353,7 +282,4 @@ To see the definitions of these arguments, type the option --help.
          - .. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive_gaussian.jpg
             :align: center
 
-<<<<<<< HEAD
-=======
-.. image:: ../_static/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi-adaptive_gaussian.jpg
->>>>>>> rasterio_plugin_vsimem
+
