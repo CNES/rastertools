@@ -1,21 +1,21 @@
 .. _usage:
 
-.. currentmodule:: eolab.rastertools
+.. currentmodule:: eolab.georastertools
 
 =============
 API Reference
 =============
 
-rastertools
+georastertools
 -----------
 
-Rastertools can be activated by calling the API :obj:`eolab.rastertools.run_tool`.
+georastertools can be activated by calling the API :obj:`eolab.georastertools.run_tool`.
 
 .. autofunction:: run_tool
 
 Example of use in python code::
 
-    from eolab.rastertools import run_tool
+    from eolab.georastertools import run_tool
     run_tool(args="radioindice --help".split())
 
 Alternatively, every raster tools can be activated with their own API:
@@ -36,12 +36,12 @@ All these objects provide:
 
 - a fluent API to configure the processing. The methods are all named with the following pattern "with_<something>" and
   return the current instance so that the methods can be chained.
-- methods to process a single file or a set of files (see :obj:`eolab.rastertools.Rastertool.process_file`
-  and :obj:`eolab.rastertools.Rastertool.process_files`)
+- methods to process a single file or a set of files (see :obj:`eolab.georastertools.Rastertool.process_file`
+  and :obj:`eolab.georastertools.Rastertool.process_files`)
 
 Example of use::
 
-    from eolab.rastertools import Radioindice
+    from eolab.georastertools import Radioindice
     proc = Radioindice(Radioindice.ndvi)
     outputs = proc.with_output(".", merge=False)
                   .with_roi("./roi.geojson")
@@ -51,12 +51,12 @@ Example of use::
 Raster products
 ---------------
 
-Rastertools provides a useful API to open raster products that are provided as an archive or a directory containing
+georastertools provides a useful API to open raster products that are provided as an archive or a directory containing
 several images.
 
 The API is very simple to use::
 
-   from eolab.rastertools.product import RasterProduct
+   from eolab.georastertools.product import RasterProduct
    import rasterio
 
    with RasterProduct("tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip") as rp:
@@ -67,13 +67,13 @@ The API is very simple to use::
 Adding custom raster types
 --------------------------
 
-To add custom raster types, use the method :obj:`eolab.rastertools.add_custom_rastertypes`.
+To add custom raster types, use the method :obj:`eolab.georastertools.add_custom_rastertypes`.
 
 .. autofunction:: add_custom_rastertypes
 
 Example of use::
 
-    from eolab.rastertools import add_custom_rastertypes
+    from eolab.georastertools import add_custom_rastertypes
 
     my_rastertypes = {
         "rastertypes": [
@@ -135,14 +135,14 @@ Example of use::
 
     add_custom_rastertypes(json)
 
-    # now any rastertools can handle products of the two new rastertypes
+    # now any georastertools can handle products of the two new rastertypes
     ...
 
 Design rules of raster tools
 ----------------------------
 
-Every raster tool object inherits from base class :obj:`eolab.rastertools.Rastertool`. 
-If the process supports windowing, the raster tool can also inherit from :obj:`eolab.rastertools.Windowable`.
+Every raster tool object inherits from base class :obj:`eolab.georastertools.Rastertool`.
+If the process supports windowing, the raster tool can also inherit from :obj:`eolab.georastertools.Windowable`.
 
 .. autosummary::
   :toctree: api/
@@ -150,7 +150,7 @@ If the process supports windowing, the raster tool can also inherit from :obj:`e
   Rastertool
   Windowable
 
-A rastertool raises a :obj:`eolab.rastertools.RastertoolConfigurationException` when invalid
+A rastertool raises a :obj:`eolab.georastertools.RastertoolConfigurationException` when invalid
 input parameter is provided.
 
 .. autosummary::
@@ -161,7 +161,7 @@ input parameter is provided.
 Moreover, a rastertool can raise any type of Exception during its execution. The best practice is
 thus to catch exceptions that can raise as follows::
 
-    from eolab.rastertools import Radioindice, RastertoolConfigurationException
+    from eolab.georastertools import Radioindice, RastertoolConfigurationException
 
     proc = Radioindice(Radioindice.ndvi)
     try:

@@ -3,7 +3,7 @@
 svf
 ---
 
-``svf`` computes the SVF of a Digital Height Model.
+``svf`` computes the SVF of a Digital Elevation Model.
 
 SVF stands for Sky View Factor. It is a geophysical parameter that measures the portion of the sky
 visible from a certain point. The portion of the sky visible above the surface is especially relevant
@@ -40,43 +40,51 @@ too many points, the "radius" parameter defines the max distance of the pixel to
 
 .. code-block:: console
 
-  $ rastertools svf --help
-  usage: rastertools svf [-h] --radius RADIUS --directions DIRECTIONS
+  $ georastertools svf --help
+  usage: georastertools svf [-h] --radius RADIUS --directions DIRECTIONS
                          --resolution RESOLUTION [--altitude ALTITUDE]
                          [-o OUTPUT] [-ws WINDOW_SIZE]
                          [-p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}]
                          inputs [inputs ...]
-  
-  Compute Sky View Factor of a Digital Height Model.
-  
-  positional arguments:
-    inputs                Input file to process (i.e. geotiff corresponding to a
-                          Digital Height Model). You can provide a single file
-                          with extension ".lst" (e.g. "filtering.lst") that
-                          lists the input files to process (one input file per
-                          line in .lst)
-  
-  optional arguments:
-    -h, --help            show this help message and exit
-    --radius RADIUS       Max distance (in pixels) around a point to evaluate
-                          horizontal elevation angle
-    --directions DIRECTIONS
-                          Number of directions on which to compute the horizon
-                          elevation angle
-    --resolution RESOLUTION
-                          Pixel resolution in meter
-    --altitude ALTITUDE   Reference altitude to use for computing the SVF. If
-                          this option is not specified, SVF is computed for
-                          every point at the altitude of the point
-    -o OUTPUT, --output OUTPUT
-                          Output dir where to store results (by default current
-                          dir)
-    -ws WINDOW_SIZE, --window_size WINDOW_SIZE
-                          Size of tiles to distribute processing, default: 1024
-    -p {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}, --pad {none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap}
-                          Pad to use around the image, default : edge (see https
-                          ://numpy.org/doc/stable/reference/generated/numpy.pad.
-                          html for more information)
+
+  Compute the Sky View Factor (SVF) of a Digital Elevation Model (DEM).
+
+  The Sky View Factor (SVF) is a measure of the visibility of the sky from a
+  point in a Digital Elevation Model (DEM). It is calculated by evaluating the
+  horizontal elevation angle from a given point in multiple directions (as
+  specified by the user), and is influenced by the topography and surrounding
+  terrain features.
+
+  Arguments:
+
+      inputs TEXT
+
+      Input file to process (i.e. geotiff corresponding to a Digital Elevation
+      Model). You can provide a single file with extension ".lst" (e.g.
+      "svf.lst") that lists the input files to process (one input file
+      per line in .lst)
+
+  Options:
+      --radius INTEGER                Maximum distance (in pixels) around a point
+                                      to evaluate horizontal elevation angle
+                                      [required]
+      --directions INTEGER            Number of directions on which to compute the
+                                      horizon elevation angle  [required]
+      --resolution FLOAT              Pixel resolution in meter  [required]
+      --altitude INTEGER              Reference altitude to use for computing the
+                                      SVF. If this option is not specified, SVF is
+                                      computed for every point at the altitude of
+                                      the point
+      -o, --output TEXT               Output directory to store results (by
+                                      default current directory)
+      -ws, --window_size INTEGER      Size of tiles to distribute processing,
+                                      default: 1024
+      -p, --pad [none,edge,maximum,mean,median,minimum,reflect,symmetric,wrap]
+                                      Pad to use around the image, default : edge(see
+                                      https://numpy.org/doc/stable/reference/generated/numpy.pad.html
+                                      for more information)
+      -h, --help                      Show this message and exit.
+
 
 .. warning::
   This command line does not accept all input raster products as other raster tools (radioindice, zonalstats).
@@ -84,27 +92,27 @@ too many points, the "radius" parameter defines the max distance of the pixel to
 
 Example:
 
-Let's take as input a Digital Height Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):
+Let's take as input a Digital Elevation Model of Toulouse generated from a PLEIADES stereo (0.5m resolution):
 
 .. image:: ../_static/dsm.jpg
 
 The first command line computes the Sky View Factor using 16 directions and a radius of 50 pixels (25 meters).
-The SVF is computed at the altitude of every point of the Digital Height Model, i.e. the SVF is computed on top
+The SVF is computed at the altitude of every point of the Digital Elevation Model, i.e. the SVF is computed on top
 of buildings (for the highest building, SVF is thus 1).
 
 .. code-block:: console
 
-  $ rastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
+  $ georastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
 
 This command generates the following SVF:
 
 .. image:: ../_static/dsm-svf.jpg
 
-It is also possible to compute the SVF at a specified height, for instance on ground (0m altitude for a Digital Height Model).
+It is also possible to compute the SVF at a specified height, for instance on ground (0m altitude for a Digital Elevation Model).
 
 .. code-block:: console
 
-  $ rastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
+  $ georastertools svf --radius 50 --directions 16 --resolution 0.5 tests\tests_data\toulouse-mnh.tif
 
 The SVF is the following:
 

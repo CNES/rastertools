@@ -1,2 +1,0 @@
-[console_scripts]
-rastertools = eolab.rastertools.main:run

@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pytest
 import logging
-import filecmp
+import os
+
+from click.testing import CliRunner
 from pathlib import Path
-from eolab.rastertools import run_tool
-from eolab.rastertools.product import RasterType
+
+from eolab.georastertools import georastertools
+from eolab.georastertools.product import RasterType
 
 from . import utils4test
 
@@ -14,6 +16,9 @@ __author__ = "Olivier Queyrut"
 __copyright__ = "Copyright 2019, CNES"
 __license__ = "Apache v2.0"
 
+from .utils4test import RastertoolsTestsData
+
+_logger = logging.getLogger(__name__)
 
 class TestCase:
     __test__ = False
@@ -25,7 +30,7 @@ class TestCase:
         self._sys_exit = 0
 
     def __repr__(self):
-        return (f"rastertools {' '.join(self._args)}"
+        return (f"georastertools {' '.join(self._args)}"
                 f"[outputs={self._outputs}][logs={self._logs}][sys_exit={self._sys_exit}]")
 
     @property
@@ -87,27 +92,32 @@ class TestCase:
 
     def run_test(self, caplog=None, loglevel=logging.ERROR, check_outputs=True, check_sys_exit=True, check_logs=True,
                  compare=False, save_gen_as_ref=False):
+
+        runner = CliRunner()
         if caplog is not None:
             caplog.set_level(loglevel)
         else:
             check_logs = False
 
-        # run rastertools
-        with pytest.raises(SystemExit) as wrapped_exception:
-            run_tool(args=self._args)
-
-        # check sys_exit
-        if check_sys_exit:
-            assert wrapped_exception.type == SystemExit
-            assert wrapped_exception.value.code == self._sys_exit
+        try:
+            georastertools(self.args)
+        except Exception as wrapped_exception:
+            if check_sys_exit:
+                # Check if the exit code matches the expected value
+                assert wrapped_exception.code == self._sys_exit, (f"Expected exit code {self._sys_exit}, but got {wrapped_exception.code}")
+        except SystemExit as sys_e:
+            if check_sys_exit:
+                # Check if the exit code matches the expected value
+                assert sys_e.code == self._sys_exit, (f"Expected exit code {self._sys_exit}, but got {sys_e.code}")
 
         # check list of outputs
         if check_outputs:
-            outdir = Path(utils4test.outdir)
+            outdir = Path(RastertoolsTestsData.tests_output_data_dir + "/")
             assert sorted([x.name for x in outdir.iterdir()]) == sorted(self._outputs)
 
         if compare:
-            match, mismatch, err = utils4test.cmpfiles(utils4test.outdir, self._refdir, self._outputs)
+            match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", self._refdir, self._outputs)
+
             assert len(match) == 3
             assert len(mismatch) == 0
             assert len(err) == 0
@@ -124,11 +134,12 @@ class TestCase:
         if caplog is not None:
             caplog.clear()
 
-        # clear output dir
+        #clear output dir
         utils4test.clear_outdir()
 
 
 def test_rastertools_command_line_info():
+
     tests = [
         TestCase("--help"),
         TestCase("-h"),
@@ -154,22 +165,33 @@ def test_rastertools_command_line_info():
     for test in tests:
         test.run_test()
 
+def generate_lst_file(file_list, output_file):
+
+    with open(output_file,"w") as lst_file:
+        for f in file_list:
+            lst_file.write(RastertoolsTestsData.tests_input_data_dir + "/" + f.split('/')[-1] + "\n")
+
 
 def test_radioindice_command_line_default():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing.lst"
+    generate_lst_file(["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
+                       "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"],
+                      lst_file_path)
+
     # list of commands to test
     argslist = [
         # no indice defined
-        " -v ri -o tests/tests_out tests/tests_data/listing.lst",
+        f" -v ri -o {RastertoolsTestsData.tests_output_data_dir} {lst_file_path}",
         # two indices with their own options, merge
-        "-v ri --pvi --savi -o tests/tests_out -m tests/tests_data/listing.lst",
+        f"-v ri --pvi --savi -o {RastertoolsTestsData.tests_output_data_dir} -m {lst_file_path}",
         # indices option, roi
-        "--verbose ri --indices pvi savi -nd nir red --roi tests/tests_data/COMMUNE_32001.shp"
-        " --output tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
-        " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
+        f"--verbose ri --indices pvi --indices savi -nd nir red --roi {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32001.shp"
+        f" --output {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"
     ]
     # get list of expected outputs
     indices_list = ["ndvi ndwi ndwi2", "indices", "pvi savi nd[nir-red]"]
@@ -192,8 +214,8 @@ def test_radioindice_additional_type():
     # list of commands to test
     argslist = [
         # add rastertypes to handle new data product
-        "-t tests/tests_data/additional_rastertypes.json -v"
-        " ri -o tests/tests_out --ndvi tests/tests_data/RGB_TIF_20170105_013442_test.tif"
+        f"-t {RastertoolsTestsData.tests_input_data_dir}/additional_rastertypes.json -v"
+        f" ri -o {RastertoolsTestsData.tests_output_data_dir} --ndvi {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif"
     ]
     # get list of expected outputs
     indices_list = "ndvi"
@@ -217,28 +239,28 @@ def test_radioindice_command_line_errors(caplog):
         # missing positional argument
         "ri --ndvi",
         # unkwnow indice
-        "ri tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip --indices strange",
+        f"ri {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip --indices strange",
         # unknown raster type: unrecognized raster type
-        "-v ri --ndvi -o tests/tests_out tests/tests_data/OCS_2017_CESBIO_extract.tif",
+         f"-v ri --ndvi -o {RastertoolsTestsData.tests_output_data_dir} {RastertoolsTestsData.tests_input_data_dir}/OCS_2017_CESBIO_extract.tif",
         # unknown raster type: unsupported extension
-        "-v ri --ndvi -o tests/tests_out tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.aaa",
+        f"-v ri --ndvi -o {RastertoolsTestsData.tests_output_data_dir} {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.aaa",
         # output dir does not exist
-        "-v ri -o ./toto --ndvi tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
+        f"-v ri -o ./toto --ndvi {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
         # unknown band in normalized difference
-        "-v ri -nd unknown red tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
+        f"-v ri -nd unknown red {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
     ]
 
     # expected logs
     logslist = [
         [],
-        [("eolab.rastertools.main", logging.ERROR, "Invalid indice name: strange")],
-        [("eolab.rastertools.main", logging.ERROR,
-          "Unsupported input file, no matching raster type identified to handle the file")],
-        [("eolab.rastertools.main", logging.ERROR,
-          "Unsupported input file tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.aaa")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR, "Invalid indice name: strange")],
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
+           "Unsupported input file, no matching raster type identified to handle the file")],
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
+          f"Unsupported input file {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.aaa")],
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid band(s) in normalized difference: unknown and/or red")]
     ]
     sysexitlist = [2, 2, 1, 1, 2, 2]
@@ -252,18 +274,23 @@ def test_radioindice_command_line_errors(caplog):
         test.run_test(caplog, check_outputs=False)
 
 
-def test_speed_command_line_default():
+def test_speed_command_line_default(compare):
     # create output dir and clear its content if any
     utils4test.create_outdir()
+
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing.lst"
+    generate_lst_file(["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
+                       "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D.zip"],
+                      lst_file_path)
 
     # list of commands to test
     argslist = [
         # default with a listing of S2A products
-        "-v sp -b 1 -o tests/tests_out tests/tests_data/listing.lst",
+        f"-v sp -b 1 -o {RastertoolsTestsData.tests_output_data_dir} {lst_file_path}",
         # default with a list of files
-        "--verbose speed --output tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        f"--verbose speed --output {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
     ]
     speed_filenames = [
         ["SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-speed-20180928-105515.tif"],
@@ -277,30 +304,36 @@ def test_speed_command_line_default():
     # execute test cases with logging level set to INFO
     for test in tests:
         test.run_test()
+    os.remove(lst_file_path)
 
 
 def test_speed_command_line_errors(caplog):
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing2.lst"
+    generate_lst_file(["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif",
+                       "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"],
+                      lst_file_path)
+
     # list of commands to test
     argslist = [
         # output dir does not exist
-        "-v sp -o ./toto tests/tests_data/listing2.lst",
+        f"-v sp -o ./toto {lst_file_path}",
         # missing one file for speed
-        "-v sp -o tests/tests_out tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
+        f"-v sp -o {RastertoolsTestsData.tests_output_data_dir} {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
         # different types for input files
-        "-v sp -a -o tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
-        " tests/tests_data/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip"
+        f"-v sp -a -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
+        f" {RastertoolsTestsData.tests_input_data_dir}/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip"
     ]
     # expected logs
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Can not compute speed with 1 input image. Provide at least 2 images.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Speed can only be computed with images of the same type")]
     ]
     sysexitlist = [2, 1, 1]
@@ -312,6 +345,7 @@ def test_speed_command_line_errors(caplog):
     # execute test cases with logging level set to INFO
     for test in tests:
         test.run_test(caplog, check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_timeseries_command_line_default(compare, save_gen_as_ref):
@@ -321,9 +355,9 @@ def test_timeseries_command_line_default(compare, save_gen_as_ref):
     # list of commands to test
     argslist = [
         # default with a list of files
-        "--verbose ts --output tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        f"--verbose ts --output {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
         " -s 2018-09-26 -e 2018-11-07 -p 20 -ws 512"
     ]
     timeseries_filenames = [
@@ -347,45 +381,49 @@ def test_timeseries_command_line_errors(caplog):
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing2.lst"
+    generate_lst_file(["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif",
+                       "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"],
+                      lst_file_path)
+
     period = " -s 2018-09-26 -e 2018-11-07 -p 20"
     # list of commands to test
     argslist = [
         # output dir does not exist
-        "-v ts -o ./toto tests/tests_data/listing2.lst" + period,
+        f"-v ts -o ./toto {lst_file_path}" + period,
         # missing one file for timeseries
-        "-v ts -o tests/tests_out tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif" + period,
+        f"-v ts -o {RastertoolsTestsData.tests_output_data_dir} {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif" + period,
         # unknown raster type
-        "-v ts -o tests/tests_out -a"
-        " tests/tests_data/DSM_PHR_Dunkerque.tif"
-        " tests/tests_data/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip" + period,
+        f"-v ts -o {RastertoolsTestsData.tests_output_data_dir} -a"
+        f" {RastertoolsTestsData.tests_input_data_dir}/DSM_PHR_Dunkerque.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip" + period,
         # different types for input files
-        "-v ts -o tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
-        " tests/tests_data/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip" + period,
+        f"-v ts -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
+        f" {RastertoolsTestsData.tests_input_data_dir}/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.zip" + period,
         # invalid date format
-        "-v ts --o tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        f"-v ts -o {RastertoolsTestsData.tests_output_data_dir} {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
         " -s 20180926 -e 2018-11-07 -p 20",
         # invalid date format
-        "-v ts --o tests/tests_out"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        f"-v ts -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
         " -s 2018-09-26 -e 20181107 -p 20"
     ]
     # expected logs
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Can not compute a timeseries with 1 input image. Provide at least 2 images.")],
-        [("eolab.rastertools.main", logging.ERROR,
-          "Unknown rastertype for input file tests/tests_data/DSM_PHR_Dunkerque.tif")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
+          f"Unknown rastertype for input file {RastertoolsTestsData.tests_input_data_dir}/DSM_PHR_Dunkerque.tif")],
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Timeseries can only be computed with images of the same type")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid format for start date: 20180926 (must be %Y-%m-%d)")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid format for end date: 20181107 (must be %Y-%m-%d)")]
     ]
     sysexitlist = [2, 1, 1, 1, 2, 2]
@@ -397,23 +435,29 @@ def test_timeseries_command_line_errors(caplog):
     # execute test cases with logging level set to INFO
     for test in tests:
         test.run_test(caplog, check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_zonalstats_command_line_default():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing2.lst"
+    generate_lst_file(["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif",
+                       "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"],
+                      lst_file_path)
+
     # list of commands to test
     argslist = [
         # specify stats to compute and sigma, 1st band computed
-        "-v zs -o tests/tests_out -f GeoJSON"
-        " -g tests/tests_data/COMMUNE_32xxx.geojson --stats min max --sigma 1.0"
-        " tests/tests_data/listing2.lst",
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON"
+        f" -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson --stats min --stats max --sigma 1.0"
+        f" {lst_file_path}",
         # default stats, all bands computed
-        "-v zs -o tests/tests_out -f GeoJSON"
-        " --all -g tests/tests_data/COMMUNE_32xxx.geojson"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
-        " tests/tests_data/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON"
+        f" --all -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"
     ]
     files = ["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi",
              "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi"]
@@ -426,7 +470,7 @@ def test_zonalstats_command_line_default():
     # execute test cases
     for test in tests:
         test.run_test()
-
+    os.remove(lst_file_path)
 
 def test_zonalstats_command_line_product():
     utils4test.create_outdir()
@@ -434,9 +478,9 @@ def test_zonalstats_command_line_product():
     # list of commands to test
     argslist = [
         # input file is a S2A product
-        "-v zs -o tests/tests_out -f GeoJSON"
-        " --all -g tests/tests_data/COMMUNE_32xxx.geojson"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON"
+        f" --all -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
     ]
     files = ["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D"]
 
@@ -454,8 +498,8 @@ def test_zonalstats_command_line_categorical():
     # list of commands to test
     argslist = [
         # input file is a S2A product
-        "-v zs -o tests/tests_out -f GeoJSON --categorical"
-        " tests/tests_data/OCS_2017_CESBIO_extract.tif"
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON --categorical"
+        f" {RastertoolsTestsData.tests_input_data_dir}/OCS_2017_CESBIO_extract.tif"
     ]
     files = ["OCS_2017_CESBIO_extract"]
 
@@ -471,40 +515,45 @@ def test_zonalstats_command_line_errors():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing2.lst"
+    generate_lst_file(["SENTINEL2A_20180928-105515-685_L2A_T30TYP_D-ndvi.tif",
+                       "SENTINEL2B_20181023-105107-455_L2A_T30TYP_D-ndvi.tif"],
+                      lst_file_path)
+
     # list of commands to test
     argslist = [
         # output dir does not exist
-        "-v zs tests/tests_data/listing2.lst -o ./toto -f GeoJSON"
-        " -g tests/tests_data/COMMUNE_32xxx.geojson --stats mean"
+        f"-v zs {lst_file_path} -o ./toto -f GeoJSON"
+        f" -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson --stats mean"
         " -b 0",
         # band 0 does not exist
-        "-v zs tests/tests_data/listing2.lst -o tests/tests_out -f GeoJSON"
-        " -g tests/tests_data/COMMUNE_32xxx.geojson --stats mean"
+        f"-v zs {lst_file_path} -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON"
+        f" -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson --stats mean"
         " -b 0",
         # invalid format
-        "-v zs -o tests/tests_out -f Truc tests/tests_data/listing2.lst",
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f Truc {lst_file_path}",
         # invalid geometry index name
-        "-v zs -o tests/tests_out -f GeoJSON --stats mean"
-        " -g tests/tests_data/COMMUNE_32xxx.geojson -gi truc"
-        " -c tests/tests_out/chart.png"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON --stats mean"
+        f" -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson -gi truc"
+        f" -c {RastertoolsTestsData.tests_output_data_dir}/chart.png"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip",
         # invalid prefix length
-        "-v zs -o tests/tests_out -f GeoJSON --prefix band1"
-        " --all -g tests/tests_data/COMMUNE_32xxx.geojson"
-        " tests/tests_data/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
+        f"-v zs -o {RastertoolsTestsData.tests_output_data_dir} -f GeoJSON --prefix band1"
+        f" --all -g {RastertoolsTestsData.tests_input_data_dir}/COMMUNE_32xxx.geojson"
+        f" {RastertoolsTestsData.tests_input_data_dir}/SENTINEL2A_20180928-105515-685_L2A_T30TYP_D.zip"
     ]
 
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Output directory \"./toto\" does not exist.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Invalid bands, all values are not in range [1, 1]")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Unrecognized output format Truc. Possible values are ")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Index 'truc' is not present in the geometries."
           " Please provide a valid value for -gi option.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.main", logging.ERROR,
           "Number of prefix does not equal the number of bands.")],
     ]
 
@@ -517,24 +566,29 @@ def test_zonalstats_command_line_errors():
     # execute test cases
     for test in tests:
         test.run_test(check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_tiling_command_line_default():
     # create output dir and clear its content if any
     utils4test.create_outdir()
 
+    lst_file_path = f"{RastertoolsTestsData.tests_input_data_dir}/listing3.lst"
+    generate_lst_file(["tif_file.tif"],
+                      lst_file_path)
+
     # list of commands to test
     argslist = [
         # default case with listing of input files
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson tests/tests_data/listing3.lst",
+        f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson {lst_file_path}",
         # default case with input file
-        "--verbose ti -o tests/tests_out -g tests/tests_data/grid.geojson"
-        " tests/tests_data/tif_file.tif",
+        f"--verbose ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif",
         # specify specific ids
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 77 93 --id_col id"
-        " tests/tests_data/tif_file.tif"
+        f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson --id 77 --id 93 --id_col id"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif"
     ]
-    input_filenames = ["tests/tests_data/tif_file.tif"]
+    input_filenames = [f"{RastertoolsTestsData.tests_input_data_dir}/tif_file.tif"]
 
     # generate test cases
     tests = [TestCase(args).ti_output(input_filenames, [77, 93]) for args in argslist]
@@ -545,19 +599,20 @@ def test_tiling_command_line_default():
 
     # Additional tests to check naming and subdir options
     # specify naming convention
-    args = ("-v ti -o tests/tests_out -g tests/tests_data/grid.geojson -n tile{}"
-            " --id_col id tests/tests_data/tif_file.tif")
+    args = (f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson -n tile{{}}"
+            f" --id_col id {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif")
     test = TestCase(args).ti_output(input_filenames, [77, 93], name="tile{}")
     test.run_test(check_outputs=False)
 
     # specify subdir naming convetion
-    args = ("-v ti -o tests/tests_out -g tests/tests_data/grid.geojson -d tile{}"
-            " --id_col id tests/tests_data/tif_file.tif")
+    args = (f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson -d tile{{}}"
+            f" --id_col id {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif")
     test = TestCase(args).ti_output(input_filenames, [77, 93], subdir="tile{}")
     # create one subdir to check if it is not re-created
-    subdir = Path("tests/tests_out/tile77")
+    subdir = Path(f"{RastertoolsTestsData.tests_output_data_dir}/tile77")
     subdir.mkdir()
     test.run_test(check_outputs=False)
+    os.remove(lst_file_path)
 
 
 def test_tiling_command_line_special_case(caplog):
@@ -567,18 +622,18 @@ def test_tiling_command_line_special_case(caplog):
     # list of commands to test
     argslist = [
         # some invalid ids
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 1 2 93 --id_col id"
-        " tests/tests_data/tif_file.tif",
+        f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson --id 1 --id 2 --id 93 --id_col id"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif",
         # a geometry does not overlap raster
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 78 93 --id_col id"
-        " tests/tests_data/tif_file.tif"
+        f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson --id 78 --id 93 --id_col id"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif"
     ]
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "The grid column \"id\" does not contain the following values: [1, 2]")],
-        [("eolab.rastertools.tiling", logging.ERROR,
+        [("eolab.georastertools.tiling", logging.ERROR,
           "Input shape 78 does not overlap raster")]
     ]
 
@@ -597,28 +652,27 @@ def test_tiling_command_line_errors(caplog):
     # list of commands to test
     argslist = [
         # ids without id_col
-        "-v ti --id 77 93 -o tests/tests_out -g tests/tests_data/grid.geojson"
-        " tests/tests_data/tif_file.tif",
+        f"-v ti --id 77 93 -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif",
         # invalid id column
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 77 93 --id_col truc"
-        " tests/tests_data/tif_file.tif",
+        f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson --id 77 --id 93 --id_col truc"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif",
         # output dir does not exist
-        "-v ti -o tests/truc -g tests/tests_data/grid.geojson"
-        " tests/tests_data/tif_file.tif",
+        f"-v ti -o tests/truc -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif",
         # all invalid ids
-        "-v ti -o tests/tests_out -g tests/tests_data/grid.geojson --id 1 2 --id_col id"
-        " tests/tests_data/tif_file.tif"
+        f"-v ti -o {RastertoolsTestsData.tests_output_data_dir} -g {RastertoolsTestsData.tests_input_data_dir}/grid.geojson --id 1 --id 2 --id_col id"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif"
     ]
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Ids cannot be specified when id_col is not defined")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Invalid id column named \"truc\": it does not exist in the grid")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "No value in the grid column \"id\" are matching the given list of ids [1, 2]")]
     ]
     sysexitlist = [2, 2, 2, 2]
@@ -639,17 +693,17 @@ def test_filtering_command_line_default():
     # list of commands to test
     argslist = [
         # default case: median
-        "-v --max_workers 1 fi median -a --kernel_size 8 -o tests/tests_out"
-        " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
+        f"-v --max_workers 1 fi median -a --kernel_size 8 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
         # default case: local sum
-        "-v fi sum -b 1 2 --kernel_size 8 -o tests/tests_out"
-        " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
+        f"-v fi sum -b 1 -b 2 --kernel_size 8 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
         # default case: local mean
-        "-v fi mean -b 1 --kernel_size 8 -o tests/tests_out"
-        " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
+        f"-v fi mean -b 1 --kernel_size 8 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
         # default case: adaptive gaussian
-        "-v fi adaptive_gaussian -b 1 --kernel_size 32 --sigma 1 -o tests/tests_out"
-        " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
+        f"-v fi adaptive_gaussian -b 1 --kernel_size 32 --sigma 1 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
     ]
     input_filenames = ["RGB_TIF_20170105_013442_test-{}.tif"]
     names = ["median", "sum", "mean", "adaptive_gaussian"]
@@ -670,22 +724,22 @@ def test_filtering_command_line_errors(caplog):
     # list of commands to test
     argslist = [
         # output dir does not exist
-        "-v fi median --kernel_size 8 -o tests/truc"
-        " tests/tests_data/tif_file.tif",
+        "-v filter median --kernel_size 8 -o tests/truc"
+        f" {RastertoolsTestsData.tests_input_data_dir}/tif_file.tif",
         # missing required argument
-        "-v fi adaptive_gaussian --kernel_size 32 -o tests/tests_out"
-        " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
-        # kernel_size > window_size
-        "-v fi median -a --kernel_size 15 --window_size 16 -o tests/tests_out"
-        " tests/tests_data/RGB_TIF_20170105_013442_test.tif",
+        f"-v filter adaptive_gaussian --kernel_size 32 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
+        # # kernel_size > window_size
+        f"-v filter median -a --kernel_size 15 --window_size 16 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/RGB_TIF_20170105_013442_test.tif",
     ]
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "The kernel size (option --kernel_size, value=15) must be strictly less than the "
           "window size minus 1 (option --window_size, value=16)")]
     ]
@@ -707,11 +761,11 @@ def test_svf_command_line_default():
     # list of commands to test
     argslist = [
         # default case: svf at the point height
-        "-v svf --radius 50 --directions 16 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v svf --radius 50 --directions 16 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # default case: svf on ground
-        "-v svf --radius 50 --directions 16 --resolution 0.5 --altitude 0 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v svf --radius 50 --directions 16 --resolution 0.5 --altitude 0 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
     ]
     output_filenames = ["toulouse-mnh-svf.tif"]
 
@@ -732,21 +786,21 @@ def test_svf_command_line_errors(caplog):
     argslist = [
         # output dir does not exist
         "-v svf --radius 50 --directions 16 --resolution 0.5 -o tests/truc"
-        " tests/tests_data/toulouse-mnh.tif",
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # missing required argument
-        "-v svf --directions 16 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v svf --directions 16 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # radius > window_size / 2
         "-v svf --radius 100 --window_size 128 --directions 16 --resolution 0.5"
-        " --altitude 0 -o tests/tests_out tests/tests_data/toulouse-mnh.tif",
+        f" --altitude 0 -o {RastertoolsTestsData.tests_output_data_dir} {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
     ]
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "The radius (option --radius, value=100) must be strictly less than half the"
           " size of the window (option --window_size, value=128)")]
     ]
@@ -769,17 +823,17 @@ def test_hillshade_command_line_default():
     # elevation / azimuth are retrieved from https://www.sunearthtools.com/dp/tools/pos_sun.php
     argslist = [
         # default case: hillshade at Toulouse the September, 21 solar noon
-        "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # default case: hillshade at Toulouse the June, 21, solar 6PM
-        "-v hs --elevation 25.82 --azimuth 278.58 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v hs --elevation 25.82 --azimuth 278.58 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # default case: hillshade at Toulouse the June, 21, solar noon
-        "-v hs --elevation 69.83 --azimuth 180 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v hs --elevation 69.83 --azimuth 180 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # default case: hillshade at Toulouse the June, 21, solar 8AM
-        "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f"-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
     ]
     output_filenames = ["toulouse-mnh-hillshade.tif"]
 
@@ -800,27 +854,27 @@ def test_hillshade_command_line_errors(caplog):
     argslist = [
         # output dir does not exist
         "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/truc"
-        " tests/tests_data/toulouse-mnh.tif",
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # missing required argument
-        "-v hs --elevation 46.81 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        "-v hs --elevation 46.81 --resolution 0.5 "
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
         # input file has more than 1 band
-        "-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o tests/tests_out"
-        " tests/tests_data/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.vrt",
+        f"-v hs --elevation 46.81 --azimuth 180.0 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/S2A_MSIL2A_20190116T105401_N0211_R051_T30TYP_20190116T120806.vrt",
         # radius > window_size / 2
         "-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5"
-        " --radius 100 --window_size 128 -o tests/tests_out"
-        " tests/tests_data/toulouse-mnh.tif",
+        f" --radius 100 --window_size 128 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
     ]
 
     # expected logs
     logslist = [
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.georastertools", logging.ERROR,
           "Output directory \"tests/truc\" does not exist.")],
         [],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "Invalid input file, it must contain a single band.")],
-        [("eolab.rastertools.main", logging.ERROR,
+        [("eolab.georastertools.cli.utils_cli", logging.ERROR,
           "The radius (option --radius, value=100) must be strictly less than half"
           " the size of the window (option --window_size, value=128)")]
     ]
