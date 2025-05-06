@@ -17,31 +17,18 @@ Description-Content-Type: text/x-rst; charset=UTF-8
 License-File: LICENSE.txt
 License-File: AUTHORS.rst
 Requires-Dist: click
-<<<<<<< HEAD
-Requires-Dist: rasterio==1.3.0
-=======
->>>>>>> rasterio_plugin_vsimem
+Requires-Dist: rasterio
 Requires-Dist: pytest>=3.6
+Requires-Dist: rioxarray
+Requires-Dist: dask
 Requires-Dist: pytest-cov
 Requires-Dist: geopandas==0.13
-Requires-Dist: python-dateutil==2.9.0
 Requires-Dist: kiwisolver==1.4.5
-Requires-Dist: fonttools==4.53.1
 Requires-Dist: matplotlib==3.7.3
 Requires-Dist: packaging==24.1
-Requires-Dist: Shapely==1.8.5.post1
-Requires-Dist: tomli==2.0.2
-Requires-Dist: Rtree==1.3.0
 Requires-Dist: fiona==1.8.21
-Requires-Dist: Pillow==9.2.0
 Requires-Dist: sphinx_rtd_theme==3.0.1
 Requires-Dist: pip==24.2
-<<<<<<< HEAD
-Requires-Dist: dask
-Requires-Dist: xarray==2022.11.0
-=======
->>>>>>> rasterio_plugin_vsimem
-Requires-Dist: pyproj==3.4.0
 Requires-Dist: sphinx==7.1.2
 Requires-Dist: scipy==1.8
 Requires-Dist: pyscaffold

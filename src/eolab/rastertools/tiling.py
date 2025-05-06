@@ -158,7 +158,7 @@ class Tiling(Rastertool):
             [str]: The list of generates tiles.
         """
         _logger.info(f"Processing file {inputfile}")
-        inputfile = '/home/ecadaux/pluto/rastertools/rastertools/tests/tests_data/tif_file.tif'
+
         # STEP 1: Prepare the input image so that it can be processed
         with RasterProduct(inputfile, vrt_outputdir=self.vrt_dir) as product:
 

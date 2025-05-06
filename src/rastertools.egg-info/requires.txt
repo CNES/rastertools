@@ -1,29 +1,16 @@
 click
-<<<<<<< HEAD
-rasterio==1.3.0
-=======
->>>>>>> rasterio_plugin_vsimem
+rasterio
 pytest>=3.6
+rioxarray
+dask
 pytest-cov
 geopandas==0.13
-python-dateutil==2.9.0
 kiwisolver==1.4.5
-fonttools==4.53.1
 matplotlib==3.7.3
 packaging==24.1
-Shapely==1.8.5.post1
-tomli==2.0.2
-Rtree==1.3.0
 fiona==1.8.21
-Pillow==9.2.0
 sphinx_rtd_theme==3.0.1
 pip==24.2
-<<<<<<< HEAD
-dask
-xarray==2022.11.0
-=======
->>>>>>> rasterio_plugin_vsimem
-pyproj==3.4.0
 sphinx==7.1.2
 scipy==1.8
 pyscaffold
