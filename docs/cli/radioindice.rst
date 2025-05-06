@@ -7,15 +7,8 @@ radioindice
 
 .. code-block:: console
 
-  $ georastertools radioindice --help
-  usage: georastertools radioindice [-h] [-o OUTPUT] [-m] [-r ROI]
-                                 [-i INDICES [INDICES ...]] [--ndvi] [--tndvi]
-                                 [--rvi] [--pvi] [--savi] [--tsavi] [--msavi]
-                                 [--msavi2] [--ipvi] [--evi] [--ndwi] [--ndwi2]
-                                 [--mndwi] [--ndpi] [--ndti] [--ndbi] [--ri]
-                                 [--bi] [--bi2] [-nd band1 band2]
-                                 [-ws WINDOW_SIZE]
-                                 inputs [inputs ...]
+  $ rio georastertools radioindice --help
+  Usage: rio georastertools radioindice [OPTIONS] INPUTS...
 
   Compute the requested radio indices on raster data.
 
@@ -94,7 +87,7 @@ a black line.
 
 .. code-block:: console
 
-  $ georastertools radioindice -r "./COMMUNE_32001.shp" --ndvi ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
+  $ rio georastertools radioindice -r "./COMMUNE_32001.shp" --ndvi ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
 
 The generated NDVI image is:
 
@@ -104,7 +97,7 @@ The second command computes two indices (NDVI and NDWI) of the same input image.
 
 .. code-block:: console
   
-  $ georastertools radioindice -i ndvi ndwi -m ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
+  $ rio georastertools radioindice -i ndvi ndwi -m ./SENTINEL2A_20180521-105702-711_L2A_T30TYP_D.zip
 
 The generated image has two bands (because option -m is activated): first one is the ndvi, second one is the ndwi. If -m option
 is not activated, two images would be generated, one image per indice.
