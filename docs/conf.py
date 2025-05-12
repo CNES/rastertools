@@ -23,7 +23,9 @@ __location__ = os.path.join(
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.join(__location__, "../src"))
+
+sys.path.insert(0, os.path.join(__location__, "../src/eolab"))
+# sys.path.insert(0, os.path.abspath('../../rastertools/src/eolab'))
 
 # -- Run sphinx-apidoc -------------------------------------------------------
 # This hack is necessary since RTD does not issue `sphinx-apidoc` before running
@@ -39,7 +41,12 @@ except ImportError:
     from sphinx import apidoc
 
 output_dir = os.path.join(__location__, "api")
-module_dir = os.path.join(__location__, "../src/eolab")
+module_dir = os.path.join(__location__, "../src/eolab/georastertools")
+
+print("=== PYTHON sys.path during Sphinx build ===")
+for p in sys.path:
+    print(p)
+print("=== END sys.path ===")
 
 try:
     shutil.rmtree(output_dir)
@@ -49,7 +56,7 @@ except FileNotFoundError:
 try:
     import sphinx
 
-    cmd_line = f"sphinx-apidoc --implicit-namespaces -f -o {output_dir} {module_dir}"
+    cmd_line = f"sphinx-apidoc -f -o {output_dir} {module_dir}"
 
     args = cmd_line.split(" ")
     if tuple(sphinx.__version__.split(".")) >= ("1", "7"):
