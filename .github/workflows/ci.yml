@@ -50,4 +50,4 @@ jobs:
       shell: bash -l {0}
       run: |
         conda activate test_env
-        pytest --cov-fail-under=65 --compare
+        pytest --cov-fail-under=65 --compare --durations=0
