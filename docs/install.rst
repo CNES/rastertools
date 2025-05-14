@@ -22,7 +22,7 @@ Secondly, run commands:
 
 .. code-block:: console
 
-  $ conda install python=3.8.13 libgdal=3.5.2
+  $ conda install python=3.10 libgdal=3.5.2
   $ pip install georastertools --no-binary rasterio
 
 ``georastertools`` will be installed in the conda environment. Then, the CLI ``georastertools`` can be used and the API :obj:`eolab.georastertools`
