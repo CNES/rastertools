@@ -8,16 +8,6 @@ First, create a conda environment via:
   $ conda create -n georastertools
   $ conda activate georastertools
 
-The following libraries will be installed in the conda environment named ``georastertools`` :
-
-- pyscaffold
-- geopandas
-- scipy
-- gdal
-- rasterio
-- matplotlib
-- tqdm
-
 Secondly, run commands:
 
 .. code-block:: console
