@@ -128,10 +128,3 @@ median = create_filter("median")
 mean = create_filter("mean")
 sum = create_filter("sum")
 adaptive_gaussian = create_filter("adaptive_gaussian")
-
-
-
-
-
-
-

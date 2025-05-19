@@ -57,7 +57,7 @@ class SVF(Rastertool, Windowable):
     too many points, the "radius" parameter defines the max distance of the pixel to test.
 
     The output image of SVF rastertool is a raster image with the SVF value computed at every pixels
-    of the input Digital Height Model.
+    of the input Digital Elevation Model.
     """
 
     def __init__(self, nb_directions: int, radius: int, resolution: float):
@@ -70,7 +70,7 @@ class SVF(Rastertool, Windowable):
                 Max distance from current point (in pixels) to consider
                 for evaluating the max elevation angle
             resolution (float):
-                Resolution of the input Digital Height Model (in meter)
+                Resolution of the input Digital Elevation Model (in meter)
         """
         super().__init__()
         self.with_windows()
@@ -93,7 +93,7 @@ class SVF(Rastertool, Windowable):
 
     @property
     def resolution(self):
-        """Resolution of the input Digital Height Model (in meter)"""
+        """Resolution of the input Digital Elevation Model (in meter)"""
         return self._resolution
 
     @property

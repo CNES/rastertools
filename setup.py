@@ -7,7 +7,7 @@ if __name__ == "__main__":
             long_description = fh.read()
 
         setup(name='georastertools',
-              version="0.1.0",
+              version="0.7.0",
               description="Collection of tools for raster data",
               long_description=long_description,
               long_description_content_type="text/x-rst",
@@ -21,7 +21,7 @@ if __name__ == "__main__":
               zip_safe=False,
               setup_requires = ["setuptools_scm"],
               install_requires=[
-                  'click',
+                  'click==8.1.8',
                   'rasterio',
                   'pytest>=3.6',
                   'pytest-cov',
@@ -42,7 +42,7 @@ if __name__ == "__main__":
                 [rasterio.rio_plugins]
                 georastertools=eolab.georastertools.main:georastertools
                 """,
-              python_requires='==3.8.13',
+              python_requires='>=3.8.13',
               use_scm_version={"version_scheme": "no-guess-dev"})
     except:  # noqa
         print(

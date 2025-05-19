@@ -9,16 +9,7 @@ API Reference
 georastertools
 -----------
 
-georastertools can be activated by calling the API :obj:`eolab.georastertools.run_tool`.
-
-.. autofunction:: run_tool
-
-Example of use in python code::
-
-    from eolab.georastertools import run_tool
-    run_tool(args="radioindice --help".split())
-
-Alternatively, every raster tools can be activated with their own API:
+Every raster tools can be activated with their own API:
 
 .. autosummary::
   :toctree: api/
