@@ -11,8 +11,8 @@ The CLI **georastertools** enable to activate several subcommands, one per raste
 
 .. code-block:: console
 
-  $ georastertools --help
-  usage: georastertools [-h] [-t RASTERTYPE] [--version] [--max_workers MAX_WORKERS] [--debug] [-v] [-vv]
+  $ rio georastertools --help
+  usage: rio georastertools [-h] [-t RASTERTYPE] [--version] [--max_workers MAX_WORKERS] [--debug] [-v] [-vv]
                      {filter,fi,hillshade,hs,radioindice,ri,speed,sp,svf,tiling,ti,timeseries,ts,zonalstats,zs} ...
 
   Collection of tools on raster data
@@ -67,7 +67,7 @@ of the progress bar:
 .. code-block:: console
 
   $ export RASTERTOOLS_NOTQDM=1
-  $ georastertools -v ri [...]
+  $ rio georastertools -v ri [...]
 
 Most of the **georastertools** are designed to split down rasters into small chunks of data so that
 the processing can be run in parallel using several processors. The command line of the tools
@@ -82,7 +82,7 @@ Alternatively, you can set an environment variable like this and keep the argume
 .. code-block:: console
 
   $ export RASTERTOOLS_MAXWORKERS=12
-  $ georastertools -v hillshade [...] # it will use 12 processors
+  $ rio georastertools -v hillshade [...] # it will use 12 processors
 
 
 Docker/Singularity
