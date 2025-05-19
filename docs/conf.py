@@ -44,6 +44,7 @@ except ImportError:
 output_dir = os.path.join(__location__, "api")
 module_dir = os.path.join(__location__, "../src/eolab/georastertools")
 
+
 try:
     shutil.rmtree(output_dir)
 except FileNotFoundError:
