@@ -1,0 +1,8 @@
+name: my_project_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - libgdal=3.5.2
+  - pip
