@@ -23,6 +23,7 @@ if not os.environ.get('READTHEDOCS', False):
     # import the method to run a rastertool
     from eolab.georastertools.main import georastertools, add_custom_rastertypes
 
+
 __all__ = [
     "RastertoolConfigurationException", "Rastertool", "Windowable",
     "Filtering", "Hillshade", "Radioindice", "Speed", "SVF", "Tiling",
