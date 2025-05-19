@@ -41,6 +41,18 @@ try:  # for Sphinx >= 1.7
 except ImportError:
     from sphinx import apidoc
 
+autodoc_mock_imports = [
+    "eolab.georastertools.filtering",
+    "eolab.georastertools.hillshade",
+    "eolab.georastertools.radioindice",
+    "eolab.georastertools.speed",
+    "eolab.georastertools.svf",
+    "eolab.georastertools.tiling",
+    "eolab.georastertools.timeseries",
+    "eolab.georastertools.zonalstats",
+    "eolab.georastertools.main"
+    ]
+
 output_dir = os.path.join(__location__, "api")
 module_dir = os.path.join(__location__, "../src/eolab/georastertools")
 
