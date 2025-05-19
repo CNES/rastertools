@@ -24,8 +24,9 @@ __location__ = os.path.join(
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
+sys.path.insert(0, os.path.join(__location__, "../src"))
 sys.path.insert(0, os.path.join(__location__, "../src/eolab"))
-# sys.path.insert(0, os.path.abspath('../../rastertools/src/eolab'))
+sys.path.insert(0, os.path.join(__location__, "../src/eolab/georastertools"))
 
 # -- Run sphinx-apidoc -------------------------------------------------------
 # This hack is necessary since RTD does not issue `sphinx-apidoc` before running
@@ -40,13 +41,21 @@ try:  # for Sphinx >= 1.7
 except ImportError:
     from sphinx import apidoc
 
+autodoc_mock_imports = [
+    "eolab.georastertools.filtering",
+    "eolab.georastertools.hillshade",
+    "eolab.georastertools.radioindice",
+    "eolab.georastertools.speed",
+    "eolab.georastertools.svf",
+    "eolab.georastertools.tiling",
+    "eolab.georastertools.timeseries",
+    "eolab.georastertools.zonalstats",
+    "eolab.georastertools.main"
+    ]
+
 output_dir = os.path.join(__location__, "api")
 module_dir = os.path.join(__location__, "../src/eolab/georastertools")
 
-print("=== PYTHON sys.path during Sphinx build ===")
-for p in sys.path:
-    print(p)
-print("=== END sys.path ===")
 
 try:
     shutil.rmtree(output_dir)
