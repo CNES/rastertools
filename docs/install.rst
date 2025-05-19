@@ -8,6 +8,7 @@ First, create a conda environment via:
   $ conda create -n georastertools
   $ conda activate georastertools
 
+
 Secondly, run commands:
 
 .. code-block:: console

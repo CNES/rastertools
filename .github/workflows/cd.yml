@@ -16,7 +16,6 @@ jobs:
       name: pypi
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup Python 3.10
         uses: actions/setup-python@v3
         with:
