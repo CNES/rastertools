@@ -21,7 +21,7 @@ if __name__ == "__main__":
               zip_safe=False,
               setup_requires = ["setuptools_scm"],
               install_requires=[
-                  'click',
+                  'click==8.1.8',
                   'rasterio',
                   'pytest>=3.6',
                   'pytest-cov',
