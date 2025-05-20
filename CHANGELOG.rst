@@ -14,3 +14,9 @@ Hillshade
 ~~~~~~~~~~
 - lzw compression for outputs
 - Better handling of errors regarding radius computation
+
+Version 0.7.0
+-------------
+
+- Rasterio plugin
+- Continuous Integration
