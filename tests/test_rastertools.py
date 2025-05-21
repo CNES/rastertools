@@ -778,6 +778,30 @@ def test_svf_command_line_default():
         test.run_test(check_outputs=False)
 
 
+def test_svf_process_files(compare, save_gen_as_ref):
+    # create output dir and clear its content if any
+    utils4test.create_outdir()
+
+    # list of commands to test
+    argslist = [
+        # default case: svf at the point height
+        f"-v svf --radius 50 --directions 16 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
+    ]
+    output_filenames = ["toulouse-mnh-svf.tif"]
+
+    refdir = utils4test.get_refdir("test_svf/")
+
+    # generate test cases
+    tests = [TestCase(args).output(output_filenames)
+             for args in argslist]
+
+    # execute test cases
+    for test in tests:
+        test.with_refdir(refdir)
+        test.run_test(compare=compare, save_gen_as_ref=save_gen_as_ref)
+
+
 def test_svf_command_line_errors(caplog):
     # create output dir and clear its content if any
     utils4test.create_outdir()
