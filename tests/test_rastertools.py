@@ -118,7 +118,7 @@ class TestCase:
         if compare:
             match, mismatch, err = utils4test.cmpfiles(RastertoolsTestsData.tests_output_data_dir + "/", self._refdir, self._outputs)
 
-            assert len(match) == 3
+            assert len(match) == len([x.name for x in Path(self._refdir).iterdir()])
             assert len(mismatch) == 0
             assert len(err) == 0
         elif save_gen_as_ref:
@@ -778,6 +778,30 @@ def test_svf_command_line_default():
         test.run_test(check_outputs=False)
 
 
+def test_svf_process_files(compare, save_gen_as_ref):
+    # create output dir and clear its content if any
+    utils4test.create_outdir()
+
+    # list of commands to test
+    argslist = [
+        # default case: svf at the point height
+        f"-v svf --radius 50 --directions 16 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif",
+    ]
+    output_filenames = ["toulouse-mnh-svf.tif"]
+
+    refdir = utils4test.get_refdir("test_svf/")
+
+    # generate test cases
+    tests = [TestCase(args).output(output_filenames)
+             for args in argslist]
+
+    # execute test cases
+    for test in tests:
+        test.with_refdir(refdir)
+        test.run_test(compare=compare, save_gen_as_ref=save_gen_as_ref)
+
+
 def test_svf_command_line_errors(caplog):
     # create output dir and clear its content if any
     utils4test.create_outdir()
@@ -844,6 +868,30 @@ def test_hillshade_command_line_default():
     # execute test cases
     for test in tests:
         test.run_test(check_outputs=False)
+
+def test_hillshade_process_files(compare, save_gen_as_ref):
+    # create output dir and clear its content if any
+    utils4test.create_outdir()
+
+    # list of commands to test
+    # elevation / azimuth are retrieved from https://www.sunearthtools.com/dp/tools/pos_sun.php
+    argslist = [
+        # default case: hillshade at Toulouse the September, 21 solar noon
+        f"-v hs --elevation 27.2 --azimuth 82.64 --resolution 0.5 -o {RastertoolsTestsData.tests_output_data_dir}"
+        f" {RastertoolsTestsData.tests_input_data_dir}/toulouse-mnh.tif"
+    ]
+    output_filenames = ["toulouse-mnh-hillshade.tif"]
+
+    refdir = utils4test.get_refdir("test_hillshade/")
+
+    # generate test cases
+    tests = [TestCase(args).output(output_filenames)
+             for args in argslist]
+
+    # execute test cases
+    for test in tests:
+        test.with_refdir(refdir)
+        test.run_test(compare=compare, save_gen_as_ref=save_gen_as_ref)
 
 
 def test_hillshade_command_line_errors(caplog):
