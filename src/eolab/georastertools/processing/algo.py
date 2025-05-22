@@ -776,8 +776,6 @@ def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float 
     if input_data.shape[0] != 1:
         raise ValueError("hillshade only accepts numpy arrays with first dim of size 1")
 
-    elev = np.radians(elevation)
-
     # initialize output
     shape = input_data.shape
     out = np.zeros(shape, dtype=bool)
@@ -799,6 +797,6 @@ def hillshade(input_data : np.ndarray, elevation : float = 0.0, azimuth : float 
         ratios = np.maximum(ratios, new_ratios)
 
     angles = np.arctan(ratios)
-    out[0, radius: shape[1] - radius, radius: shape[2] - radius] = angles > elev
+    out[0, radius: shape[1] - radius, radius: shape[2] - radius] = angles > np.radians(elevation)
 
     return out
